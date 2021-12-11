@@ -1,0 +1,31 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"A File Icon",
+		"AutoPEP8",
+		"Color Highlight",
+		"ColorPicker",
+		"DocBlockr 2021 (DoxyDoxygen powered)",
+		"Dockerfile Syntax Highlighting",
+		"Figlet Big ASCII Text",
+		"GithubEmoji",
+		"Gruvbox Material Theme",
+		"Indent XML",
+		"MarkdownPreview",
+		"Material Theme",
+		"Package Control",
+		"PackageResourceViewer",
+		"Python Data Science Snippets",
+		"python-black",
+		"SublimeCodeIntel",
+		"SublimeLinter",
+		"SublimeLinter-contrib-mypy",
+		"SublimeLinter-flake8",
+		"TodoReview",
+		"TOML",
+	],
+}

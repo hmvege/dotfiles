@@ -1,0 +1,35 @@
+{{ if (eq .chezmoi.os "darwin") -}}
+
+#!/bin/bash
+
+# Set to catch non-zero exit status errors, variable errors or pipeline
+# failures.
+set -euo pipefail
+
+sudo apt-get update
+
+packages=(
+    fasd
+    git
+    htop
+    jq
+    python3
+    python3-pip
+    tmux
+    wget
+    vim
+    zsh
+)
+
+
+## Brew
+if ! type -p brew >/dev/null 2>&1
+then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    echo "Installed Brew"
+fi
+
+
+echo "\n\n\n\n\n\n\n\n====== OSX SETUP NOT COMPLETED ======\n\n\n\n\n\n\n\n"
+
+{{ end -}}

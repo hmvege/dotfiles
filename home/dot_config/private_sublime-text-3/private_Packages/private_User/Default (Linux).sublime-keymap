@@ -1,0 +1,35 @@
+[
+    { "keys": ["ctrl+shift+9"], "command": "indent" },
+    { "keys": ["ctrl+shift+8"], "command": "unindent" },
+    { "keys": ["ctrl+shift+g"], "command": "find_all_under" },
+    // Unsets following commands in favor of indentation and commenting
+    { "keys": [], "command": "focus_group", "args": { "group": 6 } },
+    { "keys": [], "command": "focus_group", "args": { "group": 7 } },
+    { "keys": [], "command": "focus_group", "args": { "group": 8 } },
+    { "keys": [], "command": "move_to_group", "args": { "group": 7 } },
+    { "keys": [], "command": "move_to_group", "args": { "group": 8 } },
+    { "keys": [], "command": "move_to_group", "args": { "group": 9 } },
+    // For moving cursor
+    { "keys": ["ctrl+super+up"], "command": "select_lines", "args": {"forward": false} },
+    { "keys": ["ctrl+super+down"], "command": "select_lines", "args": {"forward": true} },
+    // For jumping between paragraphs
+    { "keys": ["alt+up"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": false}},
+    { "keys": ["alt+down"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": true}},
+    { "keys": ["shift+alt+up"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": false, "extend": true}},
+    { "keys": ["shift+alt+down"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": true, "extend": true}},
+    { "keys": [""], "command": "move_to_group", "args": { "group": 6 } },
+    { "keys": [""], "command": "move_to_group", "args": { "group": 7 } },
+    { "keys": [""], "command": "move_to_group", "args": { "group": 8 } },
+    
+    { "keys": ["ctrl+7"], "command": "toggle_comment", "args": { "block": false } },
+    { "keys": ["ctrl+shift+7"], "command": "toggle_comment", "args": { "block": true } },
+
+    // Build break
+    { "keys": ["ctrl+shift+c"], "command": "cancel_build" },
+    // Show build output
+    {"keys" : ["ctrl+shift+b"], "command" : "show_panel" , "args" : {"panel": "output.exec"}},
+
+    // Disables accidental page up / down split
+    { "keys": ["ctrl+shift+pagedown"], "command": "", "args": {"extend": false} },
+    { "keys": ["ctrl+shift+pageup"], "command": "", "args": {"extend": false} },
+]

@@ -1,0 +1,18 @@
+{{ if ne .chezmoi.os "darwin" }}
+echo "OSX setup is not implemented."
+exit 1
+Library/Application Support/App/file.conf
+{{ end }}
+{{ if ne .chezmoi.os "linux" }}
+.config/sublime-text-3/Packages
+.config/sublime-text-3/Packages/User
+.config/sublime-text-3/Packages/User/Doxy.sublime-settings
+.config/sublime-text-3/Packages/User/Material-Theme (Flake8Lint).tmTheme
+.config/sublime-text-3/Packages/User/Package Control.sublime-settings
+.config/sublime-text-3/Packages/User/python-cli.sublime-snippet
+.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap
+.config/sublime-text-3/Packages/User/DocblockrPython.sublime-settings
+.config/sublime-text-3/Packages/User/Preferences.sublime-settings
+.config/sublime-text-3/Packages/User/TodoReview.sublime-settings
+.config/sublime-text-3/Packages/User/SublimeLinter.sublime-settings
+{{ end }}

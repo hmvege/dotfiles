@@ -1,0 +1,34 @@
+# Various python data files
+*.pyc
+*.pyo
+*.pkl  # Pickle files
+*.eggs/
+*.ipynb_checkpoints
+*.npy
+*.pickle
+*.egg-info*
+*.pgw
+__pycache__*
+
+# Scratch folder for notes, prototyping, etc.
+scratch
+
+# Ignores virtual environment folder
+venv*
+
+# Dev related files
+*.bak
+*.swp
+
+# Log files
+*.log
+
+# OS generated files
+._*
+.cache
+.Spotlight-V100
+.Trashes
+.DS_Store
+desktop.ini
+ehthumbs.db
+Thumbs.db

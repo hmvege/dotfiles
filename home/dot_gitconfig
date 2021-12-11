@@ -1,0 +1,31 @@
+[user]
+	email = vege@stcorp.no
+	name = Mathias Vege
+
+[alias]
+    # checkout
+    co = checkout
+
+    # log
+    l = log --all --graph --decorate --oneline
+
+    # merge
+    m = merge
+
+    # rebase
+    r = rebase
+
+    # push
+    p = push
+
+    # diff
+    d = diff
+    dh = diff HEAD
+
+    # commit
+    cm = commit --message
+    cam = commit --all --message
+
+[core]
+	editor = vim
+    excludesfile = ~/.gitignore

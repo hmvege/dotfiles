@@ -5,10 +5,19 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 ## TODO
 <!-- :ballot_box_with_check:  -->
-:black_square_button: Verify that setup runs.
-:black_square_button: Add Sublime settings.
+:check: Choose a desired installation setup: should `install.sh` or `Makefile` be used, or is `chezmoi init --apply` enough?
+
+:ballot_box_with_check: Verify that setup runs.
+
+:ballot_box_with_check: Add Sublime settings.
+
+:ballot_box_with_check: Will use default color schemes for new installed, or manually install set up Material Theme.
+
 :black_square_button: Add MacOS installation script `run_once_core_osx.sh`
+
 :black_square_button: Split setup `.tmpl` scripts into separate scripts.
+
+:black_square_button: Update file structure in README.
 
 
 ## :dart: Goals
@@ -19,11 +28,14 @@ The goal for this dotfiles project repository, is following,
 * Have it be easily **maintained**. I.e. changes applied at one machine, will be easily transferable to another machine.
 
 ## :scroll: Installation
-Download, install Chezmoi, and initialize,
+Install Chezmoi and initialize by running,
 
 ```bash
-$ sh -c "$(curl -fsLS https://git.io/chezmoi)" -- init --apply <username>
+$ apt-get update && apt-get install -y curl sudo
+$ sh -c "$(curl -fsLS chezmoi.io/get)" -- -b "$HOME/dotfiles/bin" init --apply -S ~/dotfiles hmvege
 ```
+
+which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
 ### Updating dotfiles
 Pull latest changes from repository.
@@ -38,16 +50,26 @@ $ chezmoi -v apply
 ```
 `-v` displays what changes is being made. If `-n`, a dry run will be performed.
 
+
+### Add changes to Chezmoi dotfiles
+Apply the changes made to the dotfiles made through `chezmoi edit [$FILE]`
+```bash
+$ chezmoi add -S $(readlink -f ~/dotfiles/home) <dotfile-path>
+```
+`-v` displays what changes is being made. If `-n`, a dry run will be performed.
+
+
 ### Removing dotfiles
 In the case you wish to remove the dotfiles, run
 ```bash
 $ chezmoi purge
 ```
 
-##  Packages to be installed
+## :inbox_tray: Packages to be installed
 
  - [`fasd`](https://github.com/clvv/fasd)
  - [`fzf`](https://github.com/junegunn/fzf#using-git)
+ - [`lsd`](https://github.com/Peltoche/lsd)
  - [`tmux`](https://github.com/tmux/tmux)
  - [`tmux-plugins`](https://github.com/tmux-plugins/tpm)
  - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug)
@@ -71,28 +93,44 @@ Following plugins are used:
 Currently, Sublime Text 4 is my preferred editor, with Vim supporting me on the side every now and then. [Package Control](https://packagecontrol.io/) is used for managing plugins.
 
 Plugins used:
- - DockBlockr 2021
+ - A File Icon
+ - Color Highlight
+ - ColorPicker
+ - DockBlockr 2021 (DoxyDoxygen powered)
  - Dockerfile Syntax Highlighting
  - Figlet Big ASCII Text
+ - GithubEmoji
+ - Gruvebox Material Theme
  - Indent XML
  - MarkdownPreview
  - Material Theme
  - PackageResourceViewer
+ - python-black
+ - SublimeCodeIntel
  - SublimeLinter
  - SublimeLinter-contrib-mypy
  - SublimeLinter-flake8
  - TodoReview
+ - TOML
 
+Note these packages may need to be downloaded manually.
 
 ## :open_file_folder: File structure
 ```
 dotfiles
-| README.md
-| install.sh
-│ Makefile
-└─── chezmoi                # All dotfiles will be stored here
-│   |   run_once_core.sh    # Install relevant packages
-|   |   ...                 # Dotfiles 
+├── README.md
+├── bin
+│  └── chezmoi
+└── home
+   ├── .chezmoiexternal.toml
+   ├── .chezmoiignore
+   ├── dot* (dotfiles)
+   ├── .chezmoiscripts
+   │  ├── run_once_after* (scripts that run after core installation)
+   │  ├── run_once_core_linux.sh.tmpl
+   │  └── run_once_core_osx.sh.tmpl
+   └── dot_config
+      └── dotfiles stored in ~/.config
 ```
 
 ## :books: Resources
@@ -109,3 +147,4 @@ dotfiles
 - https://github.com/mkasberg/dotfiles
 - https://github.com/goooseman/dotfiles
 - https://github.com/twpayne
+- Script for installing fonts: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0

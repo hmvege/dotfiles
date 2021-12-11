@@ -1,0 +1,32 @@
+// Settings in here override those in "${packages}/DocBlockr 2021 (DoxyDoxygen powered)/Doxy.sublime-settings",
+// and are overridden in turn by syntax-specific settings.
+{
+    "min_spaces_between_columns": [ 0,0 ],
+    "preferred_tabs_sizes": [ 0 ],
+    "indentation_max": 4,
+    "preferred_line_length": 80,
+    "block_layout": {
+        "Sphinx": [
+            "",
+            "@_brief",
+            "",
+            [
+                ":param",
+                // ":type"
+            ],
+            "",
+            ":returns:",
+            // ":rtype:",
+            "",
+            ":exception",
+            ""
+        ],
+    },
+    "profiles": [
+        {
+            "languages":  [ "python", "cython" ],
+            "parsers":    [ "LanguagePython" ],
+            "doc_styles": [ "Sphinx" ]// or "Doxygen", ApiDoc", "Sphinx" (you may consider Breathe's Doc)
+        },
+    ],
+}
