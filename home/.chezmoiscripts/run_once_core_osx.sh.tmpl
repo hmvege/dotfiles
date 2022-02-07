@@ -10,17 +10,45 @@ sudo apt-get update
 
 packages=(
     fasd
+    fzf
     git
     htop
     jq
+    libffi-dev
+    pipx
     python3
     python3-pip
     tmux
-    wget
+    unzip
     vim
+    wget
     zsh
 )
 
+## pyenv + pyenv-virtualenv
+## Snippet inspired and taken from
+# https://github.com/tordks/.dotfiles/blob/master/install_pyenv.sh
+# See https://github.com/pyenv/pyenv-virtualenv/issues/233
+if ! type -p pyenv >/dev/null 2>&1
+then
+    curl https://pyenv.run | bash
+    # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+    # in case the build fails.
+    sudo apt-get install libssl-dev
+    $HOME/.pyenv/bin/pyenv install 3.9.9
+    $HOME/.pyenv/bin/pyenv global 3.9.9
+    echo "Installed pyenv and pyenv-virtualenv"
+fi
+
+# START WITH BREW
+# THEN INSTALL DEPENDENCIES!
+# Install:
+# - pyenv pyenv-virtualenv
+# - zsh
+# - ohmyzsh
+# - vim
+# - vim pluginmanager
+# - lsd
 
 ## Brew
 if ! type -p brew >/dev/null 2>&1
