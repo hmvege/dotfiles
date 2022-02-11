@@ -2,18 +2,24 @@
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 #!/bin/bash
 
-echo "\n\n==== DOTFILES SETUP COMPLETE ===="
+echo ""
+echo ""
+echo "==== DOTFILES SETUP COMPLETE ===="
 echo "You may need to relog into your user($USER) for the dotfiles to effect."
 
-if [ $XDG_SESSION_DESKTOP == "ubuntu" ]
+if [[ $XDG_SESSION_DESKTOP == "ubuntu" ]]
 then
-    echo "\nThe use Sublime: be aware that some packages may need to be downloaded manually."
+    echo ""
+    echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
 
     echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
-    for p in ${cat ${HOME}/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | sed -n '/\[/,/\]/{/\[/b;/\]/b;p}' | tr -d '"' | tr -d ","}
+    for p in ${cat ${HOME}/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | sed -n '/\,/\]/{/\b;/\]/b;p}' | tr -d '"' | tr -d ","}
+    do
+        echo "    $p"
+    done
 fi
 
-if [ $SHELL != "/bin/zsh" ]
+if [[ $SHELL != "/bin/zsh" ]]
 then
     echo "NOTE: Current shell is $SHELL."
     echo "Make sure to change your shell:"
