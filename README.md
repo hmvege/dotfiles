@@ -5,8 +5,6 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 ## TODO
 <!-- :ballot_box_with_check:  -->
-:check: Choose a desired installation setup: should `install.sh` or `Makefile` be used, or is `chezmoi init --apply` enough?
-
 :ballot_box_with_check: Verify that setup runs.
 
 :ballot_box_with_check: Add Sublime settings.
@@ -15,9 +13,7 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 :black_square_button: Add MacOS installation script `run_once_core_osx.sh`
 
-:black_square_button: Split setup `.tmpl` scripts into separate scripts.
-
-:black_square_button: Update file structure in README.
+:black_square_button: Split core setup `.tmpl` scripts into separate scripts.
 
 
 ## :dart: Goals
