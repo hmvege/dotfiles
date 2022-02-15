@@ -11,6 +11,14 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 :ballot_box_with_check: Will use default color schemes for new installed, or manually install set up Material Theme.
 
+:black_square_button: Add tmux configurations
+
+:black_square_button: Fix final bugs in setup(message script does not work)
+
+:black_square_button: Add chsh to setup scripts
+
+:black_square_button: Update installation tools. Split into two copyable commands
+
 :black_square_button: Add MacOS installation script `run_once_core_osx.sh`
 
 :black_square_button: Split core setup `.tmpl` scripts into separate scripts.
