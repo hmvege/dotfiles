@@ -34,6 +34,8 @@ packages=(
 sudo apt install -y ${packages[@]}
 echo "Packages installed."
 
+sudo chsh -s $(which zsh)
+
 ## Bat
 mkdir -vp ~/.local/bin
 if [! -L ~/.local/bin/bat ]; then
