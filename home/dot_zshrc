@@ -119,12 +119,20 @@ alias tree="ls --tree"
 
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
+#export PATH="${PYENV_ROOT}/libexec:$PATH"  # Fix for missing command
 if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init -)"
 fi
 eval "$(pyenv virtualenv-init -)"
 eval "$(pyenv init --path)"
 
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/hmvege/.zprofile
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+#echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/hmvege/.zprofile
+#eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
+# Alias for creating venv: python create env
+alias pce="python3 -m venv venv"
+
+alias fzfp="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+
+# Created by `pipx` on 2022-02-16 12:29:05
+export PATH="$HOME/.local/bin:$PATH"
