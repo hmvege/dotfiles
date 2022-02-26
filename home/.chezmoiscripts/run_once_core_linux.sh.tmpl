@@ -15,6 +15,7 @@ packages=(
     htop
     jq
     libffi-dev
+    mc
     python3
     python3-pip
     tmux
@@ -74,6 +75,8 @@ if ! type -p pipx >/dev/null 2>&1
 then
     sudo /usr/bin/python3 -m pip install pipx
     echo "Installed pipx"
+    /usr/local/bin/pipx ensurepath
+    /usr/local/bin/pipx install flake8 mypy black pip-tools pre-commit
 fi
 
 ## pyenv + pyenv-virtualenv

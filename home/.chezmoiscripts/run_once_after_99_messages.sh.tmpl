@@ -13,7 +13,8 @@ then
     echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
 
     echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
-    for p in ${cat ${HOME}/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | sed -n '/\,/\]/{/\b;/\]/b;p}' | tr -d '"' | tr -d ","}
+
+    for p in ${awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d'}
     do
         echo "    $p"
     done
