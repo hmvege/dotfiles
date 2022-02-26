@@ -36,7 +36,7 @@
 			"path": ".",
 		}
 	],
-	"font_size": 10,
+	"font_size": 9,
 	"ignored_packages":
 	[
 		"Vintage",
@@ -81,7 +81,7 @@
 		"SublimeLinter.linters.flake8.disable": false,
 	},
 	"spell_check": true,
-	"theme": "Material-Theme.sublime-theme",
+	"theme": "Gruvbox Material Dark.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true,
 	"enable_autoreload": false,
