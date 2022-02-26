@@ -9,6 +9,7 @@ set -euo pipefail
 sudo apt-get update
 
 packages=(
+    bat
     fasd
     git
     htop
@@ -25,6 +26,10 @@ packages=(
 
 sudo apt install -y ${packages[@]}
 echo "Packages installed."
+
+## Bat
+mkdir -p ~/.local/bin
+ln -s /usr/bin/batcat ~/.local/bin/bat
 
 ## Oh-my-zsh
 if [ -d "${HOME}/.oh-my-zsh" ]; then
