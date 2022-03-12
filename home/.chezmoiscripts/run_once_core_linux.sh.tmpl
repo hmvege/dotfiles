@@ -76,7 +76,10 @@ then
     sudo /usr/bin/python3 -m pip install pipx
     echo "Installed pipx"
     /usr/local/bin/pipx ensurepath
-    /usr/local/bin/pipx install flake8 mypy black pip-tools pre-commit
+    for pkg in "flake8 mypy black pip-tools pre-commit"
+    do
+        /usr/local/bin/pipx install $pkg
+    done
 fi
 
 ## pyenv + pyenv-virtualenv
