@@ -13,11 +13,14 @@ then
     echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
 
     echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
-
-    for p in ${awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d'}
+    old_ifs="$IFS"
+    IFS="
+"
+    for p in $(awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d')
     do
         echo "    $p"
     done
+    IFS="$old_ifs"
 fi
 
 if [[ $SHELL != "/bin/zsh" ]]
