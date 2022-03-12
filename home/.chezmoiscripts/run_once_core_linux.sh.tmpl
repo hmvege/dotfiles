@@ -76,7 +76,14 @@ then
     sudo /usr/bin/python3 -m pip install pipx
     echo "Installed pipx"
     /usr/local/bin/pipx ensurepath
-    for pkg in "flake8 mypy black pip-tools pre-commit"
+    pipx_packages=(
+        flake8
+        mypy
+        black
+        pip-tools
+        pre-commit
+    )
+    for pkg in ${pipx_packages[@]}
     do
         /usr/local/bin/pipx install $pkg
     done
