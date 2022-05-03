@@ -20,8 +20,8 @@ packages=(
     libsqlite3-dev
     mc
     python3
-    python3-pip
     python3-venv
+    python3-pip
     tmux
     unzip
     vim
@@ -122,6 +122,20 @@ then
     # /home/linuxbrew/.linuxbrew/bin/brew install lsd
     echo "Installed lsd"
 fi
+
+## Gogh theme install setup
+# clone the repo into "$HOME/src/gogh"
+mkdir -p "$HOME/src"
+cd "$HOME/src"
+git clone https://github.com/Gogh-Co/Gogh.git gogh
+cd gogh/themes
+
+# necessary on ubuntu
+export TERMINAL=gnome-terminal
+
+# install themes
+./afterglow.sh
+cd "$HOME"
 
 {{ end -}}
 {{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}
