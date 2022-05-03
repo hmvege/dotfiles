@@ -26,6 +26,16 @@
 
     // Build break
     { "keys": ["ctrl+shift+c"], "command": "cancel_build" },
+
+    // Remapping to match tmux
+    { "keys": ["ctrl+k", "up"], "command": "new_pane" },
+    { "keys": ["ctrl+k", "shift+up"], "command": "new_pane", "args": {"move": false} },
+    { "keys": ["ctrl+k", "down"], "command": "close_pane" },
+    { "keys": ["ctrl+k", "left"], "command": "focus_neighboring_group", "args": {"forward": false} },
+    { "keys": ["ctrl+k", "right"], "command": "focus_neighboring_group" },
+    { "keys": ["ctrl+k", "shift+left"], "command": "move_to_neighboring_group", "args": {"forward": false} },
+    { "keys": ["ctrl+k", "shift+right"], "command": "move_to_neighboring_group" },
+
     // Show build output
     {"keys" : ["ctrl+shift+b"], "command" : "show_panel" , "args" : {"panel": "output.exec"}},
 
