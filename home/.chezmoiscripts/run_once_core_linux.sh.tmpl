@@ -34,8 +34,10 @@ sudo apt install -y ${packages[@]}
 echo "Packages installed."
 
 ## Bat
-mkdir -p ~/.local/bin
-ln -s /usr/bin/batcat ~/.local/bin/bat
+mkdir -vp ~/.local/bin
+if [! -L ~/.local/bin/bat ]; then
+    ln -s /usr/bin/batcat ~/.local/bin/bat
+fi
 
 ## Oh-my-zsh
 if [ -d "${HOME}/.oh-my-zsh" ]; then
