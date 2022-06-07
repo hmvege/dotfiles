@@ -137,9 +137,5 @@ alias fzfp="fzf --preview 'bat --color=always --style=numbers --line-range=:500 
 # Created by `pipx` on 2022-02-16 12:29:05
 export PATH="$HOME/.local/bin:$PATH"
 
-{{ if (eq .chezmoi.os "linux") -}}
-{{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
-# For making LSD work with
-export PATH="$PATH:/snap/bin/"
-{{ end -}}
-{{ end -}}
+# # For making LSD work with
+# export PATH="$PATH:/snap/bin/"
