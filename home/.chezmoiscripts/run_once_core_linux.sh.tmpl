@@ -11,6 +11,7 @@ sudo apt-get update
 packages=(
     bat
     fasd
+    fd-find
     git
     htop
     jq
@@ -122,6 +123,10 @@ then
     # /home/linuxbrew/.linuxbrew/bin/brew install lsd
     echo "Installed lsd"
 fi
+
+# ## Check that fdfind is installed
+# ln -s $(which fdfind) ~/.local/bin/fd
+
 
 ## Gogh theme install setup
 # clone the repo into "$HOME/src/gogh"

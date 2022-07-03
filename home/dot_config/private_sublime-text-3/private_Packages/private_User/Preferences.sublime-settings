@@ -28,6 +28,7 @@
 		"Preprocessing",
 		"preprocessing",
 		"mosaicing",
+		"misclassified",
 	],
 	"color_scheme": "Packages/User/Material-Theme (Flake8Lint).tmTheme",
 	"folders":
@@ -36,7 +37,7 @@
 			"path": ".",
 		}
 	],
-	"font_size": 9,
+	"font_size": 10,
 	"ignored_packages":
 	[
 		"Vintage",
@@ -57,6 +58,8 @@
 		"coregistered",
 		"defocused",
 		"dotfiles",
+		"duplets",
+		"dupletts",
 		"fp2b",
 		"geomosaic",
 		"interpolator",
@@ -91,4 +94,5 @@
 	// "auto_complete_include_snippets_when_typing": false,
 	"ignored_snippets": ["*html*", "*lorem*"],
 	"show_encoding": true,
+	"update_check": true,
 }

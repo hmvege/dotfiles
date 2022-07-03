@@ -132,14 +132,15 @@ eval "$(pyenv init --path)"
 # Alias for creating venv: python create env
 alias pce="python3 -m venv venv"
 
+# fasd shortcuts
 alias fzfp="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+alias v='f -e vim' # quick opening files with vim
+alias o='a -e xdg-open' # quick opening files with xdg-open
+
 
 # Created by `pipx` on 2022-02-16 12:29:05
 export PATH="$HOME/.local/bin:$PATH"
 
-{{ if (eq .chezmoi.os "linux") -}}
-{{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 # For making LSD work with
 export PATH="$PATH:/snap/bin/"
-{{ end -}}
-{{ end -}}
+
