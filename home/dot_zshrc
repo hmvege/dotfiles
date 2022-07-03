@@ -141,6 +141,5 @@ alias o='a -e xdg-open' # quick opening files with xdg-open
 # Created by `pipx` on 2022-02-16 12:29:05
 export PATH="$HOME/.local/bin:$PATH"
 
-# For making LSD work with
-export PATH="$PATH:/snap/bin/"
-
+# # For making LSD work with
+# export PATH="$PATH:/snap/bin/"

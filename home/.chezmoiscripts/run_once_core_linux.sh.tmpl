@@ -23,6 +23,7 @@ packages=(
     python3
     python3-venv
     python3-pip
+    rename
     tmux
     unzip
     vim
@@ -34,8 +35,13 @@ sudo apt install -y ${packages[@]}
 echo "Packages installed."
 
 ## Bat
-mkdir -p ~/.local/bin
-ln -s /usr/bin/batcat ~/.local/bin/bat
+mkdir -vp ~/.local/bin
+if [! -L ~/.local/bin/bat ]; then
+    ln -s /usr/bin/batcat ~/.local/bin/bat
+    echo "Bat is installed and linked"
+else
+    echo "Bat is already installed and linked"
+fi
 
 ## Oh-my-zsh
 if [ -d "${HOME}/.oh-my-zsh" ]; then
@@ -47,14 +53,24 @@ else
 fi
 
 # Oh-my-zsh plugins
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-echo "zsh-syntax-highlighting downloaded"
+if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ]
+then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+    echo "zsh-syntax-highlighting downloaded and installed"
+else
+    echo "zsh-syntax-highlighting already installed"
+fi
 
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-echo "zsh-autosuggestions downloaded"
+if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions ]
+then
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    echo "zsh-autosuggestions downloaded and installed"
+else
+    echo "zsh-autosuggestions already installed"
+fi
 
 ## tmux pllsugins
-if ! -d "${HOME}/.tmux/plugins/tpm"
+if [ ! -d "${HOME}/.tmux/plugins/tpm" ]
 then
     git clone https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
     echo "tmux plugin manager installed."
@@ -63,9 +79,14 @@ else
 fi
 
 ## vim plugin manager
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-echo "vim plugin manager installed"
+if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
+then
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    echo "vim plugin manager installed"
+else
+    echo "vim plugin manager already installed"
+fi
 
 ## install fzf
 if ! type -p fzf >/dev/null 2>&1
@@ -73,6 +94,8 @@ then
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install --all
     echo "Installed fzf"
+else
+    echo "Already installed fzf"
 fi
 
 ## pipx
@@ -92,6 +115,8 @@ then
     do
         /usr/local/bin/pipx install $pkg
     done
+else
+    echo "Already installed pipx"
 fi
 
 ## pyenv + pyenv-virtualenv
@@ -107,6 +132,8 @@ then
     $HOME/.pyenv/bin/pyenv install 3.9.9
     $HOME/.pyenv/bin/pyenv global 3.9.9
     echo "Installed pyenv and pyenv-virtualenv"
+else
+    echo "Already installed pyenv and pyenv-virtualenv"
 fi
 
 # ## Brew
@@ -122,6 +149,8 @@ then
     sudo snap install lsd
     # /home/linuxbrew/.linuxbrew/bin/brew install lsd
     echo "Installed lsd"
+else
+    echo "Already installed lsd"
 fi
 
 # ## Check that fdfind is installed

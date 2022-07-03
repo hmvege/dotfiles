@@ -30,7 +30,9 @@
 		"mosaicing",
 		"misclassified",
 	],
-	"color_scheme": "Packages/User/Material-Theme (Flake8Lint).tmTheme",
+	// Theme
+	"theme": "Gruvbox Material Dark.sublime-theme",
+    "color_scheme": "Packages/User/Material-Theme (Flake8Lint).tmTheme",
 	"folders":
 	[
 		{
@@ -84,7 +86,6 @@
 		"SublimeLinter.linters.flake8.disable": false,
 	},
 	"spell_check": true,
-	"theme": "Gruvbox Material Dark.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true,
 	"enable_autoreload": false,
