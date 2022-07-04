@@ -4,7 +4,8 @@
     "settings": {
         "python.analysis.diagnosticSeverityOverrides": {
             // In order to avoid annoying messages for missing imports.
-            "reportMissingImports": "none"
+            "reportMissingImports": "none",
+            "reportGeneralTypeIssue": "none"
         }
     }
 }
