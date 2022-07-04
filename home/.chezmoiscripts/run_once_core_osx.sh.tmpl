@@ -13,18 +13,11 @@ packages=(
     bat
     fasd
     fzf
+    git
     htop
     jq
-    # libbz2-dev  # This might be unnecessary on OSX
-    # libffi-dev
-    # libreadline-dev
-    # libsqlite3-dev
     lsd
-    # mc  # Midnight commander
     pipx
-    # python3
-    # python3-venv
-    # python3-pip
     pyenv
     pyenv-virtualenv
     tmux
@@ -58,20 +51,13 @@ done
 ## Once again, verifying Brew install
 brew doctor
 
-## pyenv + pyenv-virtualenv
-## Snippet inspired and taken from
-# https://github.com/tordks/.dotfiles/blob/master/install_pyenv.sh
-# See https://github.com/pyenv/pyenv-virtualenv/issues/233
-if ! type -p pyenv >/dev/null 2>&1
-then
-    curl https://pyenv.run | bash
-    # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
-    # in case the build fails.
-    sudo apt-get install libssl-dev
-    $HOME/.pyenv/bin/pyenv install 3.9.9
-    $HOME/.pyenv/bin/pyenv global 3.9.9
-    echo "Installed pyenv and pyenv-virtualenv"
-fi
+## Finalizes the pyenv installation
+pyenv install 3.9.11
+pyenv install 3.10.3
+pyenv global 3.9.11
+
+# fzf installation completion
+$(brew --prefix)/opt/fzf/install
 
 # START WITH BREW
 # THEN INSTALL DEPENDENCIES!
@@ -83,68 +69,6 @@ fi
 # - vim
 # - vim pluginmanager
 # - lsd
-
-## Oh-my-zsh
-if [ -d "${HOME}/.oh-my-zsh" ]; then
-    echo "Oh My Zsh already installed at: ${HOME}/.oh-my-zsh"
-else
-    # sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    echo "Oh My Zsh is installed."
-fi
-
-# Oh-my-zsh plugins
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-echo "zsh-syntax-highlighting downloaded"
-
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-echo "zsh-autosuggestions downloaded"
-
-## tmux pllsugins
-if ! -d "${HOME}/.tmux/plugins/tpm"
-then
-    git clone https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
-    echo "tmux plugin manager installed."
-else
-    echo "tmux plugin manager already installed."
-fi
-
-## vim plugin manager
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-echo "vim plugin manager installed"
-
-## pipx
-if ! type -p pipx >/dev/null 2>&1
-then
-    sudo /usr/bin/python3 -m pip install pipx
-    echo "Installed pipx"
-    /usr/local/bin/pipx ensurepath
-    pipx_packages=(
-        flake8
-        mypy
-        black
-        pip-tools
-        pre-commit
-    )
-    for pkg in ${pipx_packages[@]}
-    do
-        /usr/local/bin/pipx install $pkg
-    done
-fi
-
-
-
-## Gogh theme install setup
-# clone the repo into "$HOME/src/gogh"
-mkdir -p "$HOME/src"
-cd "$HOME/src"
-git clone https://github.com/Gogh-Co/Gogh.git gogh
-cd gogh/themes
-
-# install themes
-./afterglow.sh
-cd "$HOME"
 
 
 echo "\n\n\n\n\n\n\n\n====== OSX SETUP NOT COMPLETED ======\n\n\n\n\n\n\n\n"
