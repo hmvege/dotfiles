@@ -12,6 +12,7 @@ xcode-select --install
 packages=(
     bat
     fasd
+    fd
     fzf
     git
     htop
@@ -34,7 +35,7 @@ packages=(
 )
 
 ## Brew
-if ! type -p brew >/dev/null 2>&1
+if [ ! type -p brew >/dev/null 2>&1 ]
 then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     echo "Installed Brew"
@@ -56,19 +57,26 @@ pyenv install 3.9.11
 pyenv install 3.10.3
 pyenv global 3.9.11
 
-# fzf installation completion
+## fzf installation completion
 $(brew --prefix)/opt/fzf/install
 
-# START WITH BREW
-# THEN INSTALL DEPENDENCIES!
-# Install:
-# - bat
-# - pyenv pyenv-virtualenv
-# - zsh
-# - ohmyzsh
-# - vim
-# - vim pluginmanager
-# - lsd
+if [ ! type -d ~/.oh-my-zsh ]
+then
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+## Workaround for fuzzy-find alt+c: https://github.com/junegunn/fzf/issues/164
+bindkey "ç" fzf-cd-widget
+
+## vim plugin manager
+if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
+then
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    echo "vim plugin manager installed"
+else
+    echo "vim plugin manager already installed"
+fi
 
 
 echo "\n\n\n\n\n\n\n\n====== OSX SETUP NOT COMPLETED ======\n\n\n\n\n\n\n\n"
