@@ -1,5 +1,4 @@
 {{ if (eq .chezmoi.os "darwin") -}}
-
 #!/bin/bash
 
 # Set to catch non-zero exit status errors, variable errors or pipeline
@@ -35,10 +34,12 @@ packages=(
 )
 
 ## Brew
-if [ ! type -p brew >/dev/null 2>&1 ]
+if ! type -p brew >/dev/null 2>&1
 then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     echo "Installed Brew"
+else
+    echo "Brew is already installed"
 fi
 
 ## Verifying Brew install
@@ -52,15 +53,27 @@ done
 ## Once again, verifying Brew install
 brew doctor
 
-## Finalizes the pyenv installation
-pyenv install 3.9.11
-pyenv install 3.10.3
-pyenv global 3.9.11
+python_global="3.9.11"
+
+if type -p "$pyenv" >/dev/null 2>&1
+then
+    echo "pyenv exists: proceeding to check if global python is set to $python_global"
+    if ! pyenv which python | grep -q $python_global
+    then
+        echo "Setting up pyenv globals"
+        pyenv install $python_global
+        pyenv install 3.10.3
+        pyenv global $python_global
+    else
+        echo "Global Python is already set to $python_global"
+    fi
+fi
+
 
 ## fzf installation completion
 $(brew --prefix)/opt/fzf/install
 
-if [ ! type -d ~/.oh-my-zsh ]
+if [ ! -d ~/.oh-my-zsh ]
 then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
