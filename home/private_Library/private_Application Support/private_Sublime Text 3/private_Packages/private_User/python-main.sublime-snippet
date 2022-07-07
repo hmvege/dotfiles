@@ -1,0 +1,19 @@
+<snippet>
+    <content><![CDATA[
+import ${3:import}
+
+def main():
+    """Main for ${1:method}
+    """
+    ${2:function}()
+
+
+if __name__ == "__main__":
+    main()
+
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>main</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <scope>source.python</scope>
+</snippet>

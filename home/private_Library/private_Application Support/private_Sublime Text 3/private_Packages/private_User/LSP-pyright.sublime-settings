@@ -1,0 +1,11 @@
+// Settings in here override those in "LSP-pyright/LSP-pyright.sublime-settings"
+
+{
+    "settings": {
+        "python.analysis.diagnosticSeverityOverrides": {
+            // In order to avoid annoying messages for missing imports.
+            "reportMissingImports": "none",
+            "reportGeneralTypeIssue": "none"
+        }
+    }
+}
