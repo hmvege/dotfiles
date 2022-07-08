@@ -5,8 +5,11 @@
 # failures.
 set -euo pipefail
 
-# Starts by installing basic developer tools for OSX
-xcode-select --install
+if ! type -p xcodebuild >/dev/null 2>&1
+then
+    # Starts by installing basic developer tools for OSX
+    xcode-select --install
+fi
 
 packages=(
     bat
