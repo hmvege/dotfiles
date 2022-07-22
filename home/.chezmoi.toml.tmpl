@@ -1,0 +1,3 @@
+{{ $email := promptString "Enter GitHub mail for this machine" }}
+[data]
+email = '{{ $email | quote }}'

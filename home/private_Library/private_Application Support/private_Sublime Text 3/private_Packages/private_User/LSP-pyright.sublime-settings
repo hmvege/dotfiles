@@ -4,9 +4,9 @@
     "settings": {
         "python.analysis.diagnosticSeverityOverrides": {
             // In order to avoid annoying messages for missing imports.
+            "reportImplicitStringConcatenation": "none",
             "reportMissingImports": "none",
-            "reportGeneralTypeIssue": "none",
-            "reportImplicitStringConcatenation": "none"
+            "reportGeneralTypeIssue": "none"
         }
     }
 }
