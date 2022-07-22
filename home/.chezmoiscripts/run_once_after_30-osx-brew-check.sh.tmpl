@@ -1,0 +1,13 @@
+{{ if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+
+# Verifying Brew install
+brew doctor -q
+
+# ## Workaround for fuzzy-find alt+c: https://github.com/junegunn/fzf/issues/164
+# bindkey "ç" fzf-cd-widget
+
+echo "Brew doctor successfully run"
+echo "Install complete"
+
+{{ end -}}

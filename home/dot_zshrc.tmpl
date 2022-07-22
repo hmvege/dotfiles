@@ -2,7 +2,11 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
+{{ if (eq .chezmoi.os "darwin") -}}
+export ZSH="/Users/{{ .chezmoi.username }}/.oh-my-zsh"
+{{ else if (eq .chezmoi.os "linux") -}}
 export ZSH="/home/{{ .chezmoi.username }}/.oh-my-zsh"
+{{ end }}
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -100,10 +104,10 @@ export EDITOR=vim
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Fuzzy file completion
-eval "$(fasd --init auto)"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_ALT_C_COMMAND="fd --type d . $HOME"
+# # Fuzzy file completion, deprecated
+# eval "$(fasd --init auto)"
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 
 # Tilix terminal
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
@@ -146,3 +150,10 @@ export PATH="$PATH:/snap/bin/"
 
 # LSD aliases
 alias ltsh='lt -l --blocks size --blocks name'
+
+{{ if (eq .chezmoi.os "darwin") -}}
+bindkey "ç" fzf-cd-widget
+
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+echo 'export PATH="/usr/local/sbin:$PATH"' >> ~/.zshrc
+{{ end -}}

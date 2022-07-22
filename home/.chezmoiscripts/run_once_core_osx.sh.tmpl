@@ -13,7 +13,6 @@ fi
 
 packages=(
     bat
-    fasd
     fd
     fzf
     git
@@ -26,7 +25,7 @@ packages=(
     pyenv-virtualenv
     tmux
     unzip
-    vim
+    # vim # Should already be installed
     wget
     zsh
     # # Required by Brew
@@ -46,20 +45,16 @@ else
     echo "Brew is already installed"
 fi
 
-## Verifying Brew install
-brew doctor
-
 for pkg in ${packages[@]}
 do
-    sudo brew install -y $pkg
+    brew install $pkg
 done
 
-## Once again, verifying Brew install
-brew doctor
+echo "Packages installed"
 
 python_global="3.9.11"
 
-if type -p "$pyenv" >/dev/null 2>&1
+if type -p pyenv >/dev/null 2>&1
 then
     echo "pyenv exists: proceeding to check if global python is set to $python_global"
     if ! pyenv which python | grep -q $python_global
@@ -81,9 +76,6 @@ if [ ! -d ~/.oh-my-zsh ]
 then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
-
-## Workaround for fuzzy-find alt+c: https://github.com/junegunn/fzf/issues/164
-bindkey "ç" fzf-cd-widget
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
