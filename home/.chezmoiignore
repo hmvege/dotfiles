@@ -12,6 +12,7 @@ Library/Application\ Support/Sublime\ Text\ 3/Packages/User/LSP-pyright.sublime-
 Library/Application\ Support/Sublime\ Text\ 3/Packages/User/python-black.sublime-settings
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}
+.config/sublime-text-3
 .config/sublime-text-3/Packages
 .config/sublime-text-3/Packages/User
 .config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap

@@ -71,6 +71,7 @@ plugins=(
     copybuffer
     copypath
     copyfile
+    dirhistory
     git
     history
     jsontools
@@ -104,10 +105,9 @@ export EDITOR=vim
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# # Fuzzy file completion, deprecated
-# eval "$(fasd --init auto)"
-# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-# export FZF_ALT_C_COMMAND="fd --type d . $HOME"
+# Fuzzy file completion
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 
 # Tilix terminal
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
@@ -120,7 +120,12 @@ alias l="lsd -l"
 alias lt="lsd --tree"
 alias la="lsd -laht"
 alias tree="ls --tree"
+alias ltsh='lt -l --blocks size --blocks name'
 
+# For making LSD work with
+export PATH="$PATH:/snap/bin/"
+
+# Settings for pyenv and pyenv-virtualenv
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 #export PATH="${PYENV_ROOT}/libexec:$PATH"  # Fix for missing command
@@ -134,13 +139,12 @@ eval "$(pyenv init --path)"
 #eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # Alias for creating venv: python create env
-alias pce="python3 -m venv venv"
+alias pvenv="python3 -m venv venv"
 
 # fasd shortcuts
 alias fzfp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias v='f -e vim' # quick opening files with vim
 alias o='a -e xdg-open' # quick opening files with xdg-open
-
 
 # Created by `pipx` on 2022-02-16 12:29:05
 export PATH="$HOME/.local/bin:$PATH"
@@ -152,6 +156,7 @@ export PATH="$PATH:/snap/bin/"
 alias ltsh='lt -l --blocks size --blocks name'
 
 {{ if (eq .chezmoi.os "darwin") -}}
+# For making alt+c change directory work in MacOS
 bindkey "ç" fzf-cd-widget
 
 alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
