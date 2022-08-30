@@ -145,6 +145,32 @@ fi
 #     echo "Installed Brew"
 # fi
 
+if ! type -p code >/dev/null 2>&1
+then
+    sudo snap install --classic code
+    echo "Installed VSCode"
+else
+    echo "Already installed VSCode"
+fi
+
+vscode_extensions=(
+    ms-python.python
+    ms-vscode.cpptools
+    sashaweiss.block-travel
+)
+
+installed_extensions=$(code --list-extensions)
+for extension in ${vscode_extensions[@]}
+do
+    if ! echo $installed_extensions | grep -q $extension
+    then
+        code --install-extension $extension
+        echo "Installed $extension"
+    else
+        echo "VSCode extension $extension found"
+    fi
+done
+
 ## lsd
 if ! type -p lsd >/dev/null 2>&1
 then
