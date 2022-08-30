@@ -40,7 +40,8 @@ sudo chsh -s $(which zsh)
 
 ## Bat
 mkdir -vp ~/.local/bin
-if [! -L ~/.local/bin/bat ]; then
+if [ ! -L ~/.local/bin/bat ]
+then
     ln -s /usr/bin/batcat ~/.local/bin/bat
     echo "Bat is installed and linked"
 else

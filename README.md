@@ -117,6 +117,9 @@ Note these packages may need to be downloaded manually.
 ### Gogh
 Terminal color provided by Gogh, using the theme Afterglow.
 
+#### Troubleshooting
+If colors do not change automatically, you may need to change the terminal profile to Default and run again.
+
 ## :open_file_folder: File structure
 ```
 dotfiles
