@@ -2,7 +2,7 @@
     "workbench.colorTheme": "Default Dark+",
     "security.workspace.trust.untrustedFiles": "open",
     "python.linting.flake8Enabled": true,
-    "python.linting.flake8Path": "/Users/hansmathiasmamenvege/.local/bin/flake8",
+    "python.linting.flake8Path": "/Users/{{ .chezmoi.username }}/.local/bin/flake8",
     "python.linting.flake8Args": [
         "--max-line-length",
         "79",
@@ -20,7 +20,7 @@
         "W503"
     ],
     "python.linting.mypyEnabled": true,
-    "python.linting.mypyPath": "/Users/hansmathiasmamenvege/.local/bin/mypy",
+    "python.linting.mypyPath": "/Users/{{ .chezmoi.username }}/.local/bin/mypy",
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
     "python.analysis.diagnosticSeverityOverrides": {
@@ -29,7 +29,7 @@
     },
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
-    "python.formatting.blackPath": "/Users/hansmathiasmamenvege/.local/bin/black",
+    "python.formatting.blackPath": "/Users/{{ .chezmoi.username }}/.local/bin/black",
     "python.formatting.blackArgs": [
         "-l 79"
     ],

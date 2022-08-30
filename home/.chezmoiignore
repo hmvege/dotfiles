@@ -10,6 +10,10 @@ Library/Application\ Support/Sublime\ Text\ 3/Packages/User/SublimeLinter.sublim
 Library/Application\ Support/Sublime\ Text\ 3/Packages/User/Default\ \(OSX\).sublime-keymap
 Library/Application\ Support/Sublime\ Text\ 3/Packages/User/LSP-pyright.sublime-settings
 Library/Application\ Support/Sublime\ Text\ 3/Packages/User/python-black.sublime-settings
+Library/Application\ Support/Code/
+Library/Application\ Support/Code/User/
+Library/Application\ Support/Code/User/keybindings.json
+Library/Application\ Support/Code/User/settings.json
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}
 .config/sublime-text-3
@@ -25,4 +29,8 @@ Library/Application\ Support/Sublime\ Text\ 3/Packages/User/python-black.sublime
 .config/sublime-text-3/Packages/User/python-cli.sublime-snippet
 .config/sublime-text-3/Packages/User/SublimeLinter.sublime-settings
 .config/sublime-text-3/Packages/User/TodoReview.sublime-settings
+.config/Code/
+.config/Code/User/
+.config/Code/User/keybindings.json
+.config/Code/User/settings.json
 {{ end }}

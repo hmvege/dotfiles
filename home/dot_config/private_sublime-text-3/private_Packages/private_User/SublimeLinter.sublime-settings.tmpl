@@ -21,19 +21,19 @@
 
             // Path to the executable to be used. Either a string or an
             // array. E.g. ['nvm', 'exec', '8.6', 'eslint']
-            // "executable": "/home/hmvege/anaconda3/bin/flake8",
-            "executable": "/home/hmvege/.local/bin/flake8",
+            // "executable": "/home/{{ .chezmoi.username }}/anaconda3/bin/flake8",
+            "executable": "/home/{{ .chezmoi.username }}/.local/bin/flake8",
 
             // A modified runtime environment for the lint job. Settings here
             // override the default, inherited ENV.
-            // "env": {"PATH": "/home/hmvege/anaconda3/bin"},
+            // "env": {"PATH": "/home/{{ .chezmoi.username }}/anaconda3/bin"},
 
             // **Only valid for PythonLinter**
             // Specify which python to use. Either a number or full path
             // to a python binary. SL will then basically use 'python -m'
             // to run the linter.
-            // "python": "/home/hmvege/anaconda3/bin/python",
-            "python": "/home/hmvege/.pyenv/shims/python3",
+            // "python": "/home/{{ .chezmoi.username }}/anaconda3/bin/python",
+            "python": "/home/{{ .chezmoi.username }}/.pyenv/shims/python3",
 
             // **Only valid for NodeLinter**
             // If true, will *not* use a globally installed binary
@@ -47,8 +47,8 @@
                 "--ignore-missing-imports",
                 "--check-untyped-defs",
             ],
-            "executable": "/home/hmvege/.local/bin/mypy",
-            "python": "/home/hmvege/.pyenv/shims/python3",
+            "executable": "/home/{{ .chezmoi.username }}/.local/bin/mypy",
+            "python": "/home/{{ .chezmoi.username }}/.pyenv/shims/python3",
             "lint_mode": "save",
         }
     },
