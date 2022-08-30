@@ -1,5 +1,3 @@
-{{ if (eq .chezmoi.os "linux") -}}
-{{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 #!/bin/bash
 
 echo ""
@@ -7,6 +5,8 @@ echo ""
 echo "==== DOTFILES SETUP COMPLETE ===="
 echo "You may need to relog into your user($USER) for the dotfiles to effect."
 
+{{ if (eq .chezmoi.os "linux") -}}
+{{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 if [[ $XDG_SESSION_DESKTOP == "ubuntu" ]]
 then
     echo ""
@@ -22,13 +22,13 @@ then
     done
     IFS="$old_ifs"
 fi
+{{ end -}}
+{{ end -}}
 
 if [[ $SHELL != "/bin/zsh" ]]
 then
     echo "NOTE: Current shell is $SHELL."
     echo "Make sure to change your shell:"
     echo 'chsh -s $(which zsh)'
+    echo 'or restart your terminal session.'
 fi
-
-{{ end -}}
-{{ end -}}

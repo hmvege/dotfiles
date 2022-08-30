@@ -1,0 +1,36 @@
+{
+    "workbench.colorTheme": "Default Dark+",
+    "security.workspace.trust.untrustedFiles": "open",
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Path": "/Users/hansmathiasmamenvege/.local/bin/flake8",
+    "python.linting.flake8Args": [
+        "--max-line-length",
+        "79",
+        "--exclude",
+        "__pycache__",
+        ".pyc",
+        ".git",
+        "--select",
+        "E",
+        "F",
+        "W",
+        "C90",
+        "--extend-ignore",
+        "E203",
+        "W503"
+    ],
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyPath": "/Users/hansmathiasmamenvege/.local/bin/mypy",
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none",
+        "reportMissingModuleSource": "none"
+    },
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "/Users/hansmathiasmamenvege/.local/bin/black",
+    "python.formatting.blackArgs": [
+        "-l 79"
+    ],
+}

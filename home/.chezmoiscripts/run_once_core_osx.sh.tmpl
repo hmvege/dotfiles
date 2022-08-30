@@ -52,30 +52,25 @@ done
 
 echo "Packages installed"
 
-python_global="3.9.11"
+python_global_3_9="3.9.13"
+python_global_3_10="3.10.5"
 
 if type -p pyenv >/dev/null 2>&1
 then
-    echo "pyenv exists: proceeding to check if global python is set to $python_global"
-    if ! pyenv which python | grep -q $python_global
+    echo "pyenv exists: proceeding to check if global python is set to $python_global_3_9"
+    if ! pyenv which python | grep -q $python_global_3_9
     then
         echo "Setting up pyenv globals"
-        pyenv install $python_global
-        pyenv install 3.10.3
-        pyenv global $python_global
+        pyenv install $python_global_3_9
+        pyenv install $python_global_3_10
+        pyenv global $python_global_3_9
     else
-        echo "Global Python is already set to $python_global"
+        echo "Global Python is already set to $python_global_3_9"
     fi
 fi
 
-
 ## fzf installation completion
 $(brew --prefix)/opt/fzf/install
-
-if [ ! -d ~/.oh-my-zsh ]
-then
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-fi
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
@@ -86,5 +81,31 @@ then
 else
     echo "vim plugin manager already installed"
 fi
+
+if [ ! type -p code >/dev/null 2>&1 ]
+then
+    brew install --cask visual-studio-code
+    echo "VSCode installed."
+else
+    echo "VSCode already installed"
+fi
+
+vscode_extensions=(
+    ms-python.python
+    ms-vscode.cpptools
+    sashaweiss.block-travel
+)
+
+installed_extensions=$(code --list-extensions)
+for extension in ${vscode_extensions[@]}
+do
+    if ! echo $installed_extensions | grep -q $extension
+    then
+        code --install-extension $extension
+        echo "Installed $extension"
+    else
+        echo "VSCode extension $extension found"
+    fi
+done
 
 {{ end -}}

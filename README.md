@@ -7,6 +7,7 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 <!-- :ballot_box_with_check:  -->
 :black_square_button: Verify updating script works with `bin/chezmoi update -v -S ~/dotfiles` for MacOS
 :black_square_button: Verify updating script works with `bin/chezmoi update -v -S ~/dotfiles` for Linux
+:black_square_button: Split settings into `~/.zprofile` and `~/.zshrc`
 
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
