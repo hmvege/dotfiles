@@ -1,11 +1,11 @@
-# [WIP] Dotfiles
-*This dotfiles repository is a work in progress.*
+# Dotfiles
 
-Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpayne/chezmoi)
+Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpayne/chezmoi).
+
+Feel free to use on your own risk, or to draw inspiration.
 
 ## TODO
-<!-- :ballot_box_with_check:  -->
-:black_square_button: Split settings into `~/.zprofile` and `~/.zshrc`
+* Split settings into `~/.zprofile` and `~/.zshrc`
 
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
