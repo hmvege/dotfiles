@@ -1,0 +1,25 @@
+[
+    { "keys": ["super+shift+9"], "command": "indent" },
+    { "keys": ["super+shift+8"], "command": "unindent" },
+    // Unsets following commands in favor of indentation and commenting
+    { "keys": [], "command": "focus_group", "args": { "group": 6 } },
+    { "keys": [], "command": "focus_group", "args": { "group": 7 } },
+    { "keys": [], "command": "focus_group", "args": { "group": 8 } },
+    { "keys": [], "command": "move_to_group", "args": { "group": 7 } },
+    { "keys": [], "command": "move_to_group", "args": { "group": 8 } },
+    { "keys": [], "command": "move_to_group", "args": { "group": 9 } },
+    // For moving cursor
+    { "keys": ["ctrl+alt+up"], "command": "select_lines", "args": {"forward": false} },
+    { "keys": ["ctrl+alt+down"], "command": "select_lines", "args": {"forward": true} },
+    // Swap lines
+    { "keys": ["ctrl+super+up"], "command": "swap_line_up" },
+    { "keys": ["ctrl+super+down"], "command": "swap_line_down" },
+    // For jumping between paragraphs
+    { "keys": ["alt+up"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": false}},
+    { "keys": ["alt+down"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": true}},
+    { "keys": ["shift+alt+up"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": false, "extend": true}},
+    { "keys": ["shift+alt+down"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": true, "extend": true}},
+    { "keys": [""], "command": "move_to_group", "args": { "group": 6 } },
+    { "keys": [""], "command": "move_to_group", "args": { "group": 7 } },
+    { "keys": [""], "command": "move_to_group", "args": { "group": 8 } },
+]

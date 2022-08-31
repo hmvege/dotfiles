@@ -10,33 +10,43 @@ sudo apt-get update
 
 packages=(
     bat
-    fasd
+    # fasd
     fd-find
     git
     htop
     jq
     libbz2-dev
     libffi-dev
+    liblzma-dev
     libreadline-dev
     libsqlite3-dev
     mc
+    python-tk
     python3
     python3-venv
     python3-pip
+    python3-tk
     rename
+    tk-dev
     tmux
     unzip
     vim
     wget
     zsh
+    # For Gogh
+    dconf-cli
+    uuid-runtime
 )
 
 sudo apt install -y ${packages[@]}
 echo "Packages installed."
 
+sudo chsh -s $(which zsh)
+
 ## Bat
 mkdir -vp ~/.local/bin
-if [! -L ~/.local/bin/bat ]; then
+if [ ! -L ~/.local/bin/bat ]
+then
     ln -s /usr/bin/batcat ~/.local/bin/bat
     echo "Bat is installed and linked"
 else
@@ -69,7 +79,7 @@ else
     echo "zsh-autosuggestions already installed"
 fi
 
-## tmux pllsugins
+## tmux plugins
 if [ ! -d "${HOME}/.tmux/plugins/tpm" ]
 then
     git clone https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
@@ -125,13 +135,19 @@ fi
 # See https://github.com/pyenv/pyenv-virtualenv/issues/233
 if ! type -p pyenv >/dev/null 2>&1
 then
+    python_global_3_9="3.9.13"
+    python_global_3_10="3.10.5"
+
     curl https://pyenv.run | bash
+    echo "Installed pyenv and pyenv-virtualenv"
+
     # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
     # in case the build fails.
     sudo apt-get install libssl-dev
-    $HOME/.pyenv/bin/pyenv install 3.9.9
-    $HOME/.pyenv/bin/pyenv global 3.9.9
-    echo "Installed pyenv and pyenv-virtualenv"
+    $HOME/.pyenv/bin/pyenv install $python_global_3_9
+    $HOME/.pyenv/bin/pyenv install $python_global_3_10
+    $HOME/.pyenv/bin/pyenv global $python_global_3_9
+    echo "Global Python is already set to $python_global_3_9"
 else
     echo "Already installed pyenv and pyenv-virtualenv"
 fi
@@ -142,6 +158,32 @@ fi
 #     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 #     echo "Installed Brew"
 # fi
+
+if ! type -p code >/dev/null 2>&1
+then
+    sudo snap install --classic code
+    echo "Installed VSCode"
+else
+    echo "Already installed VSCode"
+fi
+
+vscode_extensions=(
+    ms-python.python
+    ms-vscode.cpptools
+    sashaweiss.block-travel
+)
+
+installed_extensions=$(code --list-extensions)
+for extension in ${vscode_extensions[@]}
+do
+    if ! echo $installed_extensions | grep -q $extension
+    then
+        code --install-extension $extension
+        echo "Installed $extension"
+    else
+        echo "VSCode extension $extension found"
+    fi
+done
 
 ## lsd
 if ! type -p lsd >/dev/null 2>&1

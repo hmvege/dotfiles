@@ -5,11 +5,7 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 ## TODO
 <!-- :ballot_box_with_check:  -->
-:black_square_button: Split core setup `.tmpl` scripts into separate scripts.
-
-:black_square_button: Add MacOS installation script `run_once_core_osx.sh`
-
-:black_square_button: Verify updating script works with `bin/chezmoi update -v -S ~/dotfiles`
+:black_square_button: Split settings into `~/.zprofile` and `~/.zshrc`
 
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
@@ -57,7 +53,6 @@ bin/chezmoi purge -S ~/dotfiles
 
 ## :inbox_tray: Packages to be installed
 
- - [`fasd`](https://github.com/clvv/fasd)
  - [`fzf`](https://github.com/junegunn/fzf#using-git)
  - [`lsd`](https://github.com/Peltoche/lsd)
  - [`tmux`](https://github.com/tmux/tmux)
@@ -90,12 +85,13 @@ Following plugins are used:
  - zsh-autosuggestions
  - zsh-syntax-highlighting
 
+
 ### Sublime Text 4
 Currently, Sublime Text 4 is my preferred editor, with Vim supporting me on the side every now and then. [Package Control](https://packagecontrol.io/) is used for managing plugins.
 
 Plugins used:
- - A File Icon
- - Color Highlight
+ - AutoDocstring
+ - AutoPEP8
  - ColorPicker
  - DockBlockr 2021 (DoxyDoxygen powered)
  - Dockerfile Syntax Highlighting
@@ -103,8 +99,9 @@ Plugins used:
  - GithubEmoji
  - Gruvebox Material Theme
  - Indent XML
+ - LSP
+ - LSP-pyright
  - MarkdownPreview
- - Material Theme
  - PackageResourceViewer
  - python-black
  - SublimeCodeIntel
@@ -117,7 +114,17 @@ Plugins used:
 Note these packages may need to be downloaded manually.
 
 ### Gogh
-Terminal color provided by Gogh, using the theme Afterglow.
+Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
+
+## :question: Troubleshooting
+
+### Shell not changing
+If the shell is not changed, run `chsh` and set the path to the new shell, and then re-log into your user.
+
+### Gogh theme not activated
+If terminal theme does not change, create a new profile which you names `Default` and restart the terminal and then rerun.
+
+After installing the theme, make sure the profile is selected to be the installed one.
 
 ## :open_file_folder: File structure
 ```

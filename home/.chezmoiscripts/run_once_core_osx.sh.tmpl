@@ -1,35 +1,31 @@
 {{ if (eq .chezmoi.os "darwin") -}}
-
 #!/bin/bash
 
 # Set to catch non-zero exit status errors, variable errors or pipeline
 # failures.
 set -euo pipefail
 
-# Starts by installing basic developer tools for OSX
-xcode-select --install
+if ! type -p xcodebuild >/dev/null 2>&1
+then
+    # Starts by installing basic developer tools for OSX
+    xcode-select --install
+fi
 
 packages=(
     bat
-    fasd
+    fd
     fzf
+    git
     htop
     jq
-    # libbz2-dev  # This might be unnecessary on OSX
-    # libffi-dev
-    # libreadline-dev
-    # libsqlite3-dev
     lsd
-    # mc  # Midnight commander
+    node  # Needed by LSP
     pipx
-    # python3
-    # python3-venv
-    # python3-pip
     pyenv
     pyenv-virtualenv
     tmux
     unzip
-    vim
+    # vim # Should already be installed
     wget
     zsh
     # # Required by Brew
@@ -45,108 +41,71 @@ if ! type -p brew >/dev/null 2>&1
 then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     echo "Installed Brew"
+else
+    echo "Brew is already installed"
 fi
-
-## Verifying Brew install
-brew doctor
 
 for pkg in ${packages[@]}
 do
-    sudo brew install -y $pkg
+    brew install $pkg
 done
 
-## Once again, verifying Brew install
-brew doctor
+echo "Packages installed"
 
-## pyenv + pyenv-virtualenv
-## Snippet inspired and taken from
-# https://github.com/tordks/.dotfiles/blob/master/install_pyenv.sh
-# See https://github.com/pyenv/pyenv-virtualenv/issues/233
-if ! type -p pyenv >/dev/null 2>&1
+python_global_3_9="3.9.13"
+python_global_3_10="3.10.5"
+
+if type -p pyenv >/dev/null 2>&1
 then
-    curl https://pyenv.run | bash
-    # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
-    # in case the build fails.
-    sudo apt-get install libssl-dev
-    $HOME/.pyenv/bin/pyenv install 3.9.9
-    $HOME/.pyenv/bin/pyenv global 3.9.9
-    echo "Installed pyenv and pyenv-virtualenv"
+    echo "pyenv exists: proceeding to check if global python is set to $python_global_3_9"
+    if ! pyenv which python | grep -q $python_global_3_9
+    then
+        echo "Setting up pyenv globals"
+        pyenv install $python_global_3_9
+        pyenv install $python_global_3_10
+        pyenv global $python_global_3_9
+    else
+        echo "Global Python is already set to $python_global_3_9"
+    fi
 fi
 
-# START WITH BREW
-# THEN INSTALL DEPENDENCIES!
-# Install:
-# - bat
-# - pyenv pyenv-virtualenv
-# - zsh
-# - ohmyzsh
-# - vim
-# - vim pluginmanager
-# - lsd
-
-## Oh-my-zsh
-if [ -d "${HOME}/.oh-my-zsh" ]; then
-    echo "Oh My Zsh already installed at: ${HOME}/.oh-my-zsh"
-else
-    # sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    echo "Oh My Zsh is installed."
-fi
-
-# Oh-my-zsh plugins
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-echo "zsh-syntax-highlighting downloaded"
-
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-echo "zsh-autosuggestions downloaded"
-
-## tmux pllsugins
-if ! -d "${HOME}/.tmux/plugins/tpm"
-then
-    git clone https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
-    echo "tmux plugin manager installed."
-else
-    echo "tmux plugin manager already installed."
-fi
+## fzf installation completion
+$(brew --prefix)/opt/fzf/install
 
 ## vim plugin manager
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-echo "vim plugin manager installed"
-
-## pipx
-if ! type -p pipx >/dev/null 2>&1
+if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
 then
-    sudo /usr/bin/python3 -m pip install pipx
-    echo "Installed pipx"
-    /usr/local/bin/pipx ensurepath
-    pipx_packages=(
-        flake8
-        mypy
-        black
-        pip-tools
-        pre-commit
-    )
-    for pkg in ${pipx_packages[@]}
-    do
-        /usr/local/bin/pipx install $pkg
-    done
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    echo "vim plugin manager installed"
+else
+    echo "vim plugin manager already installed"
 fi
 
+if [ ! type -p code >/dev/null 2>&1 ]
+then
+    brew install --cask visual-studio-code
+    echo "VSCode installed."
+else
+    echo "VSCode already installed"
+fi
 
+vscode_extensions=(
+    ms-python.python
+    ms-vscode.cpptools
+    sashaweiss.block-travel
+)
 
-## Gogh theme install setup
-# clone the repo into "$HOME/src/gogh"
-mkdir -p "$HOME/src"
-cd "$HOME/src"
-git clone https://github.com/Gogh-Co/Gogh.git gogh
-cd gogh/themes
-
-# install themes
-./afterglow.sh
-cd "$HOME"
-
-
-echo "\n\n\n\n\n\n\n\n====== OSX SETUP NOT COMPLETED ======\n\n\n\n\n\n\n\n"
+installed_extensions=$(code --list-extensions)
+for extension in ${vscode_extensions[@]}
+do
+    if ! echo $installed_extensions | grep -q $extension
+    then
+        code --install-extension $extension
+        echo "Installed $extension"
+    else
+        echo "VSCode extension $extension found"
+    fi
+done
 
 {{ end -}}

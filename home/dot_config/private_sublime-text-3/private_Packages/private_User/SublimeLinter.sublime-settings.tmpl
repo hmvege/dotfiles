@@ -1,0 +1,55 @@
+{
+    "debug": true,
+
+    "linters": {
+        // The name of the linter you installed
+        "flake8": {
+            // Disables the linter. The default here is 'not set'
+            "disable": false,
+
+            // Additional arguments for the command line. Either a string
+            // or an array. If set to a string, we 'shlex.split' it*.
+            // E.g. '--ignore D112' or ['--config', './.config/foo.ini']
+            //
+            // * Note: Use proper quoting around paths esp. on Windows!
+            "args": [
+                "--exclude=__pycache__,.pyc",
+                "--max-line-length=79",
+                "--select=E,F,W,C90",
+                "--extend-ignore=E203,W503",
+            ],
+
+            // Path to the executable to be used. Either a string or an
+            // array. E.g. ['nvm', 'exec', '8.6', 'eslint']
+            // "executable": "/home/{{ .chezmoi.username }}/anaconda3/bin/flake8",
+            "executable": "/home/{{ .chezmoi.username }}/.local/bin/flake8",
+
+            // A modified runtime environment for the lint job. Settings here
+            // override the default, inherited ENV.
+            // "env": {"PATH": "/home/{{ .chezmoi.username }}/anaconda3/bin"},
+
+            // **Only valid for PythonLinter**
+            // Specify which python to use. Either a number or full path
+            // to a python binary. SL will then basically use 'python -m'
+            // to run the linter.
+            // "python": "/home/{{ .chezmoi.username }}/anaconda3/bin/python",
+            "python": "/home/{{ .chezmoi.username }}/.pyenv/shims/python3",
+
+            // **Only valid for NodeLinter**
+            // If true, will *not* use a globally installed binary
+            "disable_if_not_dependency": false
+        },
+
+        "mypy": {
+            // Disables the linter. The default here is 'not set'
+            "disable": false,
+            "args": [
+                "--ignore-missing-imports",
+                "--check-untyped-defs",
+            ],
+            "executable": "/home/{{ .chezmoi.username }}/.local/bin/mypy",
+            "python": "/home/{{ .chezmoi.username }}/.pyenv/shims/python3",
+            "lint_mode": "save",
+        }
+    },
+}
