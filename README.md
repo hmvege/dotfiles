@@ -5,8 +5,6 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 ## TODO
 <!-- :ballot_box_with_check:  -->
-:black_square_button: Verify updating script works with `bin/chezmoi update -v -S ~/dotfiles` for MacOS
-:black_square_button: Verify updating script works with `bin/chezmoi update -v -S ~/dotfiles` for Linux
 :black_square_button: Split settings into `~/.zprofile` and `~/.zshrc`
 
 ## :dart: Goals
@@ -87,6 +85,7 @@ Following plugins are used:
  - zsh-autosuggestions
  - zsh-syntax-highlighting
 
+
 ### Sublime Text 4
 Currently, Sublime Text 4 is my preferred editor, with Vim supporting me on the side every now and then. [Package Control](https://packagecontrol.io/) is used for managing plugins.
 
@@ -115,7 +114,17 @@ Plugins used:
 Note these packages may need to be downloaded manually.
 
 ### Gogh
-Terminal color provided by Gogh, using the theme Afterglow.
+Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
+
+## :question: Troubleshooting
+
+### Shell not changing
+If the shell is not changed, run `chsh` and set the path to the new shell, and then re-log into your user.
+
+### Gogh theme not activated
+If terminal theme does not change, create a new profile which you names `Default` and restart the terminal and then rerun.
+
+After installing the theme, make sure the profile is selected to be the installed one.
 
 ## :open_file_folder: File structure
 ```
