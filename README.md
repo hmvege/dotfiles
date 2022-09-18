@@ -51,6 +51,13 @@ In the case you wish to remove the dotfiles, run
 bin/chezmoi purge -S ~/dotfiles
 ```
 
+### Re-initializing
+If the prompt for GitHub mail (or similar templated parameters) are not prompted, this can be initialized by running
+```bash
+bin/chezmoi ini -S ~/dotfiles
+```
+and then the dotfiles can be applied again.
+
 ## :inbox_tray: Packages to be installed
 
  - [`fzf`](https://github.com/junegunn/fzf#using-git)
@@ -112,6 +119,9 @@ Plugins used:
  - TOML
 
 Note these packages may need to be downloaded manually.
+
+### VSCode
+Settings for VSCode have been added, and will continue being updated.
 
 ### Gogh
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.

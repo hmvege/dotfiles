@@ -196,7 +196,10 @@ else
 fi
 
 ## Check that fdfind is installed
-ln -s $(which fdfind) ~/.local/bin/fd
+if [ ! -h ~/.local/bin/fd ]
+then
+    ln -s $(which fdfind) ~/.local/bin/fd
+fi
 
 ## Gogh theme install setup
 # clone the repo into "$HOME/src/gogh"
