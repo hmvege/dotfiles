@@ -42,4 +42,8 @@
     // Disables accidental page up / down split
     { "keys": ["ctrl+shift+pagedown"], "command": "", "args": {"extend": false} },
     { "keys": ["ctrl+shift+pageup"], "command": "", "args": {"extend": false} },
+
+    // For jumping between cursor positions
+    { "keys": ["ctrl+alt+-"], "command": "jump_back" },
+    { "keys": ["ctrl+shift+-"], "command": "jump_forward" },
 ]
