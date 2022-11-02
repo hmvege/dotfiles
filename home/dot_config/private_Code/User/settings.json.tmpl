@@ -2,7 +2,7 @@
     "workbench.colorTheme": "Default Dark+",
     "security.workspace.trust.untrustedFiles": "open",
     "python.linting.flake8Enabled": true,
-    "python.linting.flake8Path": "{{ .chezmoi.homeDir }}/.local/bin/flake8",
+    "python.linting.flake8Path": "{{ .chezmoi.homeDir }}.local/bin/flake8",
     "python.linting.flake8Args": [
         "--max-line-length",
         "79",
@@ -20,7 +20,7 @@
         "W503"
     ],
     "python.linting.mypyEnabled": true,
-    "python.linting.mypyPath": "{{ .chezmoi.homeDir }}/.local/bin/mypy",
+    "python.linting.mypyPath": "{{ .chezmoi.homeDir }}.local/bin/mypy",
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
     "python.analysis.diagnosticSeverityOverrides": {
@@ -29,12 +29,19 @@
     },
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
-    "python.formatting.blackPath": "{{ .chezmoi.homeDir }}/.local/bin/black",
+    "python.formatting.blackPath": "{{ .chezmoi.homeDir }}.local/bin/black",
     "python.formatting.blackArgs": [
         "-l 79"
     ],
-    "window.zoomLevel": 1,
     "gitlens.codeLens.enabled": false,
     "gitlens.defaultTimeFormat": "HH:mm",
-    "C_Cpp.formatting": "clangFormat",
+    "clang-format.style": "file",
+    "editor.minimap.enabled": false,
+    // Ubuntu: disables the Ctrl+Alt focus
+    "window.titleBarStyle": "custom",
+    "window.customMenuBarAltFocus": false,
+    "cmake.configureOnOpen": true,
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
 }

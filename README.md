@@ -6,6 +6,7 @@ Feel free to use on your own risk, or to draw inspiration.
 
 ## TODO
 * Split settings into `~/.zprofile` and `~/.zshrc`
+* To fix matplotlib issue, add perhaps `python3-tk`
 
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,

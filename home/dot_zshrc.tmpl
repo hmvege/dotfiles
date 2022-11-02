@@ -161,4 +161,8 @@ bindkey "ç" fzf-cd-widget
 
 alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 echo 'export PATH="/usr/local/sbin:$PATH"' >> ~/.zshrc
+
+# Enabling terminal colors
+export TERM=xterm-256color
+
 {{ end -}}
