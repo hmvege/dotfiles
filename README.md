@@ -7,6 +7,7 @@ Feel free to use on your own risk, or to draw inspiration.
 ## TODO
 * Split settings into `~/.zprofile` and `~/.zshrc`
 * To fix matplotlib issue, add perhaps `python3-tk`
+* Update LSD after [snap support was discontinued](https://github.com/Peltoche/lsd/releases/tag/0.23.1)
 
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
