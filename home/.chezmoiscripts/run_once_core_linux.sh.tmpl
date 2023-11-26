@@ -9,30 +9,35 @@ set -euo pipefail
 sudo apt-get update
 
 packages=(
+    # Various CLI tools
     bat
-    # fasd
     fd-find
     git
     htop
     jq
+    mc
+    tmux
+    vim
+    rename
+    unzip
+    wget
+    zsh
+    # fasd
+    # Various packages needed for development
+    build-essential
+    libssl-dev
     libbz2-dev
     libffi-dev
     liblzma-dev
     libreadline-dev
     libsqlite3-dev
-    mc
     python-tk
     python3
     python3-venv
     python3-pip
     python3-tk
-    rename
     tk-dev
-    tmux
-    unzip
-    vim
-    wget
-    zsh
+    zlib1g-dev
     # For Gogh
     dconf-cli
     uuid-runtime
@@ -170,7 +175,11 @@ fi
 vscode_extensions=(
     ms-python.python
     ms-vscode.cpptools
+    xaver.clang-format
     sashaweiss.block-travel
+    eamodio.gitlens
+    ms-vscode.cmake-tools
+    streetsidesoftware.code-spell-checker
 )
 
 installed_extensions=$(code --list-extensions)

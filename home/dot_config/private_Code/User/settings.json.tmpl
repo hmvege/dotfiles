@@ -29,12 +29,19 @@
     },
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
-    "python.formatting.blackPath": "{{ .chezmoi.homeDir }}/.local/bin/black",
+    "python.formatting.blackPath": "{{ .chezmoi.homeDir }}.local/bin/black",
     "python.formatting.blackArgs": [
         "-l 79"
     ],
-    "window.zoomLevel": 1,
     "gitlens.codeLens.enabled": false,
     "gitlens.defaultTimeFormat": "HH:mm",
-    "C_Cpp.formatting": "clangFormat",
+    "clang-format.style": "file",
+    "editor.minimap.enabled": false,
+    // Ubuntu: disables the Ctrl+Alt focus
+    "window.titleBarStyle": "custom",
+    "window.customMenuBarAltFocus": false,
+    "cmake.configureOnOpen": true,
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
 }
