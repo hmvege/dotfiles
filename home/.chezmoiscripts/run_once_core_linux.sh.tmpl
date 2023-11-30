@@ -196,7 +196,6 @@ fi
 
 # We only install VSCode if snap is available on the system
 if command -v snap &> /dev/null; then
-
     if ! type -p code >/dev/null 2>&1
     then
         sudo snap install --classic code
@@ -270,22 +269,28 @@ then
 fi
 
 ## Gogh theme install setup
-# clone the repo into "$HOME/src/gogh"
-gogh_directory="$HOME/src/gogh"
-if [ ! -d $gogh_directory ]
+# Clones the repo into "$HOME/src/gogh"
+if [ "$TERM" = "xterm" ]
 then
-    mkdir -p "$HOME/src"
-    cd "$HOME/src"
-    git clone https://github.com/Gogh-Co/Gogh.git gogh
-    cd "$gogh_directory"
+    echo "Terminal is xterm. Skipping Gogh installation."
+else
+    GOGH_DIRECTORY="$HOME/src/gogh"
+    if [ ! -d $GOGH_DIRECTORY ]
+    then
+        mkdir -p "$HOME/src"
+        cd "$HOME/src"
+        git clone https://github.com/Gogh-Co/Gogh.git gogh
+        cd "$GOGH_DIRECTORY"
 
-    # necessary on ubuntu
-    export TERMINAL=gnome-terminal
+        # necessary on ubuntu
+        export TERMINAL=gnome-terminal
 
-    # install themes
-    ./afterglow.sh
-    cd "$HOME"
-    echo "Gogh theme installation complete"
+        # install themes
+        cd installs
+        ./afterglow.sh
+        cd "$HOME"
+        echo "Gogh theme installation complete"
+    fi
 fi
 
 {{ end -}}
