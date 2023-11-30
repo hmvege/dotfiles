@@ -41,9 +41,6 @@ packages=(
     # For Gogh
     dconf-cli
     uuid-runtime
-    #########################################
-    TODO: Install clang-format and clang-tidy
-    #########################################
 )
 
 sudo apt install -y ${packages[@]}
@@ -209,7 +206,17 @@ done
 ## lsd
 if ! type -p lsd >/dev/null 2>&1
 then
-    sudo snap install lsd
+    if curl -fsSL -o lsd.deb https://github.com/lsd-rs/lsd/releases/download/v1.0.0/lsd_1.0.0_amd64.deb
+    then
+        sudo dpkg -i lsd.deb
+    else
+        echo "Error downloading lsd package" >&2
+        exit 1
+    fi
+
+    # Cleanup
+    rm -v lsd.deb
+
     # /home/linuxbrew/.linuxbrew/bin/brew install lsd
     echo "Installed lsd"
 else

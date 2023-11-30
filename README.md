@@ -6,8 +6,8 @@ Feel free to use on your own risk, or to draw inspiration.
 
 ## TODO
 * Split settings into `~/.zprofile` and `~/.zshrc`
-* To fix matplotlib issue, add perhaps `python3-tk`
-* Update LSD after [snap support was discontinued](https://github.com/Peltoche/lsd/releases/tag/0.23.1)
+* Update LSD after [snap support was discontinued](https://github.com/lsd-rs/lsd/releases/latest)
+* Consider ways of installing clang-format, clang-tidy
 
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
@@ -172,3 +172,6 @@ dotfiles
 - https://github.com/goooseman/dotfiles
 - https://github.com/twpayne
 - Script for installing fonts: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0
+
+
+## :: License
