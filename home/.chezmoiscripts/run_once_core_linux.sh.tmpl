@@ -141,16 +141,48 @@ then
     echo "Installed pipx"
     /usr/local/bin/pipx ensurepath
     pipx_packages=(
-        flake8
-        mypy
         black
+        flake8
+        mkdocs
+        mypy
         pip-tools
+        poetry
         pre-commit
     )
     for pkg in ${pipx_packages[@]}
     do
         /usr/local/bin/pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
     done
+
+    ## Mypy package injections
+    mypy_packages=(
+        types-request
+    )
+    for pkg in ${mypy_packages[@]}
+    do
+        /usr/local/bin/pipx inject mypy $pkg
+    done
+
+    ## Flake8 package injections
+    flake8_packages=(
+        flake8-broken-line
+        flake8-bugbear
+        flake8-builtins
+        flake8-docstrings
+        flake8-docstrings-complete
+        flake8-import-order
+        flake8-markdown
+        flake8-pie
+        flake8-scream
+        flake8-simplify
+        flake8-use-fstring
+        flake8-useless-assert
+    )
+    for pkg in ${flake8_packages[@]}
+    do
+        /usr/local/bin/pipx inject flake8 $pkg
+    done
+
 else
     echo "Already installed pipx"
 fi

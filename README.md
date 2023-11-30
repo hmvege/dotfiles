@@ -76,7 +76,6 @@ and then the dotfiles can be applied again.
 Plugins used in Vim is,
  - [Material Theme](https://github.com/material-theme/vsc-community-material-theme)
 
-
 ### Oh-my-zsh
 ohmyzsh is used as framework for managing the zsh configuration.
 
