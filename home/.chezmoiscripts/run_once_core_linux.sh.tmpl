@@ -277,14 +277,14 @@ then
     mkdir -p "$HOME/src"
     cd "$HOME/src"
     git clone https://github.com/Gogh-Co/Gogh.git gogh
-    cd -v "$gogh_directory/gogh"
+    cd "$gogh_directory/gogh"
 
     # necessary on ubuntu
     export TERMINAL=gnome-terminal
 
     # install themes
     ./afterglow.sh
-    cd -v "$HOME"
+    cd "$HOME"
     echo "Gogh theme installation complete"
 fi
 
