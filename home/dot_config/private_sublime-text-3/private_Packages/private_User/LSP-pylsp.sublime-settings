@@ -1,0 +1,5 @@
+// Settings in here override those in "LSP-pylsp/LSP-pylsp.sublime-settings"
+{
+	// "python_binary": "/home/hmvege/.pyenv/shims/python3"
+	"pylsp.plugins.flake8.enabled": true,
+}

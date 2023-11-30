@@ -41,6 +41,9 @@ packages=(
     # For Gogh
     dconf-cli
     uuid-runtime
+    #########################################
+    TODO: Install clang-format and clang-tidy
+    #########################################
 )
 
 sudo apt install -y ${packages[@]}
@@ -140,8 +143,7 @@ fi
 # See https://github.com/pyenv/pyenv-virtualenv/issues/233
 if ! type -p pyenv >/dev/null 2>&1
 then
-    python_global_3_9="3.9.13"
-    python_global_3_10="3.10.5"
+    PYTHON_GLOBAL="3.11.6"
 
     curl https://pyenv.run | bash
     echo "Installed pyenv and pyenv-virtualenv"
@@ -149,15 +151,14 @@ then
     # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
     # in case the build fails.
     sudo apt-get install libssl-dev
-    $HOME/.pyenv/bin/pyenv install $python_global_3_9
-    $HOME/.pyenv/bin/pyenv install $python_global_3_10
-    $HOME/.pyenv/bin/pyenv global $python_global_3_9
-    echo "Global Python is already set to $python_global_3_9"
+    $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
+    $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
+    echo "Global Python is already set to $PYTHON_GLOBAL"
 else
     echo "Already installed pyenv and pyenv-virtualenv"
 fi
 
-# ## Brew
+# ## Brew # NOTE: unused since built in tools cover most of what is needed
 # if ! type -p brew >/dev/null 2>&1
 # then
 #     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -173,13 +174,24 @@ else
 fi
 
 vscode_extensions=(
-    ms-python.python
-    ms-vscode.cpptools
-    xaver.clang-format
-    sashaweiss.block-travel
     eamodio.gitlens
+    ms-azuretools.vscode-docker
+    ms-python.python
+    ms-python.vscode-pylance
+    ms-toolsai.jupyter
+    ms-toolsai.jupyter-keymap
+    ms-toolsai.jupyter-renderers
+    ms-toolsai.vscode-jupyter-cell-tags
+    ms-toolsai.vscode-jupyter-slideshow
+    ms-vscode-remote.remote-containers
     ms-vscode.cmake-tools
+    ms-vscode.cpptools
+    ms-vscode.cpptools-extension-pack
+    ms-vscode.cpptools-themes
+    sashaweiss.block-travel
     streetsidesoftware.code-spell-checker
+    twxs.cmake
+    xaver.clang-format
 )
 
 installed_extensions=$(code --list-extensions)
@@ -218,14 +230,15 @@ then
     mkdir -p "$HOME/src"
     cd "$HOME/src"
     git clone https://github.com/Gogh-Co/Gogh.git gogh
-    cd "$gogh_directory/themes"
+    cd -v "$gogh_directory/gogh"
 
     # necessary on ubuntu
     export TERMINAL=gnome-terminal
 
     # install themes
     ./afterglow.sh
-    cd "$HOME"
+    cd -v "$HOME"
+    echo "Gogh theme installation complete"
 fi
 
 {{ end -}}

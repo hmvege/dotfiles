@@ -1,27 +1,32 @@
 {
 	"DocblockrPython":
 	{
-		"formatter": "numpy",
+		"formatter": "sphinx",
 	},
 	"added_words":
 	[
+		"numerics",
+		"Bitbucket",
 	],
 	// Theme
 	"theme": "Gruvbox Material Dark.sublime-theme",
-    "color_scheme": "Packages/User/Material-Theme (Flake8Lint).tmTheme",
+    "color_scheme": "Packages/Material Theme/schemes/Material-Theme.tmTheme",
 	"folders":
 	[
 		{
 			"path": ".",
 		}
 	],
-	"font_size": 10,
+	"font_size": 15,
 	"ignored_packages":
 	[
 		"Vintage",
 	],
 	"ignored_words":
 	[
+		"Args",
+		"dataclasses",
+		"invariants",
 	],
 	"settings":
 	{

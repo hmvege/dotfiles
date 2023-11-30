@@ -82,6 +82,7 @@ else
     echo "vim plugin manager already installed"
 fi
 
+## VSCode installation
 if [ ! type -p code >/dev/null 2>&1 ]
 then
     brew install --cask visual-studio-code
@@ -91,9 +92,21 @@ else
 fi
 
 vscode_extensions=(
+    eamodio.gitlens
     ms-python.python
+    ms-python.vscode-pylance
+    ms-toolsai.vscode-jupyter-cell-tags
+    ms-toolsai.vscode-jupyter-slideshow
+    ms-vscode-remote.remote-containers
+    ms-vscode.cmake-tools
     ms-vscode.cpptools
+    ms-vscode.cpptools-extension-pack
+    ms-vscode.cpptools-themes
     sashaweiss.block-travel
+    streetsidesoftware.code-spell-checker
+    twxs.cmake
+    xaver.clang-format
+
 )
 
 installed_extensions=$(code --list-extensions)

@@ -136,6 +136,7 @@ fi
 eval "$(pyenv virtualenv-init -)"
 eval "$(pyenv init --path)"
 
+# In case you need HomeBrew for Linux, uncomment following lines:
 #echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/{{ .chezmoi.username }}/.zprofile
 #eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
@@ -162,6 +163,15 @@ bindkey "ç" fzf-cd-widget
 
 alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 echo 'export PATH="/usr/local/sbin:$PATH"' >> ~/.zshrc
+
+# If you need to enable custom ZSH completions, uncomment the following lines:
+# # Load custom completion functions
+# fpath=('/home/hmvege/.zsh/completion' $fpath)
+
+# # Load bash completion functions
+# autoload -Uz +X compinit && compinit
+# autoload -Uz +X bashcompinit && bashcompinit
+
 
 # Enabling terminal colors
 export TERM=xterm-256color

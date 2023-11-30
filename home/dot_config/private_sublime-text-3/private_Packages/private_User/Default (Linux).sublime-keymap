@@ -2,6 +2,7 @@
     { "keys": ["ctrl+shift+9"], "command": "indent" },
     { "keys": ["ctrl+shift+8"], "command": "unindent" },
     { "keys": ["ctrl+shift+g"], "command": "find_all_under" },
+
     // Unsets following commands in favor of indentation and commenting
     { "keys": [], "command": "focus_group", "args": { "group": 6 } },
     { "keys": [], "command": "focus_group", "args": { "group": 7 } },
@@ -9,9 +10,11 @@
     { "keys": [], "command": "move_to_group", "args": { "group": 7 } },
     { "keys": [], "command": "move_to_group", "args": { "group": 8 } },
     { "keys": [], "command": "move_to_group", "args": { "group": 9 } },
+
     // For moving cursor
     { "keys": ["ctrl+super+up"], "command": "select_lines", "args": {"forward": false} },
     { "keys": ["ctrl+super+down"], "command": "select_lines", "args": {"forward": true} },
+
     // For jumping between paragraphs
     { "keys": ["alt+up"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": false}},
     { "keys": ["alt+down"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": true}},

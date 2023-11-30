@@ -23,7 +23,8 @@ apt-get update && apt-get install -y curl sudo
 ```
 then download and apply the dotfiles,
 ```bash
-sh -c "$(curl -fsLS chezmoi.io/get)" -- -b "$HOME/dotfiles/bin" init --apply -S ~/dotfiles hmvege
+# sh -c "$(curl -fsLS chezmoi.io/get)" -- -b "$HOME/dotfiles/bin" init --apply -S ~/dotfiles hmvege
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init -S ~/dotfiles --apply --verbose hmvege
 ```
 which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 

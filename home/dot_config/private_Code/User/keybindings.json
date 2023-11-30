@@ -20,36 +20,6 @@
         "command": "block-travel.jumpDown",
         "when": "editorTextFocus"
     },
-    {
-        "key": "alt+meta+up",
-        "command": "editor.action.insertCursorAbove",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "shift+alt+up",
-        "command": "-editor.action.insertCursorAbove",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "alt+meta+down",
-        "command": "editor.action.insertCursorBelow",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "shift+alt+down",
-        "command": "-editor.action.insertCursorBelow",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "alt+down",
-        "command": "-editor.action.moveLinesDownAction",
-        "when": "editorTextFocus && !editorReadonly"
-    },
-    {
-        "key": "alt+up",
-        "command": "-editor.action.moveLinesUpAction",
-        "when": "editorTextFocus && !editorReadonly"
-    },
     // ctrl+shift+g Select all 
     // F2 follow symbol under cursor
     {
@@ -62,15 +32,6 @@
         "command": "editor.action.revealDefinition",
         "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
     },
-    // {
-    //     "key": "ctrl+r",
-    //     "command": "workbench.action.openRecent"
-    // },
-    // {
-    //     "key": "ctrl+r", // TODO: remove
-    //     "command": "workbench.action.reloadWindow",
-    //     "when": "isDevelopment"
-    // },
     // F4 change to header
     {
         "key": "f4",
@@ -149,6 +110,10 @@
         "command": "workbench.action.editorLayoutTwoColumns",
     },
     {
+        "key": "ctrl+alt+3",
+        "command": "workbench.action.editorLayoutThreeColumns",
+    },
+    {
         "key": "ctrl+k left",
         "command": "workbench.action.focusLeftGroup"
     },
@@ -163,5 +128,16 @@
     {
         "key": "ctrl+k ctrl+shift+right",
         "command": "workbench.action.moveEditorToRightGroup"
+    },
+    // Indentation similar to that of Sublime
+    {
+        "key": "ctrl+shift+9",
+        "command": "editor.action.indentLines",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+shift+8",
+        "command": "editor.action.outdentLines",
+        "when": "editorTextFocus && !editorReadonly"
     },
 ]

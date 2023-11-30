@@ -5,5 +5,5 @@
      * Available Options:
      * [PEP0257, docblock, google, numpy, sphinx]
      */
-    "formatter": "docblock"
+    "formatter": "sphinx"
 }
