@@ -194,46 +194,54 @@ fi
 #     echo "Installed Brew"
 # fi
 
-if ! type -p code >/dev/null 2>&1
-then
-    sudo snap install --classic code
-    echo "Installed VSCode"
+# We only install VSCode if snap is available on the system
+if command -v snap &> /dev/null; then
+
+    if ! type -p code >/dev/null 2>&1
+    then
+        sudo snap install --classic code
+        echo "Installed VSCode"
+    else
+        echo "Already installed VSCode"
+    fi
+
+    vscode_extensions=(
+        eamodio.gitlens
+        ms-azuretools.vscode-docker
+        ms-python.python
+        ms-python.vscode-pylance
+        ms-toolsai.jupyter
+        ms-toolsai.jupyter-keymap
+        ms-toolsai.jupyter-renderers
+        ms-toolsai.vscode-jupyter-cell-tags
+        ms-toolsai.vscode-jupyter-slideshow
+        ms-vscode-remote.remote-containers
+        ms-vscode.cmake-tools
+        ms-vscode.cpptools
+        ms-vscode.cpptools-extension-pack
+        ms-vscode.cpptools-themes
+        sashaweiss.block-travel
+        streetsidesoftware.code-spell-checker
+        twxs.cmake
+        xaver.clang-format
+    )
+
+    installed_extensions=$(code --list-extensions)
+    for extension in ${vscode_extensions[@]}
+    do
+        if ! echo $installed_extensions | grep -q $extension
+        then
+            code --install-extension $extension
+            echo "Installed $extension"
+        else
+            echo "VSCode extension $extension found"
+        fi
+    done
+
 else
-    echo "Already installed VSCode"
+    echo "Snap is not available. Skipping VSCode installation."
 fi
 
-vscode_extensions=(
-    eamodio.gitlens
-    ms-azuretools.vscode-docker
-    ms-python.python
-    ms-python.vscode-pylance
-    ms-toolsai.jupyter
-    ms-toolsai.jupyter-keymap
-    ms-toolsai.jupyter-renderers
-    ms-toolsai.vscode-jupyter-cell-tags
-    ms-toolsai.vscode-jupyter-slideshow
-    ms-vscode-remote.remote-containers
-    ms-vscode.cmake-tools
-    ms-vscode.cpptools
-    ms-vscode.cpptools-extension-pack
-    ms-vscode.cpptools-themes
-    sashaweiss.block-travel
-    streetsidesoftware.code-spell-checker
-    twxs.cmake
-    xaver.clang-format
-)
-
-installed_extensions=$(code --list-extensions)
-for extension in ${vscode_extensions[@]}
-do
-    if ! echo $installed_extensions | grep -q $extension
-    then
-        code --install-extension $extension
-        echo "Installed $extension"
-    else
-        echo "VSCode extension $extension found"
-    fi
-done
 
 ## lsd
 if ! type -p lsd >/dev/null 2>&1

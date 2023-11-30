@@ -11,9 +11,6 @@ RUN apt-get update && apt-get install -y \
     # any other software that your dotfiles configure
     && rm -rf /var/lib/apt/lists/*
 
-# For installing VSCode and snap
-RUN apt-get update && apt-get install -y snapd
-
 # Create a non-root user
 RUN useradd -m testuser && echo "testuser:testuser" | chpasswd && adduser testuser sudo
 
