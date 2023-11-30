@@ -6,7 +6,6 @@ Feel free to use on your own risk, or to draw inspiration.
 
 ## TODO
 * Split settings into `~/.zprofile` and `~/.zshrc`
-* Update LSD after [snap support was discontinued](https://github.com/lsd-rs/lsd/releases/latest)
 * Consider ways of installing clang-format, clang-tidy
 
 ## :dart: Goals
@@ -24,7 +23,7 @@ apt-get update && apt-get install -y curl sudo
 then download and apply the dotfiles,
 ```bash
 # sh -c "$(curl -fsLS chezmoi.io/get)" -- -b "$HOME/dotfiles/bin" init --apply -S ~/dotfiles hmvege
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init -S ~/dotfiles --apply --verbose hmvege
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose hmvege
 ```
 which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
@@ -129,6 +128,13 @@ Settings for VSCode have been added, and will continue being updated.
 ### Gogh
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
 
+## :alembic: Testing
+To test that the dotfiles work as intended, you can use the provided Dockerfile.
+```bash
+docker build . -t dotfiles-test-img
+docker run -it --name dotfiles-test dotfiles-test-img
+```
+
 ## :question: Troubleshooting
 
 ### Shell not changing
@@ -174,4 +180,4 @@ dotfiles
 - Script for installing fonts: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0
 
 
-## :: License
+## :balance_scale: License

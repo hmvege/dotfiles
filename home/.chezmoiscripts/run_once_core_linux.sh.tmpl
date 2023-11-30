@@ -87,7 +87,7 @@ fi
 ## tmux plugins
 if [ ! -d "${HOME}/.tmux/plugins/tpm" ]
 then
-    git clone https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
+    git clone https://github.com/tmux-plugins/tpm.git ${HOME}/.tmux/plugins/tpm
     echo "tmux plugin manager installed."
 else
     echo "tmux plugin manager already installed."
@@ -113,27 +113,6 @@ else
     echo "Already installed fzf"
 fi
 
-## pipx
-if ! type -p pipx >/dev/null 2>&1
-then
-    sudo /usr/bin/python3 -m pip install pipx
-    echo "Installed pipx"
-    /usr/local/bin/pipx ensurepath
-    pipx_packages=(
-        flake8
-        mypy
-        black
-        pip-tools
-        pre-commit
-    )
-    for pkg in ${pipx_packages[@]}
-    do
-        /usr/local/bin/pipx install $pkg
-    done
-else
-    echo "Already installed pipx"
-fi
-
 ## pyenv + pyenv-virtualenv
 ## Snippet inspired and taken from
 # https://github.com/tordks/.dotfiles/blob/master/install_pyenv.sh
@@ -153,6 +132,27 @@ then
     echo "Global Python is already set to $PYTHON_GLOBAL"
 else
     echo "Already installed pyenv and pyenv-virtualenv"
+fi
+
+## pipx
+if ! type -p pipx >/dev/null 2>&1
+then
+    sudo /usr/bin/python3 -m pip install pipx
+    echo "Installed pipx"
+    /usr/local/bin/pipx ensurepath
+    pipx_packages=(
+        flake8
+        mypy
+        black
+        pip-tools
+        pre-commit
+    )
+    for pkg in ${pipx_packages[@]}
+    do
+        /usr/local/bin/pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
+    done
+else
+    echo "Already installed pipx"
 fi
 
 # ## Brew # NOTE: unused since built in tools cover most of what is needed
