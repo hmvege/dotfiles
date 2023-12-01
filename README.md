@@ -22,8 +22,7 @@ apt-get update && apt-get install -y curl sudo
 ```
 then download and apply the dotfiles,
 ```bash
-# sh -c "$(curl -fsLS chezmoi.io/get)" -- -b "$HOME/dotfiles/bin" init --apply -S ~/dotfiles hmvege
-sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose hmvege
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 # sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose --branch 2-maintenance-update-python-versions-and-other hmvege
 ```
 which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
@@ -133,6 +132,10 @@ To test that the dotfiles work as intended, you can use the provided Dockerfile.
 ```bash
 docker build . -t dotfiles-test-img
 docker run -it --name dotfiles-test dotfiles-test-img
+```
+when running inside the Docker container, run following command and verify it runs without any issues:
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose hmvege
 ```
 
 ## :question: Troubleshooting
