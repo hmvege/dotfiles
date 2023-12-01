@@ -8,8 +8,12 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     sudo \
+    fontconfig \
     # any other software that your dotfiles configure
     && rm -rf /var/lib/apt/lists/*
+
+# Refreshes system font in preparation for setup
+RUN fc-cache -f -v
 
 # Create a non-root user
 RUN useradd -m testuser && echo "testuser:testuser" | chpasswd && adduser testuser sudo

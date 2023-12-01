@@ -272,7 +272,7 @@ fi
 # Clones the repo into "$HOME/src/gogh"
 if [ "$TERM" = "xterm" ]
 then
-    echo "Terminal is xterm. Skipping Gogh installation."
+    echo "Terminal is xterm. Skipping Gogh installation since terminal is not supported by Gogh."
 else
     GOGH_DIRECTORY="$HOME/src/gogh"
     if [ ! -d $GOGH_DIRECTORY ]

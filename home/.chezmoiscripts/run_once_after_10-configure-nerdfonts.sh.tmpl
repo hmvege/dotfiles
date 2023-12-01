@@ -6,48 +6,53 @@
 # failures.
 set -euo pipefail
 
-declare -a fonts=(
-    # BitstreamVeraSansMono
-    # CodeNewRoman
-    DroidSansMono
-    FiraCode
-    FiraMono
-    # Go-Mono
-    # Hack
-    # Hermit
-    # JetBrainsMono
-    # Meslo
-    # Noto
-    # Overpass
-    ProggyClean
-    RobotoMono
-    SourceCodePro
-    # SpaceMono
-    Ubuntu
-    UbuntuMono
-)
+if command -v fc-cache >/dev/null
+then
+    declare -a fonts=(
+        # BitstreamVeraSansMono
+        # CodeNewRoman
+        DroidSansMono
+        FiraCode
+        FiraMono
+        # Go-Mono
+        # Hack
+        # Hermit
+        # JetBrainsMono
+        # Meslo
+        # Noto
+        # Overpass
+        ProggyClean
+        RobotoMono
+        SourceCodePro
+        # SpaceMono
+        Ubuntu
+        UbuntuMono
+    )
 
-version='2.1.0'
-fonts_dir="${HOME}/.local/share/fonts"
+    version='3.1.1'
+    fonts_dir="${HOME}/.local/share/fonts"
 
-if [[ ! -d "$fonts_dir" ]]; then
-    mkdir -pv "$fonts_dir"
-fi
+    if [[ ! -d "$fonts_dir" ]]; then
+        mkdir -pv "$fonts_dir"
+    fi
 
-for font in "${fonts[@]}"; do
-    zip_file="${font}.zip"
-    download_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}/${zip_file}"
-    echo "Downloading $download_url"
-    wget "$download_url"
-    unzip "$zip_file" -d "$fonts_dir"
-    rm "$zip_file"
+    for font in "${fonts[@]}"; do
+        zip_file="${font}.zip"
+        download_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}/${zip_file}"
+        echo "Downloading $download_url"
+        wget "$download_url"
+        unzip "$zip_file" -d "$fonts_dir"
+        rm "$zip_file"
+    done
+
+    find "$fonts_dir" -name '*Windows Compatible*' -delete
+
+    echo "Rebuilding the font cache."
+    fc-cache -fv
+    echo "Fonts installed."
+else
+    echo "fc-cache not available. Skipping installing custom fonts"
 done
-
-find "$fonts_dir" -name '*Windows Compatible*' -delete
-
-echo "Rebuilding the font cache."
-fc-cache -fv
-echo "Fonts installed."
 
 {{ end -}}
 {{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}
