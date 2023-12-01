@@ -52,7 +52,7 @@ then
     echo "Fonts installed."
 else
     echo "fc-cache not available. Skipping installing custom fonts"
-done
+fi
 
 {{ end -}}
 {{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}

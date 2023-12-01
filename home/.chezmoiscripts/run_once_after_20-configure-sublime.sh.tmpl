@@ -38,7 +38,7 @@ echo "Linux flavour $OSTYPE not recognized."
 {{ end -}}
 {{ end -}}
 
-{{ if (eq .chezmoi.os "linux") -}}
+{{ if (eq .chezmoi.os "darwin") -}}
 brew install --cask sublime-text
 brew install --cask sublime-merge
 
