@@ -6,7 +6,6 @@ Feel free to use on your own risk, or to draw inspiration.
 
 ## TODO
 * Split settings into `~/.zprofile` and `~/.zshrc`
-* Consider ways of installing clang-format, clang-tidy
 
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
@@ -184,3 +183,4 @@ dotfiles
 
 
 ## :balance_scale: License
+MIT License.
