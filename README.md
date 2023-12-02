@@ -4,9 +4,6 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 Feel free to use on your own risk, or to draw inspiration.
 
-## TODO
-* Split settings into `~/.zprofile` and `~/.zshrc`
-
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
 * Have a, as close to as possible, fully **automatized dotfiles setup**.
@@ -29,33 +26,33 @@ which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as s
 ### Pulling latest changing from repository
 Pull latest changes from repository.
 ```bash
-bin/chezmoi update -v -S ~/dotfiles
+chezmoi update -v -S ~/dotfiles
 ```
 
 ### Apply changes
-Apply the changes made to the dotfiles made through `bin/chezmoi edit [$FILE]`
+Apply the changes made to the dotfiles made through `chezmoi edit [$FILE]`
 ```bash
-bin/chezmoi apply -v -S ~/dotfiles
+chezmoi apply -v -S ~/dotfiles
 ```
 `-v` displays what changes is being made. If `-n`, a dry run will be performed.
 
 ### Add changes to Chezmoi dotfiles
-Apply the changes made to the dotfiles made through `bin/chezmoi edit [$FILE]`
+Apply the changes made to the dotfiles made through `chezmoi edit [$FILE]`
 ```bash
-bin/chezmoi add -S ~/dotfiles <dotfile-path>
+chezmoi add -S ~/dotfiles <dotfile-path>
 ```
 `-v` displays what changes is being made. If `-n`, a dry run will be performed.
 
 ### Removing dotfiles
 In the case you wish to remove the dotfiles, run
 ```bash
-bin/chezmoi purge -S ~/dotfiles
+chezmoi purge -S ~/dotfiles
 ```
 
 ### Re-initializing
 If the prompt for GitHub mail (or similar templated parameters) are not prompted, this can be initialized by running
 ```bash
-bin/chezmoi ini -S ~/dotfiles
+chezmoi ini -S ~/dotfiles
 ```
 and then the dotfiles can be applied again.
 

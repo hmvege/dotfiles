@@ -1,0 +1,26 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"AutoDocstring",
+		"AutoPEP8",
+		"ColorPicker",
+		"Dockerfile Syntax Highlighting",
+		"Figlet Big ASCII Text",
+		"GithubEmoji",
+		"LSP",
+		"LSP-pyright",
+		"MarkdownPreview",
+		"MarkdownTOC",
+		"Package Control",
+		"python-black",
+		"SublimeLinter",
+		"SublimeLinter-flake8",
+		"SublimeLinter-mypy",
+		"TodoReview",
+		"TOML",
+	],
+}

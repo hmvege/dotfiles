@@ -1,7 +1,7 @@
 {
 	"DocblockrPython":
 	{
-		"formatter": "numpy",
+		"formatter": "sphinx",
 	},
 	"added_words":
 	[
