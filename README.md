@@ -19,7 +19,6 @@ apt-get update && apt-get install -y curl sudo
 then download and apply the dotfiles,
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
-# sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose --branch 2-maintenance-update-python-versions-and-other hmvege
 ```
 which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
@@ -52,7 +51,7 @@ chezmoi purge -S ~/dotfiles
 ### Re-initializing
 If the prompt for GitHub mail (or similar templated parameters) are not prompted, this can be initialized by running
 ```bash
-chezmoi ini -S ~/dotfiles
+chezmoi init -S ~/dotfiles
 ```
 and then the dotfiles can be applied again.
 
