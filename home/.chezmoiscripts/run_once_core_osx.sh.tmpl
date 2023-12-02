@@ -52,20 +52,18 @@ done
 
 echo "Packages installed"
 
-python_global_3_9="3.9.13"
-python_global_3_10="3.10.5"
+PYTHON_GLOBAL="3.11.6"
 
 if type -p pyenv >/dev/null 2>&1
 then
-    echo "pyenv exists: proceeding to check if global python is set to $python_global_3_9"
-    if ! pyenv which python | grep -q $python_global_3_9
+    echo "pyenv exists: proceeding to check if global python is set to $PYTHON_GLOBAL"
+    if ! pyenv which python | grep -q $PYTHON_GLOBAL
     then
         echo "Setting up pyenv globals"
-        pyenv install $python_global_3_9
-        pyenv install $python_global_3_10
-        pyenv global $python_global_3_9
+        pyenv install $PYTHON_GLOBAL
+        pyenv global $PYTHON_GLOBAL
     else
-        echo "Global Python is already set to $python_global_3_9"
+        echo "Global Python is already set to $PYTHON_GLOBAL"
     fi
 fi
 
@@ -82,6 +80,7 @@ else
     echo "vim plugin manager already installed"
 fi
 
+## VSCode installation
 if [ ! type -p code >/dev/null 2>&1 ]
 then
     brew install --cask visual-studio-code
@@ -91,9 +90,21 @@ else
 fi
 
 vscode_extensions=(
+    eamodio.gitlens
     ms-python.python
+    ms-python.vscode-pylance
+    ms-toolsai.vscode-jupyter-cell-tags
+    ms-toolsai.vscode-jupyter-slideshow
+    ms-vscode-remote.remote-containers
+    ms-vscode.cmake-tools
     ms-vscode.cpptools
+    ms-vscode.cpptools-extension-pack
+    ms-vscode.cpptools-themes
     sashaweiss.block-travel
+    streetsidesoftware.code-spell-checker
+    twxs.cmake
+    xaver.clang-format
+
 )
 
 installed_extensions=$(code --list-extensions)

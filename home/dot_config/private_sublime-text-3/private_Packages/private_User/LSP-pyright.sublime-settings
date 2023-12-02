@@ -6,7 +6,8 @@
             // In order to avoid annoying messages for missing imports.
             "reportImplicitStringConcatenation": "none",
             "reportMissingImports": "none",
-            "reportGeneralTypeIssue": "none"
-        }
+            "reportGeneralTypeIssue": "none",
+        },
+        "python.venvPath": ".",
     }
 }

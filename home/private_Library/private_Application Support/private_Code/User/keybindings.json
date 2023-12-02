@@ -1,53 +1,81 @@
 // Place your key bindings in this file to override the defaults
 [
     {
-        "key": "alt+shift+arrowUp", // whatever keybinding you want
+        "key": "alt+shift+up", // whatever keybinding you want
         "command": "block-travel.selectUp",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+shift+arrowDown",
+        "key": "alt+shift+down",
         "command": "block-travel.selectDown",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+arrowUp", // whatever keybinding you want
+        "key": "alt+up", // whatever keybinding you want
         "command": "block-travel.jumpUp",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+arrowDown",
+        "key": "alt+down",
         "command": "block-travel.jumpDown",
         "when": "editorTextFocus"
     },
+    // Select all matches
     {
-        "key": "alt+meta+up",
-        "command": "editor.action.insertCursorAbove",
-        "when": "editorTextFocus"
+        "key": "ctrl+meta+g",
+        "command": "selectAllSearchEditorMatches",
+        "when": "inSearchEditor"
     },
     {
-        "key": "shift+alt+up",
-        "command": "-editor.action.insertCursorAbove",
-        "when": "editorTextFocus"
+        "key": "ctrl+meta+g",
+        "command": "editor.action.selectHighlights",
+        "when": "editorFocus"
     },
+    // Move selected lines
     {
-        "key": "alt+meta+down",
-        "command": "editor.action.insertCursorBelow",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "shift+alt+down",
-        "command": "-editor.action.insertCursorBelow",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "alt+down",
-        "command": "-editor.action.moveLinesDownAction",
+        "key": "ctrl+meta+down",
+        "command": "editor.action.moveLinesDownAction",
         "when": "editorTextFocus && !editorReadonly"
     },
     {
-        "key": "alt+up",
-        "command": "-editor.action.moveLinesUpAction",
+        "key": "ctrl+meta+up",
+        "command": "editor.action.moveLinesUpAction",
         "when": "editorTextFocus && !editorReadonly"
+    },
+    // F4 change to header
+    {
+        "key": "f4",
+        "command": "goToNextReference",
+        "when": "inReferenceSearchEditor || referenceSearchVisible"
+    },
+    {
+        "key": "shift+f4",
+        "command": "goToPreviousReference",
+        "when": "inReferenceSearchEditor || referenceSearchVisible"
+    },
+    {
+        "key": "f4",
+        "command": "references-view.next",
+        "when": "reference-list.hasResult && references-view.canNavigate"
+    },
+    {
+        "key": "shift+f4",
+        "command": "references-view.prev",
+        "when": "reference-list.hasResult && references-view.canNavigate"
+    },
+    {
+        "key": "f4",
+        "command": "search.action.focusNextSearchResult",
+        "when": "hasSearchResult || inSearchEditor"
+    },
+    {
+        "key": "shift+f4",
+        "command": "search.action.focusPreviousSearchResult",
+        "when": "hasSearchResult || inSearchEditor"
+    },
+    {
+        "key": "f4", //"alt+o",
+        "command": "C_Cpp.SwitchHeaderSource",
+        "when": "editorTextFocus && editorLangId == 'c' || editorTextFocus && editorLangId == 'cpp' || editorTextFocus && editorLangId == 'cuda-cpp'"
     },
 ]

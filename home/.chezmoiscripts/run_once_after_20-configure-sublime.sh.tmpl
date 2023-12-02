@@ -20,6 +20,9 @@ then
     wget "https://packagecontrol.io/Package%20Control.sublime-package" -P "$installed_packages_dir"
     echo "Package Control downloaded - run ST4 in order to install the rest of the packages"
 
+    echo "Note: you may need to Disable then Enable the SublimeLinter - Flake8 package for it to work."
+    echo "Note: Remember to enter licenses if you have one"
+
     # # Material Theme installation
     # wget "https://github.com/equinusocio/material-theme/archive/refs/tags/v4.1.5.zip" -P $package_dir
     # unzip "$package_dir/v4.1.5.zip" -f "$package_dir"
@@ -34,26 +37,16 @@ fi
 echo "Linux flavour $OSTYPE not recognized."
 {{ end -}}
 {{ end -}}
-# {{ if ne .chezmoi.os "darwin" }}
 
-# package_dir=${HOME}/.config/sublime-text-3/Installed\ Packages
-# mkdir -pv "$package_dir"
+{{ if (eq .chezmoi.os "darwin") -}}
+brew install --cask sublime-text
+brew install --cask sublime-merge
 
-# wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
+ln -s "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge" /usr/local/bin/smerge
 
-# sudo apt install apt-transport-https
-# echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
-# sudo apt update
-# sudo apt install sublime-text
-# echo "Installed Sublime Text 4"
+echo "Installed Sublime Text 4"
+echo "Installed Sublime Merge"
+echo "Note: Remember to enter licenses if you have one"
 
-# wget "https://packagecontrol.io/Package%20Control.sublime-package" -P $package_dir
-# echo "Installed Package Control"
-
-# # # Material Theme installation
-# # wget "https://github.com/equinusocio/material-theme/archive/refs/tags/v4.1.5.zip" -P $package_dir
-# # unzip $package_dir"/v4.1.5.zip" -f $package_dir
-# # mv -v $(find $package_dir/. -maxdepth 1 -iname "material-theme-*") $package_dir/Material\ Theme
-# # echo "Material theme installed"
-
-# {{ end -}}
+{{ end -}}

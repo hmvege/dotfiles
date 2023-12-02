@@ -15,8 +15,9 @@
             "args": [
                 "--exclude=__pycache__,.pyc",
                 "--max-line-length=79",
-                "--select=E,F,W,C90",
-                "--extend-ignore=E203,W503",
+                "--docstring-convention=google",
+                // "--select=E,F,W,C90",
+                "--extend-ignore=E203,W503,PIE803,TRY003,TRY400,D100",
             ],
 
             // Path to the executable to be used. Either a string or an
@@ -32,7 +33,6 @@
             // Specify which python to use. Either a number or full path
             // to a python binary. SL will then basically use 'python -m'
             // to run the linter.
-            // "python": "/home/{{ .chezmoi.username }}/anaconda3/bin/python",
             "python": "/home/{{ .chezmoi.username }}/.pyenv/shims/python3",
 
             // **Only valid for NodeLinter**

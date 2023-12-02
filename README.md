@@ -4,9 +4,6 @@ Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpa
 
 Feel free to use on your own risk, or to draw inspiration.
 
-## TODO
-* Split settings into `~/.zprofile` and `~/.zshrc`
-
 ## :dart: Goals
 The goal for this dotfiles project repository, is following,
 * Have a, as close to as possible, fully **automatized dotfiles setup**.
@@ -21,40 +18,41 @@ apt-get update && apt-get install -y curl sudo
 ```
 then download and apply the dotfiles,
 ```bash
-sh -c "$(curl -fsLS chezmoi.io/get)" -- -b "$HOME/dotfiles/bin" init --apply -S ~/dotfiles hmvege
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
+# sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose --branch 2-maintenance-update-python-versions-and-other hmvege
 ```
 which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
 ### Pulling latest changing from repository
 Pull latest changes from repository.
 ```bash
-bin/chezmoi update -v -S ~/dotfiles
+chezmoi update -v -S ~/dotfiles
 ```
 
 ### Apply changes
-Apply the changes made to the dotfiles made through `bin/chezmoi edit [$FILE]`
+Apply the changes made to the dotfiles made through `chezmoi edit [$FILE]`
 ```bash
-bin/chezmoi apply -v -S ~/dotfiles
+chezmoi apply -v -S ~/dotfiles
 ```
 `-v` displays what changes is being made. If `-n`, a dry run will be performed.
 
 ### Add changes to Chezmoi dotfiles
-Apply the changes made to the dotfiles made through `bin/chezmoi edit [$FILE]`
+Apply the changes made to the dotfiles made through `chezmoi edit [$FILE]`
 ```bash
-bin/chezmoi add -S ~/dotfiles <dotfile-path>
+chezmoi add -S ~/dotfiles <dotfile-path>
 ```
 `-v` displays what changes is being made. If `-n`, a dry run will be performed.
 
 ### Removing dotfiles
 In the case you wish to remove the dotfiles, run
 ```bash
-bin/chezmoi purge -S ~/dotfiles
+chezmoi purge -S ~/dotfiles
 ```
 
 ### Re-initializing
 If the prompt for GitHub mail (or similar templated parameters) are not prompted, this can be initialized by running
 ```bash
-bin/chezmoi ini -S ~/dotfiles
+chezmoi ini -S ~/dotfiles
 ```
 and then the dotfiles can be applied again.
 
@@ -73,7 +71,6 @@ and then the dotfiles can be applied again.
 ### Vim plugins
 Plugins used in Vim is,
  - [Material Theme](https://github.com/material-theme/vsc-community-material-theme)
-
 
 ### Oh-my-zsh
 ohmyzsh is used as framework for managing the zsh configuration.
@@ -126,6 +123,17 @@ Settings for VSCode have been added, and will continue being updated.
 ### Gogh
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
 
+## :alembic: Testing
+To test that the dotfiles work as intended, you can use the provided Dockerfile.
+```bash
+docker build . -t dotfiles-test-img
+docker run -it --name dotfiles-test dotfiles-test-img
+```
+when running inside the Docker container, run following command and verify it runs without any issues:
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose hmvege
+```
+
 ## :question: Troubleshooting
 
 ### Shell not changing
@@ -169,3 +177,7 @@ dotfiles
 - https://github.com/goooseman/dotfiles
 - https://github.com/twpayne
 - Script for installing fonts: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0
+
+
+## :balance_scale: License
+MIT License.

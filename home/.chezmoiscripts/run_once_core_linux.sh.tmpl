@@ -9,30 +9,35 @@ set -euo pipefail
 sudo apt-get update
 
 packages=(
+    # Various CLI tools
     bat
-    # fasd
     fd-find
     git
     htop
     jq
+    mc
+    tmux
+    vim
+    rename
+    unzip
+    wget
+    zsh
+    # fasd
+    # Various packages needed for development
+    build-essential
+    libssl-dev
     libbz2-dev
     libffi-dev
     liblzma-dev
     libreadline-dev
     libsqlite3-dev
-    mc
     python-tk
     python3
     python3-venv
     python3-pip
     python3-tk
-    rename
     tk-dev
-    tmux
-    unzip
-    vim
-    wget
-    zsh
+    zlib1g-dev
     # For Gogh
     dconf-cli
     uuid-runtime
@@ -82,7 +87,7 @@ fi
 ## tmux plugins
 if [ ! -d "${HOME}/.tmux/plugins/tpm" ]
 then
-    git clone https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
+    git clone https://github.com/tmux-plugins/tpm.git ${HOME}/.tmux/plugins/tpm
     echo "tmux plugin manager installed."
 else
     echo "tmux plugin manager already installed."
@@ -108,35 +113,13 @@ else
     echo "Already installed fzf"
 fi
 
-## pipx
-if ! type -p pipx >/dev/null 2>&1
-then
-    sudo /usr/bin/python3 -m pip install pipx
-    echo "Installed pipx"
-    /usr/local/bin/pipx ensurepath
-    pipx_packages=(
-        flake8
-        mypy
-        black
-        pip-tools
-        pre-commit
-    )
-    for pkg in ${pipx_packages[@]}
-    do
-        /usr/local/bin/pipx install $pkg
-    done
-else
-    echo "Already installed pipx"
-fi
-
 ## pyenv + pyenv-virtualenv
 ## Snippet inspired and taken from
 # https://github.com/tordks/.dotfiles/blob/master/install_pyenv.sh
 # See https://github.com/pyenv/pyenv-virtualenv/issues/233
 if ! type -p pyenv >/dev/null 2>&1
 then
-    python_global_3_9="3.9.13"
-    python_global_3_10="3.10.5"
+    PYTHON_GLOBAL="3.11.6"
 
     curl https://pyenv.run | bash
     echo "Installed pyenv and pyenv-virtualenv"
@@ -144,51 +127,135 @@ then
     # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
     # in case the build fails.
     sudo apt-get install libssl-dev
-    $HOME/.pyenv/bin/pyenv install $python_global_3_9
-    $HOME/.pyenv/bin/pyenv install $python_global_3_10
-    $HOME/.pyenv/bin/pyenv global $python_global_3_9
-    echo "Global Python is already set to $python_global_3_9"
+    $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
+    $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
+    echo "Global Python is already set to $PYTHON_GLOBAL"
 else
     echo "Already installed pyenv and pyenv-virtualenv"
 fi
 
-# ## Brew
+## pipx
+if ! type -p pipx >/dev/null 2>&1
+then
+    sudo /usr/bin/python3 -m pip install pipx
+    echo "Installed pipx"
+    /usr/local/bin/pipx ensurepath
+    pipx_packages=(
+        black
+        flake8
+        mkdocs
+        mypy
+        pip-tools
+        poetry
+        pre-commit
+    )
+    for pkg in ${pipx_packages[@]}
+    do
+        /usr/local/bin/pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
+    done
+
+    ## Mypy package injections
+    mypy_packages=(
+        types-requests
+    )
+    for pkg in ${mypy_packages[@]}
+    do
+        /usr/local/bin/pipx inject mypy $pkg
+    done
+
+    ## Flake8 package injections
+    flake8_packages=(
+        flake8-broken-line
+        flake8-bugbear
+        flake8-builtins
+        flake8-docstrings
+        flake8-docstrings-complete
+        flake8-import-order
+        flake8-markdown
+        flake8-pie
+        flake8-scream
+        flake8-simplify
+        flake8-use-fstring
+        flake8-useless-assert
+    )
+    for pkg in ${flake8_packages[@]}
+    do
+        /usr/local/bin/pipx inject flake8 $pkg
+    done
+
+else
+    echo "Already installed pipx"
+fi
+
+# ## Brew # NOTE: unused since built in tools cover most of what is needed
 # if ! type -p brew >/dev/null 2>&1
 # then
 #     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 #     echo "Installed Brew"
 # fi
 
-if ! type -p code >/dev/null 2>&1
-then
-    sudo snap install --classic code
-    echo "Installed VSCode"
+# We only install VSCode if snap is available on the system
+if command -v snap &> /dev/null; then
+    if ! type -p code >/dev/null 2>&1
+    then
+        sudo snap install --classic code
+        echo "Installed VSCode"
+    else
+        echo "Already installed VSCode"
+    fi
+
+    vscode_extensions=(
+        eamodio.gitlens
+        ms-azuretools.vscode-docker
+        ms-python.python
+        ms-python.vscode-pylance
+        ms-toolsai.jupyter
+        ms-toolsai.jupyter-keymap
+        ms-toolsai.jupyter-renderers
+        ms-toolsai.vscode-jupyter-cell-tags
+        ms-toolsai.vscode-jupyter-slideshow
+        ms-vscode-remote.remote-containers
+        ms-vscode.cmake-tools
+        ms-vscode.cpptools
+        ms-vscode.cpptools-extension-pack
+        ms-vscode.cpptools-themes
+        sashaweiss.block-travel
+        streetsidesoftware.code-spell-checker
+        twxs.cmake
+        xaver.clang-format
+    )
+
+    installed_extensions=$(code --list-extensions)
+    for extension in ${vscode_extensions[@]}
+    do
+        if ! echo $installed_extensions | grep -q $extension
+        then
+            code --install-extension $extension
+            echo "Installed $extension"
+        else
+            echo "VSCode extension $extension found"
+        fi
+    done
+
 else
-    echo "Already installed VSCode"
+    echo "Snap is not available. Skipping VSCode installation."
 fi
 
-vscode_extensions=(
-    ms-python.python
-    ms-vscode.cpptools
-    sashaweiss.block-travel
-)
-
-installed_extensions=$(code --list-extensions)
-for extension in ${vscode_extensions[@]}
-do
-    if ! echo $installed_extensions | grep -q $extension
-    then
-        code --install-extension $extension
-        echo "Installed $extension"
-    else
-        echo "VSCode extension $extension found"
-    fi
-done
 
 ## lsd
 if ! type -p lsd >/dev/null 2>&1
 then
-    sudo snap install lsd
+    if curl -fsSL -o lsd.deb https://github.com/lsd-rs/lsd/releases/download/v1.0.0/lsd_1.0.0_amd64.deb
+    then
+        sudo dpkg -i lsd.deb
+    else
+        echo "Error downloading lsd package" >&2
+        exit 1
+    fi
+
+    # Cleanup
+    rm -v lsd.deb
+
     # /home/linuxbrew/.linuxbrew/bin/brew install lsd
     echo "Installed lsd"
 else
@@ -202,21 +269,28 @@ then
 fi
 
 ## Gogh theme install setup
-# clone the repo into "$HOME/src/gogh"
-gogh_directory="$HOME/src/gogh"
-if [ ! -d $gogh_directory ]
+# Clones the repo into "$HOME/src/gogh"
+if [ "$TERM" = "xterm" ]
 then
-    mkdir -p "$HOME/src"
-    cd "$HOME/src"
-    git clone https://github.com/Gogh-Co/Gogh.git gogh
-    cd "$gogh_directory/themes"
+    echo "Terminal is xterm. Skipping Gogh installation since terminal is not supported by Gogh."
+else
+    GOGH_DIRECTORY="$HOME/src/gogh"
+    if [ ! -d $GOGH_DIRECTORY ]
+    then
+        mkdir -p "$HOME/src"
+        cd "$HOME/src"
+        git clone https://github.com/Gogh-Co/Gogh.git gogh
+        cd "$GOGH_DIRECTORY"
 
-    # necessary on ubuntu
-    export TERMINAL=gnome-terminal
+        # necessary on ubuntu
+        export TERMINAL=gnome-terminal
 
-    # install themes
-    ./afterglow.sh
-    cd "$HOME"
+        # install themes
+        cd installs
+        ./afterglow.sh
+        cd "$HOME"
+        echo "Gogh theme installation complete"
+    fi
 fi
 
 {{ end -}}
