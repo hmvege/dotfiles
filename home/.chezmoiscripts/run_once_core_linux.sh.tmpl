@@ -2,9 +2,22 @@
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 #!/bin/bash
 
-# Set to catch non-zero exit status errors, variable errors or pipeline 
+# Set to catch non-zero exit status errors, variable errors or pipeline
 # failures.
 set -euo pipefail
+
+echo "System type: {{ .chezmoi.kernel.osrelease }}"
+
+{{ if (not (.chezmoi.kernel.osrelease | lower | contains "microsoft")) }}
+echo "INSTALLING ON NOT WSL"
+sleep 2
+{{ end -}}
+
+
+{{ if (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
+echo "INSTALLING ON WSL"
+sleep 2
+{{ end -}}
 
 sudo apt-get update
 
