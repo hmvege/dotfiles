@@ -3,23 +3,27 @@
 echo ""
 echo ""
 echo "==== DOTFILES SETUP COMPLETE ===="
-echo "You may need to relog into your user($USER) for the dotfiles to effect."
+echo "You may need to logout and log in into your user($USER) for the dotfiles to effect."
 
 {{ if (eq .chezmoi.os "linux") -}}
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 {{ if not (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
-echo ""
-echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
 
-echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
-old_ifs="$IFS"
-IFS="
-"
-for p in $(awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d')
-do
-    echo "    $p"
-done
-IFS="$old_ifs"
+# Only runs if we have a desktop
+if [[ $XDG_SESSION_DESKTOP == "ubuntu" ]]
+    echo ""
+    echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
+
+    echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
+    old_ifs="$IFS"
+    IFS="
+    "
+    for p in $(awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d')
+    do
+        echo "    $p"
+    done
+    IFS="$old_ifs"
+fi
 
 {{ end -}}
 {{ end -}}
@@ -30,5 +34,5 @@ then
     echo "NOTE: Current shell is $SHELL."
     echo "Make sure to change your shell:"
     echo 'chsh -s $(which zsh)'
-    echo 'or restart your terminal session. You may need to log out and login again if none of this works.'
+    echo 'or restart your terminal session.'
 fi

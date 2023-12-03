@@ -194,7 +194,7 @@ fi
 #     echo "Installed Brew"
 # fi
 
-# Will not install Gogh if WSL is detected
+# Will not install VSCode if WSL is detected
 {{ if (not (.chezmoi.kernel.osrelease | lower | contains "microsoft")) }}
 # We only install VSCode if snap is available on the system
 if command -v snap &> /dev/null; then

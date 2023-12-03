@@ -2,32 +2,33 @@
 {{ if (eq .chezmoi.os "linux") -}}
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 {{ if not (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
+if [[ $XDG_SESSION_DESKTOP == "ubuntu" ]]
+then
+    package_dir=${HOME}/.config/sublime-text-3/Packages
+    installed_packages_dir=${HOME}/.config/sublime-text-3/Installed\ Packages/
+    mkdir -pv "$package_dir" "$installed_packages_dir"
 
-package_dir=${HOME}/.config/sublime-text-3/Packages
-installed_packages_dir=${HOME}/.config/sublime-text-3/Installed\ Packages/
-mkdir -pv "$package_dir" "$installed_packages_dir"
+    wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
 
-wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+    sudo apt install apt-transport-https
+    echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+    sudo apt update
+    sudo apt install sublime-text
+    echo "Installed Sublime Text 4"
 
-sudo apt install apt-transport-https
-echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
-sudo apt update
-sudo apt install sublime-text
-echo "Installed Sublime Text 4"
+    wget "https://packagecontrol.io/Package%20Control.sublime-package" -P "$installed_packages_dir"
+    echo "Package Control downloaded - run ST4 in order to install the rest of the packages"
 
-wget "https://packagecontrol.io/Package%20Control.sublime-package" -P "$installed_packages_dir"
-echo "Package Control downloaded - run ST4 in order to install the rest of the packages"
+    echo "Note: you may need to Disable then Enable the SublimeLinter - Flake8 package for it to work."
+    echo "Note: Remember to enter licenses if you have one"
 
-echo "Note: you may need to Disable then Enable the SublimeLinter - Flake8 package for it to work."
-echo "Note: Remember to enter licenses if you have one"
-
-# # Material Theme installation
-# wget "https://github.com/equinusocio/material-theme/archive/refs/tags/v4.1.5.zip" -P $package_dir
-# unzip "$package_dir/v4.1.5.zip" -f "$package_dir"
-# target_dir="$package_dir/Material\ Theme"
-# mv -v "$(find "$package_dir"/. -maxdepth 1 -type d -iname "material-theme-*")" "$target_dir"
-# echo "Material theme installed"
-
+    # # Material Theme installation
+    # wget "https://github.com/equinusocio/material-theme/archive/refs/tags/v4.1.5.zip" -P $package_dir
+    # unzip "$package_dir/v4.1.5.zip" -f "$package_dir"
+    # target_dir="$package_dir/Material\ Theme"
+    # mv -v "$(find "$package_dir"/. -maxdepth 1 -type d -iname "material-theme-*")" "$target_dir"
+    # echo "Material theme installed"
+fi
 {{ end -}}
 {{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}
 echo "Linux flavour $OSTYPE not recognized."
