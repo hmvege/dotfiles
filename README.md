@@ -8,7 +8,11 @@ Feel free to use on your own risk, or to draw inspiration.
 The goal for this dotfiles project repository, is following,
 * Have a, as close to as possible, fully **automatized dotfiles setup**.
 * Have the setup **install packages automatically**.
-* Have a **cross-platform** dotfiles setup, working for both MacOS and Ubuntu.
+* Have a **cross-platform** dotfiles setup, working for
+   * MacOS
+   * Ubuntu 20.04
+   * Ubuntu 22.04
+   * WSL
 * Have it be easily **maintained**. I.e. changes applied at one machine, will be easily transferable to another machine.
 
 ## :scroll: Installation

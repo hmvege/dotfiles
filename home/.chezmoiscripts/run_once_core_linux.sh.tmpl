@@ -2,7 +2,7 @@
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 #!/bin/bash
 
-# Set to catch non-zero exit status errors, variable errors or pipeline 
+# Set to catch non-zero exit status errors, variable errors or pipeline
 # failures.
 set -euo pipefail
 
@@ -194,6 +194,8 @@ fi
 #     echo "Installed Brew"
 # fi
 
+# Will not install VSCode if WSL is detected
+{{ if (not (.chezmoi.kernel.osrelease | lower | contains "microsoft")) }}
 # We only install VSCode if snap is available on the system
 if command -v snap &> /dev/null; then
     if ! type -p code >/dev/null 2>&1
@@ -240,6 +242,7 @@ if command -v snap &> /dev/null; then
 else
     echo "Snap is not available. Skipping VSCode installation."
 fi
+{{ end -}}
 
 
 ## lsd
@@ -268,6 +271,8 @@ then
     ln -s $(which fdfind) ~/.local/bin/fd
 fi
 
+# Will not install Gogh if WSL is detected
+{{ if (not (.chezmoi.kernel.osrelease | lower | contains "microsoft")) }}
 ## Gogh theme install setup
 # Clones the repo into "$HOME/src/gogh"
 if [ "$TERM" = "xterm" ]
@@ -292,6 +297,7 @@ else
         echo "Gogh theme installation complete"
     fi
 fi
+{{ end -}}
 
 {{ end -}}
 {{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}
