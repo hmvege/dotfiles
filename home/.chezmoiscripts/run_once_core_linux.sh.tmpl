@@ -6,19 +6,6 @@
 # failures.
 set -euo pipefail
 
-echo "System type: {{ .chezmoi.kernel.osrelease }}"
-
-{{ if (not (.chezmoi.kernel.osrelease | lower | contains "microsoft")) }}
-echo "INSTALLING ON NOT WSL"
-sleep 2
-{{ end -}}
-
-
-{{ if (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
-echo "INSTALLING ON WSL"
-sleep 2
-{{ end -}}
-
 sudo apt-get update
 
 packages=(
