@@ -1,4 +1,5 @@
 {{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+{{ if ne .chezmoi.osRelease.id "rocky" -}}
 #!/bin/bash
 
 set -eufo pipefail
@@ -9,4 +10,5 @@ vim -E -s -c 'PlugUpdate' -c 'qa!'
 vim -E -s -c 'PlugInstall kaicataldo/material.vim' -c 'qa!'
 echo "Installed material theme for vim"
 
+{{ end -}}
 {{ end -}}
