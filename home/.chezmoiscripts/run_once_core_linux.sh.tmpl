@@ -299,6 +299,7 @@ else
         echo "Gogh theme installation complete"
     fi
 fi
+{{ end -}}
 {{ else if eq .chezmoi.osRelease.id "rocky" -}}
 #!/bin/bash
 
@@ -373,8 +374,7 @@ else
     echo "Already installed fzf"
 fi
 
-{{ end -}}
-{{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}
+{{ else -}}
 echo "Linux flavour $OSTYPE not recognized."
 {{ end -}}
 {{ end -}}
