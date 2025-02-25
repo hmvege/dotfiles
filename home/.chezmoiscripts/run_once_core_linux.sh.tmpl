@@ -315,9 +315,6 @@ set -euo pipefail
 sudo dnf -y update
 
 packages=(
-    # Various CLI tools
-    # bat
-    htop
     jq
     vim-enhanced
     unzip
@@ -326,6 +323,11 @@ packages=(
 )
 
 sudo dnf -y install ${packages[@]}
+
+# # Non-lite install:
+# sudo dnf -y install epel-release
+# sudo dnf -y install bat
+
 echo "Packages installed."
 
 ## Oh-my-zsh
