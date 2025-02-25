@@ -34,3 +34,10 @@ Library/Application\ Support/Code/User/settings.json
 .config/Code/User/keybindings.json
 .config/Code/User/settings.json
 {{ end }}
+{{ if (eq .chezmoi.osRelease.id "rocky") -}}
+.config/Code/
+.config/sublime-text-3
+.config/htop/htoprc
+.tmux.conf
+.vimrc
+{{ end -}}
