@@ -124,7 +124,7 @@ fi
 # fasd shortcuts
 alias fp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias v='f -e vim' # quick opening files with vim
-{{ if (ne .chezmoi.osRelease.id "rocky") -}}
+{{ if ne .chezmoi.osRelease.id "rocky" -}}
 alias o='a -e xdg-open' # quick opening files with xdg-open
 
 # LSD settings
@@ -146,9 +146,7 @@ if command -v pyenv 1>/dev/null 2>&1; then
 fi
 eval "$(pyenv virtualenv-init -)"
 eval "$(pyenv init --path)"
-{{ end -}}
 
-{{ if (ne .chezmoi.osRelease.id "rocky") -}}
 # Created by `pipx` on 2022-02-16 12:29:05
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -157,7 +155,7 @@ export PATH="$PATH:/snap/bin/"
 
 # LSD aliases
 alias ltsh='lt -l --blocks size --blocks name'
-{{ end- }}
+{{ end -}}
 
 {{ if (eq .chezmoi.os "darwin") -}}
 # For making alt+c change directory work in MacOS
