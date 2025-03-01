@@ -55,7 +55,7 @@ else
 fi
 
 {{ else if eq .chezmoi.osRelease.id "rocky" -}}
-#!bin/sh
+#!/bin/sh
 echo "Not installing fonts for Rocky"
 {{ else -}}
 #!/bin/sh
