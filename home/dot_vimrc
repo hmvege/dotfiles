@@ -1,6 +1,7 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'kaicataldo/material.vim', { 'branch': 'main' }
+" Plug 'kaicataldo/material.vim', { 'branch': 'main' }
+Plug 'sainnhe/everforest'
 
 " Initialize plugin system
 call plug#end()
@@ -59,11 +60,21 @@ set hlsearch
 set history=1000
 
 "" Enable true color
-"if exists('+termguicolors')
-"  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-"  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-"  set termguicolors
-"endif
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
 
 " Color scheme from https://vimcolorschemes.com/kaicataldo/material.vim
-colorscheme material
+if empty(glob('~/.vim/plugged/everforest'))
+    silent! PlugInstall
+endif
+
+try
+    colorscheme everforest
+    let g:everforest_background = 'medium'
+catch
+    " Fallback to default colorscheme if everforest is not installed
+    colorscheme default
+endtry
