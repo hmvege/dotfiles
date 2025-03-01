@@ -6,8 +6,10 @@ set -euo pipefail
 
 # vim -c PlugUpdate -c qa
 # vim -c PlugInstall 'kaicataldo/material.vim' -c qa
+vim -E -s -c 'PlugInstall' -c 'qa!'
 vim -E -s -c 'PlugUpdate' -c 'qa!'
-vim -E -s -c 'PlugInstall kaicataldo/material.vim' -c 'qa!'
+# vim -E -s -c 'PlugUpdate' -c 'qa!'
+# vim -E -s -c 'PlugInstall kaicataldo/material.vim' -c 'qa!'
 echo "Installed material theme for vim"
 
 {{ end -}}
