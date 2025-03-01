@@ -39,5 +39,4 @@ Library/Application\ Support/Code/User/settings.json
 .config/sublime-text-3
 .config/htop/htoprc
 .tmux.conf
-.vimrc
 {{ end -}}

@@ -55,7 +55,10 @@ else
 fi
 
 {{ end -}}
-{{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}
+{{ else if eq .chezmoi.osRelease.id "rocky" -}}
+#!bin/sh
+echo "Not installing fonts for Rocky8"
+{{ else -}}
 #!/bin/sh
 echo "Linux flavour $OSTYPE not recognized."
 {{ end -}}
