@@ -330,6 +330,17 @@ sudo dnf -y install ${packages[@]}
 
 echo "Packages installed."
 
+## vim plugin manager
+if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
+then
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    echo "vim plugin manager installed"
+else
+    echo "vim plugin manager already installed"
+fi
+
+
 ## Oh-my-zsh
 if [ -d "${HOME}/.oh-my-zsh" ]; then
     echo "Oh My Zsh already installed at: ${HOME}/.oh-my-zsh"
