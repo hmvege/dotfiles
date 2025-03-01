@@ -67,9 +67,9 @@ set history=1000
 "endif
 
 " Color scheme from https://vimcolorschemes.com/kaicataldo/material.vim
-if empty(glob('~/.vim/plugged/everforest'))
-    silent! PlugInstall
-endif
+" if empty(glob('~/.vim/plugged/everforest'))
+"     silent! PlugInstall
+" endif
 
 try
     colorscheme everforest
