@@ -16,7 +16,7 @@ RPROMPT='%{$reset_color%}[%D{%H:%M:%S}]'
 
 # Detect SSH and apply color
 if [[ -n "$SSH_CONNECTION" ]]; then
-    SSH_INFO="%F{red}%n@%m%f "  # Light red if in SSH session
+    USER_HOST="%F{red}%n@%m%f "  # Light red if in SSH session
 else
     USER_HOST="%F{cyan}%n@%m%f " # Cyan otherwise
 fi
@@ -25,4 +25,4 @@ fi
 PROMPT_SYMBOL='%(?.%F{green}>.%F{red}>%f)'
 
 # Main prompt
-PS1='${SSH_INFO}%F{166}%~ %F{106}$(git_current_branch)$(git_prompt_status) %{$reset_color%} ${NEWLINE}${PROMPT_SYMBOL}%{$reset_color%} '
+PS1='${USER_HOST}%F{166}%~ %F{106}$(git_current_branch)$(git_prompt_status) %{$reset_color%} ${NEWLINE}${PROMPT_SYMBOL}%{$reset_color%} '
