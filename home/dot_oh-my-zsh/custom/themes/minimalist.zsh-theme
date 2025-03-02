@@ -22,10 +22,10 @@ else
 fi
 
 # Python Virtual Environment Indicator
-VIRTUAL_ENV_PROMPT='${VIRTUAL_ENV:+(%F{blue}${VIRTUAL_ENV:t}%f)} '
+VIRTUAL_ENV_PROMPT='$(if [[ -n "$VIRTUAL_ENV" ]]; then echo "%F{blue}(${VIRTUAL_ENV:t})%f "; fi)'
 
 # Return status indicator (Green '>' if success, Red '>' + exit code if failed)
-PROMPT_SYMBOL='%(?.%F{green}>.%F{red}> (exit $?)%f'
+PROMPT_SYMBOL='%(?.%F{green}>.%F{red}>%f'
 
 # Main prompt
 PS1='${SSH_INFO}${VIRTUAL_ENV_PROMPT}%F{166}%~ %F{106}$(git_current_branch)$(git_prompt_status) %{$reset_color%} ${NEWLINE}${PROMPT_SYMBOL} '

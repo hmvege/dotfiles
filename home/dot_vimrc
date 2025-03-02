@@ -79,10 +79,13 @@ try
     set background=dark
 
     " For contrast mode
-    let g:everforest_background = 'medium'
+    let g:everforest_background = 'hard'
 
     " For better performance
     let g:everforest_better_performance = 1
+
+    " Disabling italic, since it may mess up display
+    let g:everforest_disable_italic_comment = 1
 
     colorscheme everforest
 
