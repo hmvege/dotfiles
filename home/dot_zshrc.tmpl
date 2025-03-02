@@ -14,9 +14,8 @@ export ZSH="/home/{{ .chezmoi.username }}/.oh-my-zsh"
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 ZSH_THEME="bureau"
-{{ end -}}
 {{ else if eq .chezmoi.osRelease.id "rocky" -}}
-ZSH_THEME="less-noise"
+ZSH_THEME="minimalist"
 {{ else -}}
 ZSH_THEME="bureau"
 {{ end -}}
