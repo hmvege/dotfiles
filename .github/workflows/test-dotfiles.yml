@@ -32,7 +32,7 @@ jobs:
         run: |
           docker build \
             --build-arg UBUNTU_VERSION=${{ matrix.ubuntu_version }} \
-            --build-arg GIT_BRANCH=${{ github.ref_name }} \
+            --build-arg GIT_BRANCH=${{ github.head_ref }} \
             -t dotfiles-test-image-${{ matrix.os }} \
             -f tests/${{ matrix.dockerfile_path }}/Dockerfile .
 
