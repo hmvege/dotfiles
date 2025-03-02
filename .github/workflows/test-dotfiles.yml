@@ -14,11 +14,11 @@ jobs:
     strategy:
       matrix:
         include:
-            - os: Ubuntu22.04
+            - os: ubuntu22-04
               ubuntu_version: "22.04"
-            - os: Ubuntu24.04
+            - os: ubuntu22-04
               ubuntu_version: "24.04"
-            - os: RockyLinux8
+            - os: rocklinux8
               ubuntu_version: "8"  # Assuming Rocky uses "8"
     
     steps:
