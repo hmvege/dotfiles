@@ -1,0 +1,40 @@
+name: Test Dotfiles Installation
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test-dotfiles:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+            - os: Ubuntu22.04
+              ubuntu_version: "22.04"
+            - os: Ubuntu24.04
+              ubuntu_version: "24.04"
+            - os: RockyLinux8
+              ubuntu_version: "8"  # Assuming Rocky uses "8"
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image for ${{ matrix.os }}
+        run: |
+          docker build \
+            --build-arg UBUNTU_VERSION=${{ matrix.ubuntu_version }} \
+            --build-arg GIT_BRANCH=${{ github.ref_name }} \
+            -t dotfiles-test-image-${{ matrix.os }} \
+            -f tests/${{ matrix.os }}/Dockerfile .
+
+      - name: Installing dotfiles and verifying successful installation
+        run: |
+          docker run \
+            --rm -it dotfiles-test-image-${{ matrix.os }} \
+            bash -c "chezmoi apply && echo 'SUCCESSFUL INSTALL' || (echo 'INSTALL FAILED'; exec bash)"
