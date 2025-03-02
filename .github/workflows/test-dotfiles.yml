@@ -38,6 +38,5 @@ jobs:
 
       - name: Installing dotfiles and verifying successful installation
         run: |
-          docker run \
-            --rm -it dotfiles-test-image-${{ matrix.os }} \
-            bash -c "chezmoi apply && echo 'SUCCESSFUL INSTALL' || (echo 'INSTALL FAILED'; exec bash)"
+          docker run --rm dotfiles-test-image-${{ matrix.os }} \
+            bash -c "chezmoi apply && echo 'SUCCESSFUL INSTALL' || (echo 'INSTALL FAILED'; exit 1)"

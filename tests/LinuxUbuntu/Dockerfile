@@ -11,8 +11,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user for testing, handling existing GID conflicts (GitHub action ubuntu docker images has 1000)
-RUN if ! getent group 1000 > /dev/null; then groupadd -g 1000 developer; fi && \
-    useradd -m -s /bin/bash -u 1000 -g $(getent group 1000 | cut -d: -f3) developer && \
+RUN groupadd -g 1010 developer && \
+    useradd -m -s /bin/bash -u 1010 -g 1010 developer && \
     echo "developer ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Ensure the home directory has correct ownership
