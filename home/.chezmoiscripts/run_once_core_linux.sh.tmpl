@@ -119,7 +119,7 @@ fi
 # See https://github.com/pyenv/pyenv-virtualenv/issues/233
 if ! type -p pyenv >/dev/null 2>&1
 then
-    PYTHON_GLOBAL="3.11.6"
+    PYTHON_GLOBAL="3.12.9"
 
     curl https://pyenv.run | bash
     echo "Installed pyenv and pyenv-virtualenv"
@@ -320,6 +320,7 @@ packages=(
     unzip
     wget
     zsh
+    python3.11
 )
 
 sudo dnf -y install ${packages[@]}

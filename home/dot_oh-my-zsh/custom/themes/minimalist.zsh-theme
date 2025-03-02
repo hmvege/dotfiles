@@ -18,11 +18,11 @@ RPROMPT='%{$reset_color%}[%D{%H:%M:%S}]'
 if [[ -n "$SSH_CONNECTION" ]]; then
     SSH_INFO="%F{red}%n@%m%f "  # Light red if in SSH session
 else
-    SSH_INFO=""
+    USER_HOST="%F{cyan}%n@%m%f " # Cyan otherwise
 fi
 
 # Return status indicator (Green '>' if success, Red '>' if failed)
 PROMPT_SYMBOL='%(?.%F{green}>.%F{red}>%f)'
 
 # Main prompt
-PS1='${SSH_INFO}%F{166}%~ %F{106}$(git_current_branch)$(git_prompt_status) %{$reset_color%} ${NEWLINE}${PROMPT_SYMBOL} '
+PS1='${SSH_INFO}%F{166}%~ %F{106}$(git_current_branch)$(git_prompt_status) %{$reset_color%} ${NEWLINE}${PROMPT_SYMBOL}%{$reset_color%} '
