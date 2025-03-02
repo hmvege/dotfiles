@@ -16,11 +16,14 @@ jobs:
         include:
             - os: ubuntu22-04
               ubuntu_version: "22.04"
+              dockerfile_path: "LinuxUbuntu"
             - os: ubuntu22-04
               ubuntu_version: "24.04"
-            - os: rocklinux8
+              dockerfile_path: "LinuxUbuntu"
+            - os: rocky8
               ubuntu_version: "8"  # Assuming Rocky uses "8"
-    
+              dockerfile_path: "LinuxRocky8"
+              
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -31,7 +34,7 @@ jobs:
             --build-arg UBUNTU_VERSION=${{ matrix.ubuntu_version }} \
             --build-arg GIT_BRANCH=${{ github.ref_name }} \
             -t dotfiles-test-image-${{ matrix.os }} \
-            -f tests/${{ matrix.os }}/Dockerfile .
+            -f tests/${{ matrix.dockerfile_path }}/Dockerfile .
 
       - name: Installing dotfiles and verifying successful installation
         run: |
