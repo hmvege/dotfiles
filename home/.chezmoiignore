@@ -33,6 +33,7 @@ Library/Application\ Support/Code/User/settings.json
 .config/Code/User/
 .config/Code/User/keybindings.json
 .config/Code/User/settings.json
+.oh-my-zsh/custom/themes/minimalist-ssh.zsh-theme
 {{ end }}
 {{ if (eq .chezmoi.osRelease.id "rocky") -}}
 .config/Code/

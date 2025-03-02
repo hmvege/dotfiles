@@ -12,7 +12,14 @@ export ZSH="/home/{{ .chezmoi.username }}/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+{{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 ZSH_THEME="bureau"
+{{ end -}}
+{{ else if eq .chezmoi.osRelease.id "rocky" -}}
+ZSH_THEME="less-noise"
+{{ else -}}
+ZSH_THEME="bureau"
+{{ end -}}
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -87,10 +94,6 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
@@ -112,11 +115,6 @@ export EDITOR=vim
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 
-# Tilix terminal
-if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-	source /etc/profile.d/vte-2.91.sh
-fi
-
 # In case you need HomeBrew for Linux, uncomment following lines:
 #echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/{{ .chezmoi.username }}/.zprofile
 #eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -126,6 +124,11 @@ alias fp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-
 alias v='f -e vim' # quick opening files with vim
 {{ if ne .chezmoi.osRelease.id "rocky" -}}
 alias o='a -e xdg-open' # quick opening files with xdg-open
+
+# Tilix terminal
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+	source /etc/profile.d/vte-2.91.sh
+fi
 
 # LSD settings
 alias ls="lsd"
