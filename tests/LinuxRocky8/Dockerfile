@@ -21,8 +21,8 @@ RUN sh -c "$(curl -fsLS get.chezmoi.io)" -- -t v2.49.1 -b "$HOME/.local/bin/"
 ENV PATH=$HOME/.local/bin:$PATH
 
 # Initialize and apply the dotfiles using Chezmoi
-RUN chezmoi init --promptString "Enter GitHub mail for this machine=testmail" hmvege --branch "dotfile-updates-2024-linux"
-RUN chezmoi apply -v
+ARG GIT_BRANCH=master
+RUN cd $HOME && chezmoi init --promptString "Enter GitHub mail for this machine=testmail" hmvege --branch "$GIT_BRANCH"
 
 # Set default command to an interactive shell
 CMD ["/bin/bash"]

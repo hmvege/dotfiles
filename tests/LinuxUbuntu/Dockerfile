@@ -30,7 +30,7 @@ RUN cd $HOME && sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/"
 ENV PATH=$HOME/.local/bin:$PATH
 
 # Initialize and apply the dotfiles using Chezmoi
-ARG GIT_BRANCH=main
+ARG GIT_BRANCH=master
 RUN cd $HOME && chezmoi init --promptString "Enter GitHub mail for this machine=testmail" hmvege --branch "$GIT_BRANCH"
 
 # Set default command to an interactive shell (or override with test image)
