@@ -1,10 +1,26 @@
 {{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
 #!/bin/bash
 
-set -euo pipefail
+# set -euo pipefail
+
+# vim -E -c 'PlugInstall' -c 'qa!'
+
+# echo "Installed material theme for vim"
+set -euxo pipefail  # Print all commands and fail on errors
+
+echo "Checking vim installation..."
+which vim
+vim --version
+
+echo "Checking vim-plug..."
+ls -l ~/.vim/autoload/plug.vim || echo "plug.vim missing!"
+
+echo "Checking network access..."
+curl -I https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim || echo "curl failed!"
+
+echo "Running PlugInstall..."
+vim -E -s -c 'PlugInstall' -c 'qa!' || echo "Vim PlugInstall failed!"
 
 vim -E -c 'PlugInstall' -c 'qa!'
-
-echo "Installed material theme for vim"
 
 {{ end -}}
