@@ -7,7 +7,7 @@ ENV TZ="Europe/Oslo"
 
 # Install basic dependencies
 RUN apt-get update && \
-    apt-get install -y curl sudo git xauth x11-apps tzdata && \
+    apt-get install -y curl git sudo tzdata xauth x11-apps && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user for testing, handling existing GID conflicts (GitHub action ubuntu docker images has 1000)
@@ -23,8 +23,16 @@ USER developer
 WORKDIR /home/developer
 ENV HOME=/home/developer
 
-# Install Chezmoi into $HOME/.local/bin
-RUN cd $HOME && sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/"
+# Determine Ubuntu version and install correct Chezmoi version into $HOME/.local/bin
+# Ubuntu 20.04 and previously require an older Chezmoi version in order to work
+# due to missing GLIBC library.
+RUN UBUNTU_VERSION=$(awk -F= '/^VERSION_ID/ { print $2 }' /etc/os-release | tr -d '"') && \
+    if [ "$(echo "$UBUNTU_VERSION" | cut -d. -f1)" -ge 22 ]; then \
+    CHEZMOI_VERSION="latest"; \
+    else \
+    CHEZMOI_VERSION="v2.49.1"; \
+    fi && \
+    cd $HOME && sh -c "$(curl -fsLS get.chezmoi.io)" -- -t "$CHEZMOI_VERSION" -b "$HOME/.local/bin/"
 
 # Update PATH so Chezmoi is found
 ENV PATH=$HOME/.local/bin:$PATH

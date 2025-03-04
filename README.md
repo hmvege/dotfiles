@@ -12,6 +12,8 @@ The goal for this dotfiles project repository, is following,
    * MacOS
    * Ubuntu 20.04
    * Ubuntu 22.04
+   * Ubuntu 24.04
+   * Rocky8
    * WSL
 * Have it be easily **maintained**. I.e. changes applied at one machine, will be easily transferable to another machine.
 
