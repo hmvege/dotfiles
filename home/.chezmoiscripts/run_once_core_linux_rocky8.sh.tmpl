@@ -1,0 +1,72 @@
+{{ if (eq .chezmoi.os "linux") -}}
+{{ if (eq .chezmoi.osRelease.id "rocky") -}}
+#!/bin/bash
+
+# Set to catch non-zero exit status errors, variable errors or pipeline
+# failures.
+set -euo pipefail
+
+sudo dnf -y update
+
+packages=(
+    jq
+    vim-enhanced
+    unzip
+    wget
+    zsh
+    python3.12
+)
+
+sudo dnf -y install ${packages[@]}
+
+echo "Packages installed."
+
+## vim plugin manager
+if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
+then
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    echo "vim plugin manager installed"
+else
+    echo "vim plugin manager already installed"
+fi
+
+
+## Oh-my-zsh
+if [ -d "${HOME}/.oh-my-zsh" ]; then
+    echo "Oh My Zsh already installed at: ${HOME}/.oh-my-zsh"
+else
+    # sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    echo "Oh My Zsh is installed."
+fi
+
+# Oh-my-zsh plugins
+if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ]
+then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+    echo "zsh-syntax-highlighting downloaded and installed"
+else
+    echo "zsh-syntax-highlighting already installed"
+fi
+
+if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions ]
+then
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    echo "zsh-autosuggestions downloaded and installed"
+else
+    echo "zsh-autosuggestions already installed"
+fi
+
+## install fzf
+if ! type -p fzf >/dev/null 2>&1
+then
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    ~/.fzf/install --all
+    echo "Installed fzf"
+else
+    echo "Already installed fzf"
+fi
+
+{{ end -}}
+{{ end -}}

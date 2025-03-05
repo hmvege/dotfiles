@@ -1,6 +1,15 @@
 {
     "workbench.colorTheme": "Default Dark+",
     "security.workspace.trust.untrustedFiles": "open",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    // Editor
+    "editor.formatOnSave": true,
+    "editor.minimap.enabled": false,
+    // Ubuntu: disables the Ctrl+Alt focus
+    "window.titleBarStyle": "custom",
+    "window.customMenuBarAltFocus": false,
+    // Python
     "python.linting.flake8Enabled": true,
     "python.linting.flake8Path": "{{ .chezmoi.homeDir }}/.local/bin/flake8",
     "python.linting.flake8Args": [
@@ -27,27 +36,61 @@
         "reportMissingImports": "none",
         "reportMissingModuleSource": "none"
     },
-    "editor.formatOnSave": true,
     "python.formatting.provider": "black",
     "python.formatting.blackPath": "{{ .chezmoi.homeDir }}.local/bin/black",
     "python.formatting.blackArgs": [
         "-l 79"
     ],
-    "gitlens.defaultTimeFormat": "HH:mm",
-    "clang-format.style": "file",
-    "editor.minimap.enabled": false,
-    // Ubuntu: disables the Ctrl+Alt focus
-    "window.titleBarStyle": "custom",
-    "window.customMenuBarAltFocus": false,
-    "cmake.configureOnOpen": true,
-    "[cpp]": {
-        "editor.defaultFormatter": "xaver.clang-format"
-    },
-    "explorer.confirmDragAndDrop": false,
     "[python]": {
         "editor.formatOnType": true
     },
-    "explorer.confirmDelete": false,
+    // C++
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "clang-format.style": "file",
+    // Note, you may need to specify clang format explicitly
+    // "clang-format.executable": "/usr/bin/clang-format-14",
+    // Gitlens
     "gitlens.hovers.currentLine.over": "line",
     "gitlens.codeLens.enabled": true,
+    "gitlens.defaultTimeFormat": "HH:mm",
+    // CMake
+    "cmake.configureOnOpen": true,
+    "cmake.options.statusBarVisibility": "visible",
+    "cmake.options.advanced": {
+        "build": {
+            "statusBarVisibility": "visible"
+        },
+        "launch": {
+            "statusBarVisibility": "visible"
+        },
+        "debug": {
+            "statusBarVisibility": "visible"
+        }
+    },
+    "cmake.showOptionsMovedNotification": false,
+    "cmake.pinnedCommands": [
+        "workbench.action.tasks.configureTaskRunner",
+        "workbench.action.tasks.runTask"
+    ],
+    // Spelling
+    "cSpell.userWords": [
+        "arange",
+        "argmin",
+        "dtype",
+        "ndarray",
+        "newaxis"
+    ],
+    // Markdown
+    "markdown-toc.depthFrom": 2,
+    "markdown-toc.orderedList": true,
+    "markdown-toc.depthTo": 4,
+    "markdown-toc.updateOnSave": false,
+    "markdown-toc.withLinks": false,
+    "markdown-toc.bulletCharacter": "- ",
+    "markdown-toc.anchorMode": "gitlab.com",
+    "markdown.extension.preview.autoShowPreviewToSide": true,
+    "markdown.extension.toc.levels": "2..6",
+    "markdown.extension.toc.orderedList": true,
 }

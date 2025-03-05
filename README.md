@@ -12,6 +12,8 @@ The goal for this dotfiles project repository, is following,
    * MacOS
    * Ubuntu 20.04
    * Ubuntu 22.04
+   * Ubuntu 24.04
+   * Rocky8
    * WSL
 * Have it be easily **maintained**. I.e. changes applied at one machine, will be easily transferable to another machine.
 
@@ -127,14 +129,57 @@ Settings for VSCode have been added, and will continue being updated.
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
 
 ## :alembic: Testing
-To test that the dotfiles work as intended, you can use the provided Dockerfile.
+To manually test that the dotfiles work as intended, you can use the Dockerfiles found in `tests`.
+
+### :penguin: Linux: Ubuntu
+Build docker image as,
 ```bash
-docker build . -t dotfiles-test-img
-docker run -it --name dotfiles-test dotfiles-test-img
+docker build \
+ --build-arg UBUNTU_VERSION=22.04 \
+ --build-arg GIT_BRANCH=master \
+ -f tests/LinuxUbuntu/Dockerfile \
+ -t dotfiles-ubuntu-img --progress=plain . 
 ```
-when running inside the Docker container, run following command and verify it runs without any issues:
+You can then enter the image and run the dotfiles as,
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply --verbose hmvege
+docker run -it -d --name ubuntu-dotfiles-test-1 dotfiles-ubuntu-img:latest
+docker exec -it ubuntu-dotfiles-test-1 bash
+```
+Once inside, 
+```bash
+chezmoi update -n # To ensure the latest changes are picked up
+chezmoi apply # To start installing dotfiles
+```
+
+To clean up, run
+```bash
+docker stop ubuntu-dotfiles-test-1 && docker rm ubuntu-dotfiles-test-1
+```
+
+### :penguin: Linux: Rocky 8
+Build docker image as,
+```bash
+docker build \
+ --build-arg GIT_BRANCH=master \
+ -f tests/LinuxRocky/Dockerfile \
+ -t dotfiles-rocky-test --progress=plain . 
+```
+You can then enter the image and run the dotfiles as,
+```bash
+docker run -it -d --name rocky-dotfiles-test-1 dotfiles-rocky-test:latest bash
+docker exec -it rocky-dotfiles-test-1 bash
+```
+Once inside, 
+```bash
+chezmoi --version || echo "Chezmoi is missing!"
+chezmoi update -n # To ensure the latest changes are picked up
+chezmoi apply # To start installing dotfiles
+```
+
+To clean up, run
+```bash
+docker stop rocky-dotfiles-test-1 && docker rm rocky-dotfiles-test-1
+docker rmi dotfiles-rocky-test
 ```
 
 ## :question: Troubleshooting
