@@ -31,7 +31,6 @@ packages=(
     libreadline-dev
     libsqlite3-dev
     libssl-dev
-    libssl-dev
     tk-dev
     zlib1g-dev
     # Python + python packages, adhering to Python 3.12+ PEP 668
@@ -44,7 +43,7 @@ packages=(
     uuid-runtime
 )
 
-sudo apt install -y ${packages[@]}
+sudo apt-get install -y ${packages[@]}
 echo "Packages installed."
 
 sudo chsh -s $(which zsh)
@@ -128,8 +127,8 @@ then
     # pyenv calls ensurepip in the background, which will trigger Python 3.12>
     # safety feature against making changes to global python install, even tho
     # no packages are being installed in the global Python environment.
-    # CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
-    # CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
+    # PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
+    # PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
 else
     echo "Already installed pyenv and pyenv-virtualenv"
 fi
@@ -137,7 +136,7 @@ fi
 ## pipx
 if ! type -p pipx >/dev/null 2>&1
 then
-    sudo apt install pipx
+    sudo apt-get install pipx
     pipx ensurepath
 
     echo "Installed pipx"
