@@ -21,13 +21,6 @@ then
 
     echo "Note: you may need to Disable then Enable the SublimeLinter - Flake8 package for it to work."
     echo "Note: Remember to enter licenses if you have one"
-
-    # # Material Theme installation
-    # wget "https://github.com/equinusocio/material-theme/archive/refs/tags/v4.1.5.zip" -P $package_dir
-    # unzip "$package_dir/v4.1.5.zip" -f "$package_dir"
-    # target_dir="$package_dir/Material\ Theme"
-    # mv -v "$(find "$package_dir"/. -maxdepth 1 -type d -iname "material-theme-*")" "$target_dir"
-    # echo "Material theme installed"
 fi
 {{ end -}}
 {{ if (not (eq .chezmoi.osRelease.id "ubuntu")) -}}
