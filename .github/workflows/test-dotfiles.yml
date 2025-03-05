@@ -14,6 +14,9 @@ jobs:
     strategy:
       matrix:
         include:
+            - os: ubuntu20-04
+              ubuntu_version: "20.04"
+              dockerfile_path: "LinuxUbuntu"
             - os: ubuntu22-04
               ubuntu_version: "22.04"
               dockerfile_path: "LinuxUbuntu"
