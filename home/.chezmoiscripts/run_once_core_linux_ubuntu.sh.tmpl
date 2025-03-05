@@ -31,12 +31,12 @@ packages=(
     liblzma-dev
     libreadline-dev
     libsqlite3-dev
-    python3
+    python3 # NOTE: consider removing if default is ok
     python3-venv
     python3-pip
-    python3-tk
-    tk-dev
-    zlib1g-dev
+    python3-tk # NOTE: consider removing if default is ok
+    tk-dev # NOTE: consider removing if default is ok
+    zlib1g-dev # NOTE: consider removing if default is ok
     # For Gogh
     dconf-cli
     uuid-runtime
@@ -113,9 +113,6 @@ else
 fi
 
 ## pyenv + pyenv-virtualenv
-## Snippet inspired and taken from
-# https://github.com/tordks/.dotfiles/blob/master/install_pyenv.sh
-# See https://github.com/pyenv/pyenv-virtualenv/issues/233
 if ! type -p pyenv >/dev/null 2>&1
 then
     PYTHON_GLOBAL="3.12.9"
@@ -126,8 +123,11 @@ then
     # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
     # in case the build fails.
     sudo apt-get install libssl-dev
-    $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
-    echo "Global Python is already set to $PYTHON_GLOBAL"
+    # pyenv calls ensurepip in the background, which will trigger Python 3.12>
+    # safety feature against making changes to global python install, even tho
+    # no packages are being installed in the global Python environment.
+    CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
+    CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
 else
     echo "Already installed pyenv and pyenv-virtualenv"
 fi

@@ -19,8 +19,9 @@ echo "Checking network access..."
 curl -I https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim || echo "curl failed!"
 
 echo "Running PlugInstall..."
-vim -E -s -c 'PlugInstall' -c 'qa!' || echo "Vim PlugInstall failed!"
+# vim -E -s -c 'PlugInstall' -c 'qa!' || echo "Vim PlugInstall failed!"
 
-vim -E -c 'PlugInstall' -c 'qa!'
+# vim -E -c 'PlugInstall' -c 'qa!'
+vim +'silent! PlugInstall' +qall
 
 {{ end -}}
