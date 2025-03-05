@@ -127,8 +127,8 @@ then
     # pyenv calls ensurepip in the background, which will trigger Python 3.12>
     # safety feature against making changes to global python install, even tho
     # no packages are being installed in the global Python environment.
-    # PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
-    # PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
+    PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
+    PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
 else
     echo "Already installed pyenv and pyenv-virtualenv"
 fi
@@ -136,10 +136,9 @@ fi
 ## pipx
 if ! type -p pipx >/dev/null 2>&1
 then
-    sudo apt-get install pipx
-    pipx ensurepath
-
+    sudo apt-get install -y pipx
     echo "Installed pipx"
+
     /usr/local/bin/pipx ensurepath
     pipx_packages=(
         black
