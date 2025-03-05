@@ -2,11 +2,6 @@
 {{ if (eq .chezmoi.osRelease.id "rocky") -}}
 #!/bin/bash
 
-# TODO: make Rocky8 build very light
-# TODO: pass argument for lite build using --promptString?
-# TODO: pass argument for gui build using --promptString [yes|no]?
-# TODO: pass argument for private vs office using --promptString?
-
 # Set to catch non-zero exit status errors, variable errors or pipeline
 # failures.
 set -euo pipefail
@@ -23,10 +18,6 @@ packages=(
 )
 
 sudo dnf -y install ${packages[@]}
-
-# # Non-lite install:
-# sudo dnf -y install epel-release
-# sudo dnf -y install bat
 
 echo "Packages installed."
 
