@@ -139,7 +139,7 @@ then
     sudo apt-get install -y pipx
     echo "Installed pipx"
 
-    /usr/local/bin/pipx ensurepath
+    pipx ensurepath
     pipx_packages=(
         black
         flake8
@@ -151,7 +151,7 @@ then
     )
     for pkg in ${pipx_packages[@]}
     do
-        /usr/local/bin/pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
+        pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
     done
 
     ## Mypy package injections
@@ -180,7 +180,7 @@ then
     )
     for pkg in ${flake8_packages[@]}
     do
-        /usr/local/bin/pipx inject flake8 $pkg
+        pipx inject flake8 $pkg
     done
 
 else
