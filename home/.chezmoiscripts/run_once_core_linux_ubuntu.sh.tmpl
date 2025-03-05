@@ -160,7 +160,7 @@ then
     )
     for pkg in ${mypy_packages[@]}
     do
-        /usr/local/bin/pipx inject mypy $pkg
+        pipx inject mypy $pkg
     done
 
     ## Flake8 package injections
