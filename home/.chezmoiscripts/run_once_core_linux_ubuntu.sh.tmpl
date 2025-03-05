@@ -126,8 +126,8 @@ then
     # pyenv calls ensurepip in the background, which will trigger Python 3.12>
     # safety feature against making changes to global python install, even tho
     # no packages are being installed in the global Python environment.
-    CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
-    CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
+    # CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
+    # CONFIGURE_OPTS="--without-ensurepip" $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
 else
     echo "Already installed pyenv and pyenv-virtualenv"
 fi
