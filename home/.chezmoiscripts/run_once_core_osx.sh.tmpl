@@ -39,14 +39,24 @@ else
     echo "Brew is already installed"
 fi
 
+if [[ "$(uname -m)" == "arm64" ]]; then
+    # Apple Silicon typically uses /opt/homebrew
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+    # Intel typically uses /usr/local
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+brew update
+brew upgrade
 for pkg in ${packages[@]}
 do
     brew install $pkg
 done
-
 echo "Packages installed"
 
-PYTHON_GLOBAL="3.11.6"
+## pyenv
+PYTHON_GLOBAL="3.12.9"
 
 if type -p pyenv >/dev/null 2>&1
 then
@@ -59,6 +69,60 @@ then
     else
         echo "Global Python is already set to $PYTHON_GLOBAL"
     fi
+fi
+
+## pipx
+if ! type -p pipx >/dev/null 2>&1
+then
+    sudo apt-get install -y pipx
+    echo "Installed pipx"
+
+    pipx ensurepath
+    pipx_packages=(
+        black
+        flake8
+        mkdocs
+        mypy
+        pip-tools
+        poetry
+        pre-commit
+    )
+    for pkg in ${pipx_packages[@]}
+    do
+        pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
+    done
+
+    ## Mypy package injections
+    mypy_packages=(
+        types-requests
+    )
+    for pkg in ${mypy_packages[@]}
+    do
+        pipx inject mypy $pkg
+    done
+
+    ## Flake8 package injections
+    flake8_packages=(
+        flake8-broken-line
+        flake8-bugbear
+        flake8-builtins
+        flake8-docstrings
+        flake8-docstrings-complete
+        flake8-import-order
+        flake8-markdown
+        flake8-pie
+        flake8-scream
+        flake8-simplify
+        flake8-use-fstring
+        flake8-useless-assert
+    )
+    for pkg in ${flake8_packages[@]}
+    do
+        pipx inject flake8 $pkg
+    done
+
+else
+    echo "Already installed pipx"
 fi
 
 ## fzf installation completion
