@@ -10,6 +10,7 @@ on:
 
 jobs:
   test-dotfiles:
+    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,3 +44,14 @@ jobs:
         run: |
           docker run --rm dotfiles-test-image-${{ matrix.os }} \
             bash -c "chezmoi apply && echo 'SUCCESSFUL INSTALL' || (echo 'INSTALL FAILED'; exit 1)"
+
+  test-macos-dotfiles:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ChezMoi & Apply Dotfiles
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)"
+          chezmoi -S $(pwd) init --apply

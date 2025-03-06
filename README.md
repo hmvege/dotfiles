@@ -1,3 +1,5 @@
+![Badge](https://github.com/hmvege/dotfiles/actions/workflows/test-dotfiles.yml/badge.svg)
+
 # Dotfiles
 
 Dotfiles repository for `hmvege`, managed with [Chezmoi](https://github.com/twpayne/chezmoi).
