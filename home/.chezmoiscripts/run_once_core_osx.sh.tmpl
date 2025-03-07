@@ -49,11 +49,31 @@ fi
 
 brew update
 brew upgrade
+
 for pkg in ${packages[@]}
 do
     brew install $pkg
 done
 echo "Packages installed"
+
+## OMZ 
+if [ ! -d "${HOME}/.oh-my-zsh" ]; then
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    echo "Oh My Zsh is installed."
+fi
+
+# oh-my-zsh plugins
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
+      "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions.git \
+      "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+fi
 
 ## pyenv
 PYTHON_GLOBAL="3.12.9"
@@ -74,56 +94,51 @@ fi
 ## pipx
 if ! type -p pipx >/dev/null 2>&1
 then
-    sudo apt-get install -y pipx
-    echo "Installed pipx"
-
     pipx ensurepath
-    pipx_packages=(
-        black
-        flake8
-        mkdocs
-        mypy
-        pip-tools
-        poetry
-        pre-commit
-    )
-    for pkg in ${pipx_packages[@]}
-    do
-        pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
-    done
-
-    ## Mypy package injections
-    mypy_packages=(
-        types-requests
-    )
-    for pkg in ${mypy_packages[@]}
-    do
-        pipx inject mypy $pkg
-    done
-
-    ## Flake8 package injections
-    flake8_packages=(
-        flake8-broken-line
-        flake8-bugbear
-        flake8-builtins
-        flake8-docstrings
-        flake8-docstrings-complete
-        flake8-import-order
-        flake8-markdown
-        flake8-pie
-        flake8-scream
-        flake8-simplify
-        flake8-use-fstring
-        flake8-useless-assert
-    )
-    for pkg in ${flake8_packages[@]}
-    do
-        pipx inject flake8 $pkg
-    done
-
-else
-    echo "Already installed pipx"
 fi
+
+pipx_packages=(
+    black
+    flake8
+    mkdocs
+    mypy
+    pip-tools
+    poetry
+    pre-commit
+)
+for pkg in ${pipx_packages[@]}
+do
+    pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
+done
+
+## Mypy package injections
+mypy_packages=(
+    types-requests
+)
+for pkg in ${mypy_packages[@]}
+do
+    pipx inject mypy $pkg
+done
+
+## Flake8 package injections
+flake8_packages=(
+    flake8-broken-line
+    flake8-bugbear
+    flake8-builtins
+    flake8-docstrings
+    flake8-docstrings-complete
+    flake8-import-order
+    flake8-markdown
+    flake8-pie
+    flake8-scream
+    flake8-simplify
+    flake8-use-fstring
+    flake8-useless-assert
+)
+for pkg in ${flake8_packages[@]}
+do
+    pipx inject flake8 $pkg
+done
 
 ## fzf installation completion
 $(brew --prefix)/opt/fzf/install
