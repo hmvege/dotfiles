@@ -35,9 +35,11 @@ Library/Application\ Support/Code/User/settings.json
 .config/Code/User/settings.json
 .oh-my-zsh/custom/themes/minimalist-ssh.zsh-theme
 {{ end }}
+{{ if eq .chezmoi.os "linux" }}
 {{ if (eq .chezmoi.osRelease.id "rocky") -}}
 .config/Code/
 .config/sublime-text-3
 .config/htop/htoprc
 .tmux.conf
+{{ end -}}
 {{ end -}}
