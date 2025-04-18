@@ -61,7 +61,8 @@ foreach ($pkg in $packages) {
 }
 
 # Install fonts
-scoop bucket add nerd-fonts && scoop install JetBrainsMono NF
+scoop bucket add nerd-fonts
+scoop install JetBrainsMono-NF
 
 # Install VSCode
 if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
@@ -97,7 +98,7 @@ $vscodeExtensions = @(
     "streetsidesoftware.code-spell-checker",
     "twxs.cmake",
     "xaver.clang-format",
-    "yzhang.markdown-all-in-one",
+    "yzhang.markdown-all-in-one"
 )
 
 foreach ($ext in $vscodeExtensions) {
