@@ -31,6 +31,11 @@ if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
     Write-Output "Scoop is already installed."
 }
 
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    Write-Output "Installing Git (required for Scoop buckets)…"
+    scoop install git
+}
+
 function Ensure-ScoopBucket {
     param([string]$Name)
 
