@@ -102,6 +102,15 @@ else
     echo "vim plugin manager already installed"
 fi
 
+## Install zoxide
+if ! type -p z >/dev/null 2>&1
+then
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+    echo "Installed zoxide"
+else
+    echo "Already installed zoxide"
+fi
+
 ## install fzf
 if ! type -p fzf >/dev/null 2>&1
 then

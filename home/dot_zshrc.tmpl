@@ -151,6 +151,9 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # LSD aliases
 alias ltsh='lt -l --blocks size --blocks name'
+
+# Zoxide setup
+eval "$(zoxide init zsh)"
 {{ end -}}
 
 {{ if (eq .chezmoi.os "darwin") -}}
