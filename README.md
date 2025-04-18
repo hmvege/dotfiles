@@ -96,36 +96,14 @@ Following plugins are used:
  - zsh-autosuggestions
  - zsh-syntax-highlighting
 
+### VSCode
+VSCode is now the preferred Editor.
 
 ### Sublime Text 4
-Currently, Sublime Text 4 is my preferred editor, with Vim supporting me on the side every now and then. [Package Control](https://packagecontrol.io/) is used for managing plugins.
+Sublime Text 4 still installed for a full Linux and MacOS setup, even tho VSCode is now the preferred editor. [Package Control](https://packagecontrol.io/) is used for managing plugins in ST4.
 
-Plugins used:
- - AutoDocstring
- - AutoPEP8
- - ColorPicker
- - DockBlockr 2021 (DoxyDoxygen powered)
- - Dockerfile Syntax Highlighting
- - Figlet Big ASCII Text
- - GithubEmoji
- - Gruvebox Material Theme
- - Indent XML
- - LSP
- - LSP-pyright
- - MarkdownPreview
- - PackageResourceViewer
- - python-black
- - SublimeCodeIntel
- - SublimeLinter
- - SublimeLinter-contrib-mypy
- - SublimeLinter-flake8
- - TodoReview
- - TOML
-
-Note these packages may need to be downloaded manually.
-
-### VSCode
-Settings for VSCode have been added, and will continue being updated.
+### Vim
+A basic Vim setup is installed.
 
 ### Gogh
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
@@ -220,7 +198,6 @@ dotfiles
 - [tmux cheat sheet](https://tmuxcheatsheet.com/)
 
 ## :bulb: Inspiration
-<!-- - https://github.com/tordks/.dotfiles -->
 - https://github.com/renemarc/dotfiles
 - https://github.com/narze/dotfiles
 - https://github.com/mkasberg/dotfiles
