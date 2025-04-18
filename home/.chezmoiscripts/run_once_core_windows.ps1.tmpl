@@ -14,7 +14,7 @@ if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 Write-Output "--- Running Windows core setup script ---"
 
 # Install or update PowerShell
-$pwshInstallScript = "{{ .chezmoi.sourceDir }}\scripts\install-powershell.ps1"
+$pwshInstallScript = "{{ .chezmoi.sourceDir }}\scripts\install_powershell.ps1"
 if (Test-Path $pwshInstallScript) {
     Write-Output "Running PowerShell installation script..."
     & $pwshInstallScript
