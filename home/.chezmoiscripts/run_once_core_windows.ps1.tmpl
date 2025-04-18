@@ -60,6 +60,9 @@ foreach ($pkg in $packages) {
     }
 }
 
+# Install fonts
+scoop bucket add nerd-fonts && scoop install JetBrainsMono NF
+
 # Install VSCode
 if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
     Write-Output "Installing Visual Studio Code..."
@@ -79,25 +82,22 @@ if (-not ($env:PATH -split ';' | Where-Object { $_ -eq $codePath })) {
 
 # Install VSCode extensions
 $vscodeExtensions = @(
-    "ms-python.python",
-    "ms-vscode.cpptools",
-    "ms-toolsai.jupyter",
+    "cschlosser.doxdocgen",
+    "eamodio.gitlens",
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
+    "ms-python.python",
+    "ms-toolsai.jupyter",
+    "ms-vscode-remote.remote-containers",
+    "ms-vscode.cmake-tools",
+    "ms-vscode.cpptools-extension-pack",
+    "ms-vscode.cpptools-themes",
+    "ms-vscode.cpptools",
+    "sashaweiss.block-travel",
     "streetsidesoftware.code-spell-checker",
-    "yzhang.markdown-all-in-one"
-    "cschlosser.doxdocgen"
-    "eamodio.gitlens"
-    "ms-azuretools.vscode-docker"
-    "ms-vscode-remote.remote-containers"
-    "ms-vscode.cmake-tools"
-    "ms-vscode.cpptools"
-    "ms-vscode.cpptools-extension-pack"
-    "ms-vscode.cpptools-themes"
-    "sashaweiss.block-travel"
-    "streetsidesoftware.code-spell-checker"
-    "twxs.cmake"
-    "xaver.clang-format"
+    "twxs.cmake",
+    "xaver.clang-format",
+    "yzhang.markdown-all-in-one",
 )
 
 foreach ($ext in $vscodeExtensions) {
