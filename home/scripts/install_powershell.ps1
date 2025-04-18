@@ -9,20 +9,20 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function Install-PowerShell {
-    Write-Host "→ downloading PowerShell $LatestVersion..."
+    Write-Host "Downloading PowerShell $LatestVersion..."
     Invoke-WebRequest -Uri $InstallerUrl -OutFile $InstallerPath -UseBasicParsing
 
-    Write-Host '→ verifying hash...'
+    Write-Host 'Verifying hash...'
     $ActualHash = (Get-FileHash -Path $InstallerPath -Algorithm SHA256).Hash.ToUpper()
     if ($ActualHash -ne $ExpectedHash) {
         Remove-Item $InstallerPath -Force
         throw "HASH MISMATCH!  expected $ExpectedHash  got $ActualHash"
     }
 
-    Write-Host '✓ Hash OK - installing'
+    Write-Host 'Hash OK - installing'
     Start-Process msiexec.exe -Wait -ArgumentList "/i `"$InstallerPath`" /qn /norestart"
     Remove-Item $InstallerPath -Force
-    Write-Host "✓ PowerShell $LatestVersion installed."
+    Write-Host "PowerShell $LatestVersion installed."
 }
 
 # ---------- main ----------
