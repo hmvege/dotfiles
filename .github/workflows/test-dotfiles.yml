@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  test-dotfiles:
+  test-linux-dotfiles:
     if: false
     runs-on: ubuntu-latest
     strategy:
@@ -55,3 +55,16 @@ jobs:
         run: |
           sh -c "$(curl -fsLS get.chezmoi.io)"
           chezmoi -S $(pwd) init --apply
+
+  test-windows-dotfiles:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chezmoi
+        run: iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$env:RUNNER_TEMP/bin'"
+      - name: Apply dotfiles
+        run: $env:RUNNER_TEMP\bin\chezmoi.exe init -S $PWD --apply hmvege
+      - name: Idempotency check
+        run: |
+          $env:RUNNER_TEMP\bin\chezmoi.exe apply -n | Tee-Object diff.txt
+          if ((Get-Content diff.txt).Length -ne 0) { throw 'Not idempotent!' }
