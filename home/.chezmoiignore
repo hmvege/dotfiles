@@ -35,6 +35,9 @@ Library/Application\ Support/Code/User/settings.json
 .config/Code/User/settings.json
 .oh-my-zsh/custom/themes/minimalist-ssh.zsh-theme
 {{ end }}
+{{ if ne .chezmoi.os "windows" }}
+.config/powershell/Microsoft.PowerShell_profile.ps1
+{{ end }}
 {{ if (eq .chezmoi.osRelease.id "rocky") -}}
 .config/Code/
 .config/sublime-text-3

@@ -17,9 +17,12 @@ The goal for this dotfiles project repository, is following,
    * Ubuntu 24.04
    * Rocky8
    * WSL
+   * Windows 11
 * Have it be easily **maintained**. I.e. changes applied at one machine, will be easily transferable to another machine.
 
 ## :scroll: Installation
+
+### :penguin: Linux
 Install Chezmoi and initialize, ensure `curl` and `sudo` is installed,
 ```bash
 apt-get update && apt-get install -y curl sudo
@@ -29,6 +32,19 @@ then download and apply the dotfiles,
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 ```
 which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
+
+### MacOS
+On MacOS, you should be able to install Chezmoi via
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
+```
+
+### Windows
+The dotfiles for Windows is targeting PowerShell. Install Chezmoi via,
+```powershell
+iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --apply hmvege"
+```
+The dotfiles setup will download the latest PowerShell 7.4.1.
 
 ### Pulling latest changing from repository
 Pull latest changes from repository.
