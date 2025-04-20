@@ -1,9 +1,4 @@
-{{ if (eq .chezmoi.os "windows") -}}
-Write-Output ""
-Write-Output ""
-Write-Output "==== DOTFILES SETUP COMPLETE ===="
-Write-Output "You may need to restart your terminal and start up latest PowerShell terminal for the dotfiles to effect."
-{{ else -}}
+{{ if (neq .chezmoi.os "windows") -}}
 #!/bin/bash
 
 echo ""
