@@ -49,7 +49,7 @@ scripts/
 scripts/install_powershell.ps1
 {{ end }}
 # Ignoring all linux related config files
-{{ if .chezmoi.os "windows" }}
+{{ if eq .chezmoi.os "windows" }}
 .zshrc
 .vimrc
 .tmux.conf
