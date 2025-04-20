@@ -1,4 +1,4 @@
-{{ if (neq .chezmoi.os "windows") -}}
+{{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
 #!/bin/bash
 
 echo ""
