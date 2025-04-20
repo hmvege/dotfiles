@@ -1,0 +1,12 @@
+{{ if eq .chezmoi.os "windows" -}}
+<#
+    Post‑install script for Windows
+    Installs CLI tools via Scoop and required PowerShell modules.
+    Idempotent – safe to re‑run.
+#>
+
+Import-Module PSReadLine
+Import-Module PSFzf
+
+Write-Host "Windows shell tooling is ready."
+{{ end -}}

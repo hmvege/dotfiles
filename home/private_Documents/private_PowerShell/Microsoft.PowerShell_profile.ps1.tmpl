@@ -1,5 +1,5 @@
 # Initialize oh-my-posh and PSFzf options
-oh-my-posh init pwsh --config 'C:\Users\mathias.vege\AppData\Local\Programs\oh-my-posh\themes\wopian.omp.json' | Invoke-Expression
+oh-my-posh init pwsh --config 'C:\Users\{{ .chezmoi.username }}\AppData\Local\Programs\oh-my-posh\themes\wopian.omp.json' | Invoke-Expression
 
 # Tab shows list of files instead of cycling through files
 Import-Module PSReadLine
