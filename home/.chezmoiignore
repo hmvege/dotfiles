@@ -35,11 +35,6 @@ Library/Application\ Support/Code/User/settings.json
 .config/Code/User/settings.json
 .oh-my-zsh/custom/themes/minimalist-ssh.zsh-theme
 {{ end }}
-{{ if ne .chezmoi.os "windows" }}
-.config/powershell/Microsoft.PowerShell_profile.ps1
-scripts/
-scripts/install_powershell.ps1
-{{ end }}
 {{ if eq .chezmoi.os "linux" }}
 {{ if (eq .chezmoi.osRelease.id "rocky") -}}
 .config/Code/
@@ -48,3 +43,16 @@ scripts/install_powershell.ps1
 .tmux.conf
 {{ end -}}
 {{ end -}}
+{{ if ne .chezmoi.os "windows" }}
+.config/powershell/Microsoft.PowerShell_profile.ps1
+scripts/
+scripts/install_powershell.ps1
+{{ end }}
+# Ignoring all linux related config files
+{{ if .chezmoi.os "windows" }}
+.zshrc
+.vimrc
+.tmux.conf
+.oh-my-zsh/
+.htop
+{{ end }}
