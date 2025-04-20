@@ -1,5 +1,5 @@
 # Initialize oh-my-posh and PSFzf options
-oh-my-posh init pwsh --config 'C:\Users\{{ .chezmoi.username }}\AppData\Local\Programs\oh-my-posh\themes\wopian.omp.json' | Invoke-Expression
+oh-my-posh init pwsh --config '$env:POSH_THEMES_PATH\wopian.omp.json' | Invoke-Expression
 
 # Tab shows list of files instead of cycling through files
 Import-Module PSReadLine
@@ -7,6 +7,7 @@ Set-PSReadLineOption -EditMode Vi
 Set-PSReadLineKeyHandler -Key Tab -Function Complete
 
 # Enabling ctrl+r as backward fuzzy search
+Import-Module PSFzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 
 # Autosuggestions (similar to zsh plugins). NOTE: requires modern PS
