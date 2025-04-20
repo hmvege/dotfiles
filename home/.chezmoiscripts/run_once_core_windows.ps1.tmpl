@@ -157,7 +157,7 @@ $pipxPkgs = @(
 )
 
 foreach ($pkg in $pipxPkgs) {
-    if (-not (& pipx list | Select-String -Pattern $pkg)) {
+    if (-not (& python -m pipx list | Select-String -Pattern $pkg)) {
         python -m pipx install $pkg
     } else {
         Write-Output "$pkg already installed with pipx."
