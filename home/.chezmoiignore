@@ -44,7 +44,9 @@ Library/Application\ Support/Code/User/settings.json
 {{ end -}}
 {{ end -}}
 {{ if ne .chezmoi.os "windows" }}
-.config/powershell/Microsoft.PowerShell_profile.ps1
+Documents/
+Documents/PowerShell/
+Documents/PowerShell/Microsoft.PowerShell_profile.ps1
 scripts/
 scripts/install_powershell.ps1
 {{ end }}
