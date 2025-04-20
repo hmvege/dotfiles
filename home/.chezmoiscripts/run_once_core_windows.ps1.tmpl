@@ -71,6 +71,7 @@ scoop update
 # Install CLI + font package (fonts can live here if you like)
 $packages = @(
     "bat",
+    "curl",
     "fd",
     "fzf",
     "git",
@@ -78,9 +79,9 @@ $packages = @(
     "lsd",
     "oh-my-posh",
     "python",
-    "vim",
-    "curl",
     "ripgrep",
+    "sublime-merge",
+    "vim",
     "zoxide"
 )
 
@@ -157,13 +158,13 @@ $pipxPkgs = @(
 
 foreach ($pkg in $pipxPkgs) {
     if (-not (& pipx list | Select-String -Pattern $pkg)) {
-        pipx install $pkg
+        python -m pipx install $pkg
     } else {
         Write-Output "$pkg already installed with pipx."
     }
 }
 
 # Final message
-Write-Output "\n==== Windows core tools setup complete ===="
+Write-Output "==== Windows core tools setup complete ===="
 Write-Output "You may need to restart your terminal for all changes to take effect."
 {{ end }}
