@@ -5,25 +5,25 @@
     Idempotent – safe to re‑run.
 #>
 
-$ErrorActionPreference = 'Stop'
+# $ErrorActionPreference = 'Stop'
 
-$modules = @(
-    @{ Name = 'PSReadLine'; MinimumVersion = '2.3.6' },
-    @{ Name = 'PSFzf';      MinimumVersion = '2.6.7' }
-)
+# $modules = @(
+#     @{ Name = 'PSReadLine'; MinimumVersion = '2.3.6' },
+#     @{ Name = 'PSFzf';      MinimumVersion = '2.6.7' }
+# )
 
-foreach ($m in $modules) {
-    $have = Get-Module -ListAvailable -Name $m.Name | Sort-Object Version -Descending | Select-Object -First 1
-    if (-not $have -or $have.Version -lt [Version]$m.MinimumVersion) {
-        Write-Host "Installing/updating $($m.Name)…"
-        Install-Module $($m.Name) -Scope CurrentUser -Force
-    } else {
-        Write-Host "$($m.Name) already present ($($have.Version))"
-    }
-}
+# foreach ($m in $modules) {
+#     $have = Get-Module -ListAvailable -Name $m.Name | Sort-Object Version -Descending | Select-Object -First 1
+#     if (-not $have -or $have.Version -lt [Version]$m.MinimumVersion) {
+#         Write-Host "Installing/updating $($m.Name)…"
+#         Install-Module $($m.Name) -Scope CurrentUser -Force
+#     } else {
+#         Write-Host "$($m.Name) already present ($($have.Version))"
+#     }
+# }
 
 # Import-Module PSReadLine
-# Install-Module PSfzf -Scope CurrentUser -Force
+Install-Module PSfzf -Scope CurrentUser -Force
 # Import-Module PSFzf
 
 Write-Host "Windows shell tooling is ready."

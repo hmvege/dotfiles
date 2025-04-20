@@ -88,7 +88,7 @@ $packages = @(
 foreach ($pkg in $packages) {
     Ensure-ScoopPackage $pkg
 }
-Ensure-ScoopPackage "JetBrainsMono-NF"
+Ensure-ScoopPackage "Meslo-NF"
 
 # Install VSCode
 if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
