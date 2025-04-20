@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 
 function Install-PowerShell {
     Write-Host "Downloading PowerShell $LatestVersion..."
-    Invoke-WebRequest -Uri $InstallerUrl -OutFile $InstallerPath -UseBasicParsing
+    curl.exe -fSL $InstallerUrl -o $InstallerPath
 
     Write-Host 'Verifying hash...'
     $ActualHash = (Get-FileHash -Path $InstallerPath -Algorithm SHA256).Hash.ToUpper()
