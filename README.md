@@ -178,6 +178,33 @@ docker stop rocky-dotfiles-test-1 && docker rm rocky-dotfiles-test-1
 docker rmi dotfiles-rocky-test
 ```
 
+### Windows
+To test on windows, you can run and test in [Sandbox mode](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/. The config file can be something like,
+```
+<Configuration>
+  <MemoryInMB>8192</MemoryInMB>
+  <ProcessorCount>8</ProcessorCount>
+  <VGpu>Enable</VGpu>
+
+  <LogonCommand>
+    <Command>powershell.exe -ExecutionPolicy Bypass -NoLogo -NoExit</Command>
+  </LogonCommand>
+</Configuration>
+```
+Once started, run the following commands
+```
+# For faster downloading and installing
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -Name 'VerifiedAndReputablePolicyState' -Value 0
+& "$env:windir\System32\CiTool.exe" -r
+
+Set-ExecutionPolicy Bypass -Scope Process -Force
+iex "& { $(irm 'https://get.chezmoi.io/ps1') } -b '~/bin' -- init --branch <branch-to-test> --apply hmvege"
+```
+The pipeline will also run tests on the windows setup.
+
+### MacOS
+The pipeline will run tests on the MacOS setup.
+
 ## :question: Troubleshooting
 
 ### Shell not changing
