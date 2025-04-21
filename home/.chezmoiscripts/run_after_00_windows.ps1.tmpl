@@ -7,7 +7,7 @@
 
 # ensure NuGet provider + PSGallery trust – silent
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$null = Get-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 `
+$null = Get-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201
                             -ForceBootstrap -Scope CurrentUser
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
