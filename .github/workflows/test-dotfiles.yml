@@ -54,7 +54,7 @@ jobs:
       - name: Install ChezMoi & Apply Dotfiles
         run: |
           sh -c "$(curl -fsLS get.chezmoi.io)"
-          chezmoi -S $(pwd) init --apply
+          chezmoi -S $(pwd) init --promptString "Enter GitHub mail for this machine=testmail" --apply --branch "${{ github.head_ref }}"
 
   test-windows-dotfiles:
     runs-on: windows-latest
@@ -63,7 +63,7 @@ jobs:
       - name: Install Chezmoi
         run: iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$env:RUNNER_TEMP/bin'"
       - name: Apply dotfiles
-        run: $env:RUNNER_TEMP\bin\chezmoi.exe init -S $PWD --apply hmvege
+        run: $env:RUNNER_TEMP\bin\chezmoi.exe init -S $PWD --promptString "Enter GitHub mail for this machine=testmail" --apply hmvege --branch "${{ github.head_ref }}"
       - name: Idempotency check
         run: |
           $env:RUNNER_TEMP\bin\chezmoi.exe apply -n | Tee-Object diff.txt
