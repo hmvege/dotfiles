@@ -79,6 +79,7 @@ $packages = @(
     "lsd",
     "oh-my-posh",
     "python",
+    "psfzf",
     "ripgrep",
     "sublime-merge",
     "vim",
@@ -89,6 +90,7 @@ foreach ($pkg in $packages) {
     Ensure-ScoopPackage $pkg
 }
 Ensure-ScoopPackage "Meslo-NF"
+Ensure-ScoopPackage "JetBrainsMono-NF"
 
 # Install VSCode
 if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
