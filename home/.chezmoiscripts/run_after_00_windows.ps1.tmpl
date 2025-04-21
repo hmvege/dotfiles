@@ -5,16 +5,14 @@
     Idempotent – safe to re‑run.
 #>
 
-# ensure NuGet provider + PSGallery trust
-if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue)) {
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 `
-                           -Scope CurrentUser -Force
-}
-if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
-    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-}
+# ensure NuGet provider + PSGallery trust – silent
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$null = Get-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 `
+                            -ForceBootstrap -Scope CurrentUser
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
-Install-Module PSfzf -Scope CurrentUser -Force
+# module install
+Install-Module PSFzf -Scope CurrentUser -Force
 
 Write-Host "Windows shell tooling is ready."
 {{ end -}}
