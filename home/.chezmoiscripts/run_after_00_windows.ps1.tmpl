@@ -5,11 +5,22 @@
     Idempotent – safe to re‑run.
 #>
 
-# ensure NuGet provider + PSGallery trust – silent
+# ── Ensure NuGet provider + PSGallery trust (silent & idempotent) ──────────────
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$null = Get-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201
-                            -ForceBootstrap -Scope CurrentUser
-Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+
+$minNuGetVersion   = [Version]'2.8.5.201'
+$haveNuGetProvider = Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue |
+                    Sort-Object Version -Descending | Select-Object -First 1
+
+if (-not $haveNuGetProvider -or $haveNuGetProvider.Version -lt $minNuGetVersion) {
+    Install-PackageProvider -Name NuGet -MinimumVersion $minNuGetVersion `
+                            -Scope CurrentUser -Force
+}
+
+if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
+    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+}
+# ───────────────────────────────────────────────────────────────────────────────
 
 # module install
 Install-Module PSFzf -Scope CurrentUser -Force
