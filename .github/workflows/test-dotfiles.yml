@@ -25,7 +25,7 @@ jobs:
               ubuntu_version: "24.04"
               dockerfile_path: "LinuxUbuntu"
             - os: rocky8
-              ubuntu_version: "8"  # Assuming Rocky uses "8"
+              ubuntu_version: "8"
               dockerfile_path: "LinuxRocky8"
               
     steps:
@@ -45,6 +45,13 @@ jobs:
           docker run --rm dotfiles-test-image-${{ matrix.os }} \
             bash -c "chezmoi apply && echo 'SUCCESSFUL INSTALL' || (echo 'INSTALL FAILED'; exit 1)"
 
+      - name: Idempotency Check
+        run: |
+          docker run --rm dotfiles-test-image-${{ matrix.os }} \
+            bash -c "chezmoi apply -n | tee diff.txt && \
+              if [ -s diff.txt ]; then echo 'Not idempotent!'; cat diff.txt; exit 1; else echo 'Idempotent'; fi"
+    
+
   test-macos-dotfiles:
     runs-on: macos-latest
     steps:
@@ -53,18 +60,44 @@ jobs:
 
       - name: Install ChezMoi & Apply Dotfiles
         run: |
-          sh -c "$(curl -fsLS get.chezmoi.io)"
-          chezmoi -S $(pwd) init --promptString "Enter GitHub mail for this machine=testmail" --apply --branch "${{ github.head_ref }}"
+          sh -c "$(curl -fsLS get.chezmoi.io)" \
+            chezmoi -S $(pwd) init \
+            --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+            --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
+            --promptBool "Install GUI tools (y/n)=n" \
+            --apply \
+            --branch "${{ github.head_ref }}" \
+            hmvege
+      
+      - name: Idempotency Check
+        run: |
+          chezmoi -S $(pwd) apply -n | tee diff.txt
+          if [ -s diff.txt ]; then echo "Not idempotent"; cat diff.txt; exit 1; else echo "Idempotent"; fi
+
 
   test-windows-dotfiles:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Chezmoi
         run: iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$env:RUNNER_TEMP/bin'"
-      - name: Apply dotfiles
-        run: $env:RUNNER_TEMP\bin\chezmoi.exe init -S $PWD --promptString "Enter GitHub mail for this machine=testmail" --apply hmvege --branch "${{ github.head_ref }}"
-      - name: Idempotency check
+
+      - name: Apply Dotfiles
+        run: |
+          $env:RUNNER_TEMP\bin\chezmoi.exe init -S $PWD `
+            --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+            --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
+            --promptBool "Install GUI tools (y/n)=n" \
+            --apply hmvege --branch "${{ github.head_ref }}"
+
+      - name: Idempotency Check
         run: |
           $env:RUNNER_TEMP\bin\chezmoi.exe apply -n | Tee-Object diff.txt
-          if ((Get-Content diff.txt).Length -ne 0) { throw 'Not idempotent!' }
+          if ((Get-Content diff.txt).Length -ne 0) {
+            Write-Output "Not idempotent!"
+            Get-Content diff.txt
+            exit 1
+          } else {
+            Write-Output "Idempotent"
+          }

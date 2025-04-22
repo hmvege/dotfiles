@@ -22,21 +22,11 @@ ENV PATH=$HOME/.local/bin:$PATH
 
 # Initialize and apply the dotfiles using Chezmoi
 ARG GIT_BRANCH=master
-RUN cd $HOME && chezmoi init --apply \
+RUN cd $HOME && chezmoi init \
     --promptString "Enter GitHub mail for this machine=testmail@example.com" \
     --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
     --promptBool "Install GUI tools (y/n)=n" \
     --branch "$GIT_BRANCH" hmvege
-
-# Check for idempotency
-RUN chezmoi apply -n | tee /tmp/chezmoi-diff.txt && \
-    if [ -s /tmp/chezmoi-diff.txt ]; then \
-    echo "Not idempotent - changes detected!"; \
-    cat /tmp/chezmoi-diff.txt; \
-    exit 1; \
-    else \
-    echo "Idempotent - no changes detected."; \
-    fi
 
 # Set default command to an interactive shell
 CMD ["/bin/bash"]
