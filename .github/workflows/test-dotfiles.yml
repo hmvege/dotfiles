@@ -10,7 +10,6 @@ on:
 
 jobs:
   test-linux-dotfiles:
-    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -60,18 +59,17 @@ jobs:
 
       - name: Install ChezMoi & Apply Dotfiles
         run: |
-          sh -c "$(curl -fsLS get.chezmoi.io)" \
-            chezmoi -S $(pwd) init \
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init -S ~/dotfiles \
             --promptString "Enter GitHub mail for this machine=testmail@example.com" \
             --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
             --promptBool "Install GUI tools (y/n)=n" \
             --apply \
             --branch "${{ github.head_ref }}" \
             hmvege
-      
+
       - name: Idempotency Check
         run: |
-          chezmoi -S $(pwd) apply -n | tee diff.txt
+          chezmoi -S "$HOME/.local/bin" apply -n | tee diff.txt
           if [ -s diff.txt ]; then echo "Not idempotent"; cat diff.txt; exit 1; else echo "Idempotent"; fi
 
 
@@ -85,10 +83,10 @@ jobs:
 
       - name: Apply Dotfiles
         run: |
-          $env:RUNNER_TEMP\bin\chezmoi.exe init -S $PWD `
-            --promptString "Enter GitHub mail for this machine=testmail@example.com" \
-            --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
-            --promptBool "Install GUI tools (y/n)=n" \
+            & "$env:RUNNER_TEMP/bin/chezmoi.exe" init -S "$PWD" `
+            --promptString "Enter GitHub mail for this machine=testmail@example.com" `
+            --promptBool "Do you want a minimal (lite) setup (y/n)=n" `
+            --promptBool "Install GUI tools (y/n)=n" `
             --apply hmvege --branch "${{ github.head_ref }}"
 
       - name: Idempotency Check
