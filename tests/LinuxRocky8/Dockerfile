@@ -24,8 +24,8 @@ ENV PATH=$HOME/.local/bin:$PATH
 ARG GIT_BRANCH=master
 RUN cd $HOME && chezmoi init \
     --promptString "Enter GitHub mail for this machine=testmail@example.com" \
-    --promptBool "Do you want a minimal (lite) setup?=true" \
-    --promptBool "Install GUI tools? (auto-detected GUI: true)=false" \
+    --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
+    --promptBool "Install GUI tools (y/n)=n" \
     --branch "$GIT_BRANCH" hmvege
 
 # Set default command to an interactive shell
