@@ -13,6 +13,7 @@ function Install-PowerShell {
     curl.exe -fSL $InstallerUrl -o $InstallerPath
 
     Write-Host 'Verifying hash...'
+    Import-Module Microsoft.PowerShell.Utility -ErrorAction SilentlyContinue
     $ActualHash = (Get-FileHash -Path $InstallerPath -Algorithm SHA256).Hash.ToUpper()
     if ($ActualHash -ne $ExpectedHash) {
         Remove-Item $InstallerPath -Force

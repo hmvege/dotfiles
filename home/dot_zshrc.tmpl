@@ -12,11 +12,15 @@ export ZSH="/home/{{ .chezmoi.username }}/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+{{ if (eq .chezmoi.os "linux") -}}
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 ZSH_THEME="bureau"
 {{ else if eq .chezmoi.osRelease.id "rocky" -}}
 ZSH_THEME="minimalist"
 {{ else -}}
+ZSH_THEME="bureau"
+{{ end -}}
+{{ else if (eq .chezmoi.os "darwin") -}}
 ZSH_THEME="bureau"
 {{ end -}}
 
@@ -81,10 +85,12 @@ plugins=(
     git
     history
     jsontools
+{{ if hasKey .chezmoi.osRelease "id" }}
 {{ if (ne .chezmoi.osRelease.id "rocky") -}}
     sublime
     tmux
     vscode
+{{ end -}}
 {{ end -}}
     z
     zsh-autosuggestions
@@ -121,6 +127,7 @@ export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 # fasd shortcuts
 alias fp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias v='f -e vim' # quick opening files with vim
+{{ if hasKey .chezmoi.osRelease "id" }}
 {{ if ne .chezmoi.osRelease.id "rocky" -}}
 alias o='a -e xdg-open' # quick opening files with xdg-open
 
@@ -154,6 +161,7 @@ alias ltsh='lt -l --blocks size --blocks name'
 
 # Zoxide setup
 eval "$(zoxide init zsh)"
+{{ end -}}
 {{ end -}}
 
 {{ if (eq .chezmoi.os "darwin") -}}
