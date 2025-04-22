@@ -1,11 +1,7 @@
 {{ $email := promptString "Enter GitHub mail for this machine" }}
 
-{{ $isWSL := contains (lower .chezmoi.kernel.osrelease) "microsoft" }}
-{{ $xdgDesktop := env "XDG_SESSION_DESKTOP" }}
-{{ $hasGUI := and (not $isWSL) (ne $xdgDesktop "") }}
-
 {{ $lite := promptBool "Do you want a minimal (lite) setup?" }}
-{{ $gui := ternary false (promptBool (printf "Install GUI tools? (auto-detected GUI: %v)" $hasGUI)) $lite }}
+{{ $gui := ternary false (promptBool (printf "Install GUI tools?")) $lite }}
 
 [data]
 email = '{{ $email | quote }}'
