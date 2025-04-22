@@ -11,22 +11,20 @@ echo "You may need to logout and log in into your user($USER) for the dotfiles t
 {{ if not (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
 
 # Only runs if we have a desktop
-if [[ $XDG_SESSION_DESKTOP == "ubuntu" ]]
-then
-    echo ""
-    echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
+{{ if .gui }}
+echo ""
+echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
 
-    echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
-    old_ifs="$IFS"
-    IFS="
-    "
-    for p in $(awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d')
-    do
-        echo "    $p"
-    done
-    IFS="$old_ifs"
-fi
-
+echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
+old_ifs="$IFS"
+IFS="
+"
+for p in $(awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d')
+do
+    echo "    $p"
+done
+IFS="$old_ifs"
+{{ end -}}
 {{ end -}}
 {{ end -}}
 

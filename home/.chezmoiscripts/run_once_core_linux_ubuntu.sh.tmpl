@@ -15,7 +15,6 @@ packages=(
     git
     htop
     jq
-    mc
     tmux
     vim
     rename
@@ -257,8 +256,7 @@ fi
 #     echo "Installed Brew"
 # fi
 
-# Will not install VSCode if WSL is detected
-{{ if (not (.chezmoi.kernel.osrelease | lower | contains "microsoft")) }}
+{{ if and .gui (not .lite) }}
 # We only install VSCode if snap is available on the system
 if command -v snap &> /dev/null; then
     if ! type -p code >/dev/null 2>&1
@@ -308,7 +306,6 @@ else
     echo "Snap is not available. Skipping VSCode installation."
 fi
 {{ end -}}
-
 
 ## lsd
 if ! type -p lsd >/dev/null 2>&1

@@ -16,11 +16,17 @@ The goal for this dotfiles project repository, is following,
    * Ubuntu 22.04
    * Ubuntu 24.04
    * Rocky8
-   * WSL
+   * WSL 2
    * Windows 11
 * Have it be easily **maintained**. I.e. changes applied at one machine, will be easily transferable to another machine.
 
 ## :scroll: Installation
+
+### :question: Prompted Questions
+During the installation, you'll be asked:
+- Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts), with auto-detected recommendation.
+- Whether to perform a **minimal (lite) setup**. If `lite` mode is selected, GUI apps will automatically be skipped.
+- **Mail** used for GitHub.
 
 ### :penguin: Linux
 Install Chezmoi and initialize, ensure `curl` and `sudo` is installed,
@@ -33,13 +39,13 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfile
 ```
 which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
-### MacOS
+### :green_apple:	MacOS
 On MacOS, you should be able to install Chezmoi via
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 ```
 
-### Windows
+### :window: Windows
 The dotfiles for Windows is targeting PowerShell. Install Chezmoi via,
 ```powershell
 iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --apply hmvege"
@@ -178,7 +184,7 @@ docker stop rocky-dotfiles-test-1 && docker rm rocky-dotfiles-test-1
 docker rmi dotfiles-rocky-test
 ```
 
-### Windows
+### :window: Windows
 To test on windows, you can run and test in [Sandbox mode](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/. The config file can be something like,
 ```
 <Configuration>
@@ -202,7 +208,7 @@ iex "& { $(irm 'https://get.chezmoi.io/ps1') } -b '~/bin' -- init --branch <bran
 ```
 The pipeline will also run tests on the windows setup.
 
-### MacOS
+### :green_apple: MacOS
 The pipeline will run tests on the MacOS setup.
 
 ## :question: Troubleshooting

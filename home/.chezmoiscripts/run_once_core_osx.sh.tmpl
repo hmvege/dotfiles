@@ -154,6 +154,7 @@ else
     echo "vim plugin manager already installed"
 fi
 
+{{ if and .gui (not .lite) }}
 ## VSCode installation
 if [ ! type -p code >/dev/null 2>&1 ]
 then
@@ -198,5 +199,5 @@ do
         echo "VSCode extension $extension found"
     fi
 done
-
+{{ end -}}
 {{ end -}}

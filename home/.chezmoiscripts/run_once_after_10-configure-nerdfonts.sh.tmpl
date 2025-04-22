@@ -1,3 +1,4 @@
+{{ if .gui }}
 {{ if (eq .chezmoi.os "linux") -}}
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 #!/bin/bash
@@ -6,25 +7,21 @@
 # failures.
 set -euo pipefail
 
+# Ensure fontconfig is available
+if ! command -v fc-cache >/dev/null 2>&1; then
+    echo "fc-cache not found - attempting to install fontconfig..."
+    sudo apt-get update && sudo apt-get install -y fontconfig
+fi
+
 if command -v fc-cache >/dev/null
 then
     declare -a fonts=(
-        # BitstreamVeraSansMono
-        # CodeNewRoman
         DroidSansMono
         FiraCode
         FiraMono
-        # Go-Mono
-        # Hack
-        # Hermit
-        # JetBrainsMono
-        # Meslo
-        # Noto
-        # Overpass
         ProggyClean
         RobotoMono
         SourceCodePro
-        # SpaceMono
         Ubuntu
         UbuntuMono
     )
@@ -60,5 +57,6 @@ echo "Not installing fonts for Rocky"
 {{ else -}}
 #!/bin/sh
 echo "Linux flavour $OSTYPE not recognized."
+{{ end -}}
 {{ end -}}
 {{ end -}}
