@@ -77,6 +77,9 @@ jobs:
 
   test-windows-dotfiles:
     runs-on: windows-latest
+    env:
+      # Bug in Get-FileHash validations requires file hash skip.
+      SCOOP_CHECKSUM_SKIP: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: MinoruSekine/setup-scoop@v4.0.1

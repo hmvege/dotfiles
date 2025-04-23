@@ -184,6 +184,8 @@ docker stop rocky-dotfiles-test-1 && docker rm rocky-dotfiles-test-1
 docker rmi dotfiles-rocky-test
 ```
 
+This also runs as a GitHub actions pipeline.
+
 ### :window: Windows
 To test on windows, you can run and test in [Sandbox mode](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/. The config file can be something like,
 ```
