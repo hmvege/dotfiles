@@ -10,7 +10,6 @@ on:
 
 jobs:
   test-linux-dotfiles:
-    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -54,7 +53,6 @@ jobs:
 
   test-macos-dotfiles:
     runs-on: macos-latest
-    if: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
