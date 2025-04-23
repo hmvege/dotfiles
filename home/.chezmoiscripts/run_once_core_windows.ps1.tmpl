@@ -2,8 +2,6 @@
 # run_once_core_windows.ps1.tmpl
 # Sets up core tools for Windows: PowerShell, Scoop, pipx, oh-my-posh, bat, etc.
 
-$env:SCOOP_CHECKSUM_SKIP = 'true'
-
 # Self-elevate the script if required
 if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
   if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {

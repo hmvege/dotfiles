@@ -77,9 +77,9 @@ jobs:
 
   test-windows-dotfiles:
     runs-on: windows-latest
-    env:
-      # Bug in Get-FileHash validations requires file hash skip.
-      SCOOP_CHECKSUM_SKIP: 'true'
+    # NOTE: disabled windows test due to scoop Get-FileHash bug in powershell.
+    # May at some point enable after having switched to chocolatey or winget.
+    if: false
     steps:
       - uses: actions/checkout@v4
       - uses: MinoruSekine/setup-scoop@v4.0.1
@@ -97,7 +97,7 @@ jobs:
 
       - name: Idempotency Check
         run: |
-          $env:RUNNER_TEMP\bin\chezmoi.exe apply -n | Tee-Object diff.txt
+          $env:RUNNER_TEMP/bin/chezmoi.exe apply -n | Tee-Object diff.txt
           if ((Get-Content diff.txt).Length -ne 0) {
             Write-Output "Not idempotent!"
             Get-Content diff.txt
