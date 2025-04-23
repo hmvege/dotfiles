@@ -5,6 +5,29 @@
 # Ensuring Get-FileHash is available for scoop.
 Import-Module Microsoft.PowerShell.Utility -ErrorAction SilentlyContinue
 
+# If that still didn’t give us Get-FileHash, define a tiny .NET fallback:
+if (-not (Get-Command Get-FileHash -ErrorAction SilentlyContinue)) {
+    function Get-FileHash {
+        param(
+            [Parameter(Mandatory)]
+            [string] $Path,
+            [ValidateSet('SHA1','SHA256','MD5')]
+            [string] $Algorithm = 'SHA256'
+        )
+        $alg   = [System.Security.Cryptography.HashAlgorithm]::Create($Algorithm)
+        $stream= [System.IO.File]::OpenRead($Path)
+        try {
+            $bytes = $alg.ComputeHash($stream)
+        } finally {
+            $stream.Close()
+        }
+        return [PSCustomObject]@{
+            Algorithm = $Algorithm
+            Hash      = ([BitConverter]::ToString($bytes)).Replace('-','')
+        }
+    }
+}
+
 # Self-elevate the script if required
 if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
   if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
