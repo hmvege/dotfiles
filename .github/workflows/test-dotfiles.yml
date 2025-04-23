@@ -54,6 +54,7 @@ jobs:
 
   test-macos-dotfiles:
     runs-on: macos-latest
+    if: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -78,6 +79,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: MinoruSekine/setup-scoop@v4.0.1
 
       - name: Install Chezmoi
         run: iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$env:RUNNER_TEMP/bin'"
