@@ -1,7 +1,6 @@
 # Initialize oh-my-posh and PSFzf options
 $env:POSH_GIT_ENABLED = $true
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\wopian.omp.json" | Invoke-Expression
-Import-Module posh-git
 
 # Tab shows list of files instead of cycling through files
 Import-Module PSReadLine
