@@ -20,7 +20,6 @@ packages=(
     rename
     unzip
     wget
-    zoxide
     zsh
     # Various packages needed for development
     build-essential
@@ -109,6 +108,21 @@ then
     echo "vim plugin manager installed"
 else
     echo "vim plugin manager already installed"
+fi
+
+## Install zoxide
+if ! type -p z >/dev/null 2>&1
+then    
+    # Try distro package first (Ubuntu 24.04+ ships zoxide)
+    if sudo apt-get install -y zoxide; then
+        echo "Installed zoxide via apt"
+    else
+        # Fallback to upstream script, but don’t exit on failure
+        curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh \
+            | sh || echo "zoxide install failed, continuing anyway"
+    fi
+else
+    echo "Already installed zoxide"
 fi
 
 ## install fzf
