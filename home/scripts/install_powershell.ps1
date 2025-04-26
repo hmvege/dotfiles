@@ -5,7 +5,7 @@ $InstallerUrl = "https://github.com/PowerShell/PowerShell/releases/download/v$La
 $InstallerPath = "$env:TEMP\PowerShell-$LatestVersion.msi"
 
 # SHA-256 for PowerShell-7.5.0-win-x64.msi (from Microsoft’s release checksums)
-$ExpectedHash = '6B988B7E236A8E1CF1166D3BE289D3A20AA344499153BDAADD2F9FEDFFC6EDA9'
+$ExpectedHash = 'B110ECCAF55BB53AE5E6B6DE478587ED8203570B0BDA9BD374A0998E24D4033A'
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
