@@ -36,10 +36,17 @@ packages=(
     python3-venv
     python3-pip
     python3-tk
-    # For Gogh
+)
+
+# For Gogh terminal colors
+packages_gogh_requirements=(
     dconf-cli
     uuid-runtime
 )
+
+{{ if not .lite }}
+packages+=( "${packages_gogh_requirements[@]}" )
+{{ end }}
 
 sudo apt-get install -y ${packages[@]}
 echo "Packages installed."
@@ -82,6 +89,7 @@ else
     echo "zsh-autosuggestions already installed"
 fi
 
+{{ if not .lite }}
 ## tmux plugins
 if [ ! -d "${HOME}/.tmux/plugins/tpm" ]
 then
@@ -90,6 +98,7 @@ then
 else
     echo "tmux plugin manager already installed."
 fi
+{{ end }}
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
@@ -307,6 +316,13 @@ else
 fi
 {{ end -}}
 
+## Check that fdfind is installed
+if [ ! -h ~/.local/bin/fd ]
+then
+    ln -s $(which fdfind) ~/.local/bin/fd
+fi
+
+{{ if not .lite }}
 ## lsd
 if ! type -p lsd >/dev/null 2>&1
 then
@@ -325,12 +341,6 @@ then
     echo "Installed lsd"
 else
     echo "Already installed lsd"
-fi
-
-## Check that fdfind is installed
-if [ ! -h ~/.local/bin/fd ]
-then
-    ln -s $(which fdfind) ~/.local/bin/fd
 fi
 
 # Will not install Gogh if WSL is detected
@@ -359,6 +369,7 @@ else
         echo "Gogh theme installation complete"
     fi
 fi
+{{ end -}}
 {{ end -}}
 {{ end -}}
 {{ end -}}

@@ -1,4 +1,4 @@
-{{ if .gui }}
+{{ if and .gui (not .lite) }}
 {{ if (eq .chezmoi.os "linux") -}}
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 #!/bin/bash

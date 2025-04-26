@@ -39,9 +39,10 @@ ENV PATH=$HOME/.local/bin:$PATH
 
 # Initialize and apply the dotfiles using Chezmoi
 ARG GIT_BRANCH=master
+ARG LITE="false"
 RUN cd $HOME && chezmoi init \
     --promptString "Enter GitHub mail for this machine=testmail@example.com" \
-    --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
+    --promptBool "Do you want a minimal (lite) setup (y/n)=${LITE}" \
     --promptBool "Install GUI tools (y/n)=n" \
     --branch "$GIT_BRANCH" hmvege
 

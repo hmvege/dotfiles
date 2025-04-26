@@ -25,7 +25,7 @@ The goal for this dotfiles project repository, is following,
 ### :question: Prompted Questions
 During the installation, you'll be asked:
 - Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts), with auto-detected recommendation.
-- Whether to perform a **minimal (lite) setup**. If `lite` mode is selected, GUI apps will automatically be skipped.
+- Whether to perform a **minimal (lite) setup**. If `lite` mode is selected, GUI apps will automatically be skipped (e.g. VSCode, Sublime, tmux, Gogh etc.).
 - **Mail** used for GitHub.
 
 ### :penguin: Linux
@@ -87,15 +87,17 @@ and then the dotfiles can be applied again.
 
 ## :inbox_tray: Packages to be installed
 
- - [`fzf`](https://github.com/junegunn/fzf#using-git)
- - [`lsd`](https://github.com/Peltoche/lsd)
- - [`tmux`](https://github.com/tmux/tmux)
- - [`tmux-plugins`](https://github.com/tmux-plugins/tpm)
- - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug)
- - [`pyenv` and `pyenv-virtualenv`](https://github.com/pyenv)
- - `zsh` and [`ohmyzsh`](https://github.com/ohmyzsh/ohmyzsh)
- - [`pipx`](https://pypa.github.io/pipx/)
- - [`gogh`](https://gogh-co.github.io/Gogh/)
+ - [`fzf`](https://github.com/junegunn/fzf#using-git) fuzzy searching.
+ - [`fd`](https://github.com/sharkdp/fd) better `find`.
+ - [`lsd`](https://github.com/Peltoche/lsd). Pretties `ls`.
+ - [`tmux`](https://github.com/tmux/tmux). Terminal multiplexer.
+ - [`tmux-plugins`](https://github.com/tmux-plugins/tpm). Plugins for `tmux`.
+ - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug). On-the-go editor.
+ - [`pyenv` and `pyenv-virtualenv`](https://github.com/pyenv). Python virtual environment handler.
+ - `zsh` and [`ohmyzsh`](https://github.com/ohmyzsh/ohmyzsh). Shell and zsh framework.
+ - [`pipx`](https://pypa.github.io/pipx/). For installing pip packages in independent Python environments.
+ - [`gogh`](https://gogh-co.github.io/Gogh/). Terminal colors.
+ - [`zoxide`](https://github.com/ajeetdsouza/zoxide). Better change directory `cd`.
 
 ### Vim plugins
 Plugins used in Vim is,

@@ -17,15 +17,32 @@ jobs:
             - os: ubuntu20-04
               ubuntu_version: "20.04"
               dockerfile_path: "LinuxUbuntu"
+              lite: "false"
             - os: ubuntu22-04
               ubuntu_version: "22.04"
               dockerfile_path: "LinuxUbuntu"
+              lite: "false"
             - os: ubuntu24-04
               ubuntu_version: "24.04"
               dockerfile_path: "LinuxUbuntu"
+              lite: "false"
             - os: rocky8
               ubuntu_version: "8"
               dockerfile_path: "LinuxRocky8"
+              lite: "false"
+            # Lite install tests
+            - os: ubuntu20-04-lite
+              ubuntu_version: "20.04"
+              dockerfile_path: "LinuxUbuntu"
+              lite: "true"
+            - os: ubuntu22-04-lite
+              ubuntu_version: "22.04"
+              dockerfile_path: "LinuxUbuntu"
+              lite: "true"
+            - os: ubuntu24-04-lite
+              ubuntu_version: "24.04"
+              dockerfile_path: "LinuxUbuntu"
+              lite: "true"
               
     steps:
       - name: Checkout Repository
