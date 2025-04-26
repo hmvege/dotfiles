@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  test-dotfiles:
+  test-linux-dotfiles:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -17,15 +17,32 @@ jobs:
             - os: ubuntu20-04
               ubuntu_version: "20.04"
               dockerfile_path: "LinuxUbuntu"
+              lite: "false"
             - os: ubuntu22-04
               ubuntu_version: "22.04"
               dockerfile_path: "LinuxUbuntu"
+              lite: "false"
             - os: ubuntu24-04
               ubuntu_version: "24.04"
               dockerfile_path: "LinuxUbuntu"
+              lite: "false"
             - os: rocky8
-              ubuntu_version: "8"  # Assuming Rocky uses "8"
+              ubuntu_version: "8"
               dockerfile_path: "LinuxRocky8"
+              lite: "false"
+            # Lite install tests
+            - os: ubuntu20-04-lite
+              ubuntu_version: "20.04"
+              dockerfile_path: "LinuxUbuntu"
+              lite: "true"
+            - os: ubuntu22-04-lite
+              ubuntu_version: "22.04"
+              dockerfile_path: "LinuxUbuntu"
+              lite: "true"
+            - os: ubuntu24-04-lite
+              ubuntu_version: "24.04"
+              dockerfile_path: "LinuxUbuntu"
+              lite: "true"
               
     steps:
       - name: Checkout Repository
@@ -43,3 +60,63 @@ jobs:
         run: |
           docker run --rm dotfiles-test-image-${{ matrix.os }} \
             bash -c "chezmoi apply && echo 'SUCCESSFUL INSTALL' || (echo 'INSTALL FAILED'; exit 1)"
+
+      - name: Idempotency Check
+        run: |
+          docker run --rm dotfiles-test-image-${{ matrix.os }} \
+            bash -c "chezmoi apply -n | tee diff.txt && \
+              if [ -s diff.txt ]; then echo 'Not idempotent!'; cat diff.txt; exit 1; else echo 'Idempotent'; fi"
+    
+
+  test-macos-dotfiles:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ChezMoi & Apply Dotfiles
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init -S ~/dotfiles \
+            --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+            --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
+            --promptBool "Install GUI tools (y/n)=n" \
+            --apply \
+            --branch "${{ github.head_ref }}" \
+            hmvege
+
+      - name: Idempotency Check
+        run: |
+          chezmoi -S "$HOME/.local/bin" apply -n | tee diff.txt
+          if [ -s diff.txt ]; then echo "Not idempotent"; cat diff.txt; exit 1; else echo "Idempotent"; fi
+
+
+  test-windows-dotfiles:
+    runs-on: windows-latest
+    # NOTE: disabled windows test due to scoop Get-FileHash bug in powershell.
+    # May at some point enable after having switched to chocolatey or winget.
+    if: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: MinoruSekine/setup-scoop@v4.0.1
+
+      - name: Install Chezmoi
+        run: iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$env:RUNNER_TEMP/bin'"
+
+      - name: Apply Dotfiles
+        run: |
+            & "$env:RUNNER_TEMP/bin/chezmoi.exe" init -S "$PWD" `
+            --promptString "Enter GitHub mail for this machine=testmail@example.com" `
+            --promptBool "Do you want a minimal (lite) setup (y/n)=n" `
+            --promptBool "Install GUI tools (y/n)=n" `
+            --apply hmvege --branch "${{ github.head_ref }}"
+
+      - name: Idempotency Check
+        run: |
+          $env:RUNNER_TEMP/bin/chezmoi.exe apply -n | Tee-Object diff.txt
+          if ((Get-Content diff.txt).Length -ne 0) {
+            Write-Output "Not idempotent!"
+            Get-Content diff.txt
+            exit 1
+          } else {
+            Write-Output "Idempotent"
+          }

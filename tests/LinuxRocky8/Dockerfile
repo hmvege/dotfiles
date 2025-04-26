@@ -22,7 +22,11 @@ ENV PATH=$HOME/.local/bin:$PATH
 
 # Initialize and apply the dotfiles using Chezmoi
 ARG GIT_BRANCH=master
-RUN cd $HOME && chezmoi init --promptString "Enter GitHub mail for this machine=testmail" hmvege --branch "$GIT_BRANCH"
+RUN cd $HOME && chezmoi init \
+    --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+    --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
+    --promptBool "Install GUI tools (y/n)=n" \
+    --branch "$GIT_BRANCH" hmvege
 
 # Set default command to an interactive shell
 CMD ["/bin/bash"]

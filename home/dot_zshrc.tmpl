@@ -12,11 +12,15 @@ export ZSH="/home/{{ .chezmoi.username }}/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+{{ if (eq .chezmoi.os "linux") -}}
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 ZSH_THEME="bureau"
 {{ else if eq .chezmoi.osRelease.id "rocky" -}}
 ZSH_THEME="minimalist"
 {{ else -}}
+ZSH_THEME="bureau"
+{{ end -}}
+{{ else if (eq .chezmoi.os "darwin") -}}
 ZSH_THEME="bureau"
 {{ end -}}
 
@@ -81,12 +85,13 @@ plugins=(
     git
     history
     jsontools
+{{ if hasKey .chezmoi.osRelease "id" }}
 {{ if (ne .chezmoi.osRelease.id "rocky") -}}
     sublime
     tmux
     vscode
 {{ end -}}
-    z
+{{ end -}}
     zsh-autosuggestions
     zsh-syntax-highlighting
 )
@@ -121,6 +126,7 @@ export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 # fasd shortcuts
 alias fp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias v='f -e vim' # quick opening files with vim
+{{ if hasKey .chezmoi.osRelease "id" }}
 {{ if ne .chezmoi.osRelease.id "rocky" -}}
 alias o='a -e xdg-open' # quick opening files with xdg-open
 
@@ -129,6 +135,7 @@ if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
 	source /etc/profile.d/vte-2.91.sh
 fi
 
+{{ if not .lite}}
 # LSD settings
 alias ls="lsd"
 alias l="lsd -l"
@@ -140,6 +147,10 @@ alias ltsh='lt -l --blocks size --blocks name'
 # For making LSD work with
 export PATH="$PATH:/snap/bin/"
 
+# LSD aliases
+alias ltsh='lt -l --blocks size --blocks name'
+{{ end }}
+
 # Settings for pyenv and pyenv-virtualenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
@@ -149,8 +160,9 @@ eval "$(pyenv virtualenv-init -)"
 # Created by `pipx` on 2022-02-16 12:29:05
 export PATH="$HOME/.local/bin:$PATH"
 
-# LSD aliases
-alias ltsh='lt -l --blocks size --blocks name'
+# Zoxide setup
+eval "$(zoxide init zsh)"
+{{ end -}}
 {{ end -}}
 
 {{ if (eq .chezmoi.os "darwin") -}}

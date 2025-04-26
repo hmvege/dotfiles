@@ -1,0 +1,29 @@
+{{ if eq .chezmoi.os "windows" -}}
+<#
+    Post‑install script for Windows
+    Installs CLI tools via Scoop and required PowerShell modules.
+    Idempotent – safe to re‑run.
+#>
+
+# ── Ensure NuGet provider + PSGallery trust (silent & idempotent) ──────────────
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+$minNuGetVersion   = [Version]'2.8.5.201'
+$haveNuGetProvider = Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue |
+                    Sort-Object Version -Descending | Select-Object -First 1
+
+if (-not $haveNuGetProvider -or $haveNuGetProvider.Version -lt $minNuGetVersion) {
+    Install-PackageProvider -Name NuGet -MinimumVersion $minNuGetVersion `
+                            -Scope CurrentUser -Force
+}
+
+if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
+    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+}
+# ───────────────────────────────────────────────────────────────────────────────
+
+# module install
+Install-Module PSFzf -Scope CurrentUser -Force
+
+Write-Host "Windows shell tooling is ready."
+{{ end -}}

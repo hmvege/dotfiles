@@ -15,7 +15,6 @@ packages=(
     git
     htop
     jq
-    mc
     tmux
     vim
     rename
@@ -37,10 +36,17 @@ packages=(
     python3-venv
     python3-pip
     python3-tk
-    # For Gogh
+)
+
+# For Gogh terminal colors
+packages_gogh_requirements=(
     dconf-cli
     uuid-runtime
 )
+
+{{ if not .lite }}
+packages+=( "${packages_gogh_requirements[@]}" )
+{{ end }}
 
 sudo apt-get install -y ${packages[@]}
 echo "Packages installed."
@@ -83,6 +89,7 @@ else
     echo "zsh-autosuggestions already installed"
 fi
 
+{{ if not .lite }}
 ## tmux plugins
 if [ ! -d "${HOME}/.tmux/plugins/tpm" ]
 then
@@ -91,6 +98,7 @@ then
 else
     echo "tmux plugin manager already installed."
 fi
+{{ end }}
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
@@ -100,6 +108,21 @@ then
     echo "vim plugin manager installed"
 else
     echo "vim plugin manager already installed"
+fi
+
+## Install zoxide
+if ! type -p z >/dev/null 2>&1
+then    
+    # Try distro package first (Ubuntu 24.04+ ships zoxide)
+    if sudo apt-get install -y zoxide; then
+        echo "Installed zoxide via apt"
+    else
+        # Fallback to upstream script, but don’t exit on failure
+        curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh \
+            | sh || echo "zoxide install failed, continuing anyway"
+    fi
+else
+    echo "Already installed zoxide"
 fi
 
 ## install fzf
@@ -248,8 +271,7 @@ fi
 #     echo "Installed Brew"
 # fi
 
-# Will not install VSCode if WSL is detected
-{{ if (not (.chezmoi.kernel.osrelease | lower | contains "microsoft")) }}
+{{ if and .gui (not .lite) }}
 # We only install VSCode if snap is available on the system
 if command -v snap &> /dev/null; then
     if ! type -p code >/dev/null 2>&1
@@ -300,7 +322,13 @@ else
 fi
 {{ end -}}
 
+## Check that fdfind is installed
+if [ ! -h ~/.local/bin/fd ]
+then
+    ln -s $(which fdfind) ~/.local/bin/fd
+fi
 
+{{ if not .lite }}
 ## lsd
 if ! type -p lsd >/dev/null 2>&1
 then
@@ -319,12 +347,6 @@ then
     echo "Installed lsd"
 else
     echo "Already installed lsd"
-fi
-
-## Check that fdfind is installed
-if [ ! -h ~/.local/bin/fd ]
-then
-    ln -s $(which fdfind) ~/.local/bin/fd
 fi
 
 # Will not install Gogh if WSL is detected
@@ -353,6 +375,7 @@ else
         echo "Gogh theme installation complete"
     fi
 fi
+{{ end -}}
 {{ end -}}
 {{ end -}}
 {{ end -}}

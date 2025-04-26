@@ -1,0 +1,146 @@
+# Initialize oh-my-posh and PSFzf options
+$env:POSH_GIT_ENABLED = $true
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\wopian.omp.json" | Invoke-Expression
+
+# Tab shows list of files instead of cycling through files
+Import-Module PSReadLine
+Set-PSReadLineOption -EditMode Vi
+Set-PSReadLineKeyHandler -Key Tab -Function Complete
+
+# Enabling ctrl+r as backward fuzzy search
+$env:FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border --margin=1,1"
+Set-PsFzfOption -PSReadlineChordProvider "Ctrl+t" -PSReadlineChordReverseHistory "Ctrl+r"
+
+# Autosuggestions (similar to zsh plugins). NOTE: requires modern PS
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+# Set-PSReadLineOption -PredictionViewStyle ListView
+
+# Delete the next word (forward kill) with Alt+d
+Set-PSReadLineKeyHandler -Key Alt+d -Function KillWord
+
+# Delete the previous word (backward kill) with Ctrl+w
+Set-PSReadLineKeyHandler -Key Ctrl+w -Function BackwardDeleteWord
+
+# Improved ls-custom: Displays files in columns adjusted to terminal width.
+function ls-custom {
+    param (
+        [string]$Path = ".",
+        [int]$Columns = 0  # 0 triggers auto-calculation based on terminal width.
+    )
+
+    # Retrieve file and directory names
+    $items = Get-ChildItem -Path $Path | Select-Object -ExpandProperty Name
+    if (-not $items) { return }
+
+    # Determine the maximum length among the filenames
+    $maxLength = ($items | Measure-Object -Maximum Length).Maximum
+    $columnWidth = $maxLength + 2
+
+    # Get terminal width; adjust columns if auto-calculation is enabled
+    $terminalWidth = $host.UI.RawUI.WindowSize.Width
+    if ($Columns -le 0) {
+        $Columns = [Math]::Max(1, [Math]::Floor($terminalWidth / $columnWidth))
+    }
+
+    # Print items in rows with the computed number of columns
+    for ($i = 0; $i -lt $items.Count; $i += $Columns) {
+        $rangeEnd = [math]::Min($i + $Columns - 1, $items.Count - 1)
+        $row = ($items[$i..$rangeEnd] | ForEach-Object { $_.PadRight($columnWidth) }) -join ""
+        Write-Output $row
+    }
+}
+
+# ls-one: An ls -1 equivalent that lists file/directory names one per line.
+function ls-one {
+    param(
+        [string]$Path = "."
+    )
+    Get-ChildItem -Path $Path | ForEach-Object { $_.Name }
+}
+
+# Existing functions for various "ls" outputs
+function ll-c {
+    param (
+        [string]$Path = "."
+    )
+    Get-ChildItem -Path $Path | Format-List
+}
+
+function l-c {
+    param (
+        [string]$Path = "."
+    )
+    Get-ChildItem -Path $Path | Format-Table
+}
+
+function la-c {
+    param (
+        [string]$Path = "."
+    )
+    Get-ChildItem -Path $Path -Force | Format-Table
+}
+
+# Aliases for ls-related functions
+Set-Alias lsc ls-custom
+Set-Alias ll ll-c
+Set-Alias la la-c
+Set-Alias l l-c
+Set-Alias ls1 ls-one
+
+# Functions for case-sensitive and case-insensitive find
+function find-f {
+    param (
+        [string]$Path = ".",
+        [string]$Name
+    )
+    Get-ChildItem -Path $Path -Recurse -Filter $Name
+}
+
+function findi-f {
+    param (
+        [string]$Path = ".",
+        [string]$Name
+    )
+    Get-ChildItem -Path $Path -Recurse | Where-Object { $_.Name -like $Name }
+}
+
+Set-Alias find find-f
+Set-Alias findi findi-f
+
+# Grep function for pattern searching with additional options
+function grep {
+    param(
+        [string]$pattern,
+        [string]$path = ".",
+        [switch]$recursive = $false,
+        [switch]$caseInsensitive = $false,
+        [switch]$invertMatch = $false
+    )
+
+    # Prepare parameters for Select-String
+    $parameters = @{}
+
+    if ($recursive) {
+        $parameters.Recurse = $true
+    }
+
+    # PowerShell is case-insensitive by default. 
+    # The following explicitly sets case sensitivity as needed.
+    $parameters.CaseSensitive = -not $caseInsensitive
+
+    if ($invertMatch) {
+        $parameters.NotMatch = $true
+    }
+
+    $parameters.Pattern = $pattern
+    $parameters.Path = $path
+
+    Select-String @parameters
+}
+
+# Example usages:
+#   ls1                 -> lists files one per line.
+#   lsc                 -> lists files in dynamic columns.
+#   grep -r -i "pattern" "C:\path\to\search"
+
+Invoke-Expression (& { (zoxide init powershell | Out-String) })

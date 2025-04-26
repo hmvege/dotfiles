@@ -1,3 +1,9 @@
 {{ $email := promptString "Enter GitHub mail for this machine" }}
+
+{{ $lite := promptBool "Do you want a minimal (lite) setup (y/n)" }}
+{{ $gui := ternary false (promptBool (printf "Install GUI tools (y/n)")) $lite }}
+
 [data]
 email = '{{ $email | quote }}'
+lite = {{ $lite }}
+gui = {{ $gui }}
