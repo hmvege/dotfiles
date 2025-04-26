@@ -1,4 +1,4 @@
-$LatestVersion = '7.5.0'
+$LatestVersion = '7.5.1'
 $MinVersion = '7.4.0'
 
 $InstallerUrl = "https://github.com/PowerShell/PowerShell/releases/download/v$LatestVersion/PowerShell-$LatestVersion-win-x64.msi"
