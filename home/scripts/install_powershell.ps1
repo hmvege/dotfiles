@@ -4,7 +4,7 @@ $MinVersion = '7.4.0'
 $InstallerUrl = "https://github.com/PowerShell/PowerShell/releases/download/v$LatestVersion/PowerShell-$LatestVersion-win-x64.msi"
 $InstallerPath = "$env:TEMP\PowerShell-$LatestVersion.msi"
 
-# SHA-256 for PowerShell-7.5.0-win-x64.msi (from Microsoft’s release checksums)
+# SHA-256 for PowerShell-7.5.1-win-x64.msi (from Microsoft’s release checksums)
 $ExpectedHash = 'B110ECCAF55BB53AE5E6B6DE478587ED8203570B0BDA9BD374A0998E24D4033A'
 
 Set-StrictMode -Version Latest
