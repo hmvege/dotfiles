@@ -17,7 +17,7 @@ packages=(
     python3.12
 )
 
-sudo dnf -y install ${packages[@]}
+sudo dnf -y --skip-broken install ${packages[@]}
 
 echo "Packages installed."
 
