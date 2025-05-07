@@ -9,6 +9,7 @@ set -euo pipefail
 sudo dnf -y update
 
 packages=(
+    fzf
     jq
     vim-enhanced
     unzip
@@ -55,16 +56,6 @@ then
     echo "zsh-autosuggestions downloaded and installed"
 else
     echo "zsh-autosuggestions already installed"
-fi
-
-## install fzf
-if ! type -p fzf >/dev/null 2>&1
-then
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install --all
-    echo "Installed fzf"
-else
-    echo "Already installed fzf"
 fi
 
 {{ end -}}
