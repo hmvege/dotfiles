@@ -1,18 +1,25 @@
+# Enables gco (git checkout) menu auto-complete
+function Git-Checkout { git checkout $args }
+Set-Alias -Name gco -Value Git-Checkout -Option AllScope -Force
+
 # Initialize oh-my-posh and PSFzf options
 $env:POSH_GIT_ENABLED = $true
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\wopian.omp.json" | Invoke-Expression
+Import-Module posh-git -ArgumentList $false, $false, $true
 
 # Tab shows list of files instead of cycling through files
 Import-Module PSReadLine
 Set-PSReadLineOption -EditMode Vi
-Set-PSReadLineKeyHandler -Key Tab -Function Complete
+
+# Show a menu of all completions (including git branches)
+Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 # Enabling ctrl+r as backward fuzzy search
-$env:FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border --margin=1,1"
-Set-PsFzfOption -PSReadlineChordProvider "Ctrl+t" -PSReadlineChordReverseHistory "Ctrl+r"
+Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 
 # Autosuggestions (similar to zsh plugins). NOTE: requires modern PS
 Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+# For dropdown menu listing, enable:
 # Set-PSReadLineOption -PredictionViewStyle ListView
 
 # Delete the next word (forward kill) with Alt+d
@@ -58,7 +65,7 @@ function ls-one {
     Get-ChildItem -Path $Path | ForEach-Object { $_.Name }
 }
 
-# Existing functions for various "ls" outputs
+# Existing functions for various 'ls' outputs
 function ll-c {
     param (
         [string]$Path = "."
