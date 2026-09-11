@@ -1,143 +1,125 @@
-{{ if eq .chezmoi.os "windows" }}
-
-# Self-elevate the script if required
-if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
-  if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
-    $CommandLine = "-NoExit -File `"" + $MyInvocation.MyCommand.Path + "`" " + $MyInvocation.UnboundArguments
-    Start-Process -Wait -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
-    Exit
-  }
-}
+{{ if eq .chezmoi.os "windows" -}}
+{{ includeTemplate "windows-pwsh-bootstrap.ps1" . }}
 
 Write-Output "--- Running Windows core setup script ---"
 
-# Install or update PowerShell
-$pwshInstallScript = "{{ .chezmoi.sourceDir }}\scripts\install_powershell.ps1"
-if (Test-Path $pwshInstallScript) {
-    Write-Output "Running PowerShell installation script..."
-    & $pwshInstallScript
-} else {
-    Write-Warning "PowerShell install script not found at $pwshInstallScript"
-}
+function Invoke-SetupCommand {
+    param([string]$Command, [string[]]$Arguments)
 
-# Install Scoop
-if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
-    Write-Output "Installing Scoop..."
-    Set-ExecutionPolicy RemoteSigned -scope CurrentUser -Force
-    Invoke-RestMethod get.scoop.sh | Invoke-Expression
-} else {
-    Write-Output "Scoop is already installed."
-}
-
-if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Write-Output "Installing Git (required for Scoop buckets)…"
-    # Using silent progress bar and aria2 for faster downloads.
-    $ProgressPreference='SilentlyContinue'; scoop install aria2 git
-}
-
-function Ensure-ScoopBucket {
-    param([string]$Name)
-
-    $escaped = [regex]::Escape($Name)
-    if (-not (scoop bucket list | Select-String -Pattern "^$escaped(\s|$)")) {
-        Write-Output "Adding Scoop bucket: $Name"
-        scoop bucket add $Name
+    $global:LASTEXITCODE = 0
+    & $Command @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "$Command $($Arguments -join ' ') failed with exit code $LASTEXITCODE."
     }
-    else {
-        Write-Output "Bucket '$Name' already exists."
+}
+
+$scoopRoot = $env:SCOOP
+if (-not $scoopRoot) { $scoopRoot = Join-Path $env:USERPROFILE 'scoop' }
+$scoopShims = Join-Path $scoopRoot 'shims'
+if (Test-Path -LiteralPath $scoopShims) { $env:PATH = "$scoopShims;$env:PATH" }
+
+if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+    Write-Output 'Installing Scoop for the current user...'
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    $global:LASTEXITCODE = 0
+    Invoke-RestMethod 'https://get.scoop.sh' | Invoke-Expression
+    if ($LASTEXITCODE -ne 0) { throw "Scoop bootstrap failed with exit code $LASTEXITCODE." }
+    Update-SetupPath
+    $env:PATH = "$scoopShims;$env:PATH"
+    if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+        throw 'Scoop bootstrap completed but scoop is unavailable.'
     }
 }
 
 function Ensure-ScoopPackage {
     param([string]$Name)
 
-    $escaped = [regex]::Escape($Name)
-    if (-not (scoop list | Select-String -Pattern "^$escaped(\s|$)")) {
-        Write-Output "Installing $Name ..."
-        scoop install $Name
+    # Scope detection to this user's Scoop root, including custom SCOOP paths.
+    $metadata = Join-Path $scoopRoot "apps\$Name\current\install.json"
+    if (Test-Path -LiteralPath $metadata -PathType Leaf) {
+        Write-Output "$Name is already installed."
     }
     else {
-        Write-Output "$Name already installed."
+        Invoke-SetupCommand scoop @('install', $Name)
+        if (-not (Test-Path -LiteralPath $metadata -PathType Leaf)) {
+            throw "Scoop did not finish installing $Name."
+        }
     }
 }
 
-# Scoop setup
+function Ensure-ScoopBucket {
+    param([string]$Name)
+
+    if (-not (Test-Path -LiteralPath (Join-Path $scoopRoot "buckets\$Name") -PathType Container)) {
+        Invoke-SetupCommand scoop @('bucket', 'add', $Name)
+    }
+}
+
+# Git is needed before Scoop can add or update buckets.
+Ensure-ScoopPackage 'git'
+Invoke-SetupCommand scoop @('update')
+
+$packages = @(
+    'ag',
+    'bat',
+    'cloc',
+    'coreutils',
+    'cppcheck',
+    'curl',
+    'fd',
+    'fzf',
+    'jq',
+    'lsd',
+    'marp',
+    'oh-my-posh',
+    'python',
+    'ripgrep',
+    'vim',
+    'zoxide'
+)
+foreach ($pkg in $packages) { Ensure-ScoopPackage $pkg }
+
+# Migrate the previous Scoop-owned module to the PSGallery post-install step.
+if (Test-Path -LiteralPath (Join-Path $scoopRoot 'apps\psfzf\current\install.json')) {
+    Invoke-SetupCommand scoop @('uninstall', 'psfzf')
+}
+
+# Use Scoop's Python explicitly to avoid the Windows Store execution alias.
+$python = Join-Path $scoopRoot 'apps\python\current\python.exe'
+$global:LASTEXITCODE = 0
+& $python -m pip show pipx *> $null
+if ($LASTEXITCODE -ne 0) {
+    Invoke-SetupCommand $python @('-m', 'pip', 'install', '--user', 'pipx')
+}
+Invoke-SetupCommand $python @('-m', 'pipx', 'ensurepath')
+Update-SetupPath
+$pipxBin = Invoke-SetupCommand $python @('-m', 'pipx', 'environment', '--value', 'PIPX_BIN_DIR')
+$env:PATH = "$pipxBin;$env:PATH"
+
+$pipxPkgs = @('black', 'flake8', 'mypy', 'pre-commit', 'poetry', 'pip-tools', 'mkdocs')
+$pipxState = (Invoke-SetupCommand $python @('-m', 'pipx', 'list', '--json')) | ConvertFrom-Json
+$installedPipx = @($pipxState.venvs.PSObject.Properties.Name)
+foreach ($pkg in $pipxPkgs) {
+    if ($pkg -notin $installedPipx) {
+        Invoke-SetupCommand $python @('-m', 'pipx', 'install', $pkg)
+    }
+    else {
+        Write-Output "$pkg is already installed with pipx."
+    }
+}
+
+{{ if and .gui (not .lite) -}}
 Ensure-ScoopBucket 'extras'
 Ensure-ScoopBucket 'nerd-fonts'
-scoop update
-
-# Install CLI + font package (fonts can live here if you like)
-$packages = @(
-    "ag",
-    "bat",
-    "curl",
-    "fd",
-    "fzf",
-    "git",
-    "jq",
-    "lsd",
-    "oh-my-posh",
-    "python",
-    "psfzf",
-    "ripgrep",
-    "sublime-merge",
-    "vim",
-    "zoxide"
-)
-
-foreach ($pkg in $packages) {
+foreach ($pkg in @('windirstat', 'sublime-merge', 'Meslo-NF', 'JetBrainsMono-NF', 'vscode')) {
     Ensure-ScoopPackage $pkg
 }
-Ensure-ScoopPackage "Meslo-NF"
-Ensure-ScoopPackage "JetBrainsMono-NF"
 
-# Ensure Python + pipx setup
-if (-not (Get-Command pipx -ErrorAction SilentlyContinue)) {
-    Write-Output "Installing pipx via Python..."
-    python -m pip install --user pipx
-    python -m pipx ensurepath
-} else {
-    Write-Output "pipx is already installed."
-}
+# Add VSCode only to this process; Scoop owns its persistent environment setup.
+$codePath = Join-Path $scoopRoot 'apps\vscode\current\bin'
+$env:PATH = "$codePath;$env:PATH"
+$code = Join-Path $codePath 'code.cmd'
 
-# pipx packages
-$pipxPkgs = @(
-    "black",
-    "flake8",
-    "mypy",
-    "pre-commit",
-    "poetry",
-    "pip-tools",
-    "mkdocs"
-)
-
-foreach ($pkg in $pipxPkgs) {
-    if (-not (& python -m pipx list | Select-String -Pattern $pkg)) {
-        python -m pipx install $pkg
-    } else {
-        Write-Output "$pkg already installed with pipx."
-    }
-}
-
-{{ if and .gui (not .lite) }}
-# Install VSCode
-if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
-    Write-Output "Installing Visual Studio Code..."
-    scoop install vscode
-} else {
-    Write-Output "Visual Studio Code is already installed."
-}
-
-# Ensure VSCode CLI is on PATH
-$codePath = "$env:USERPROFILE\\scoop\\apps\\vscode\\current\\bin"
-if (-not ($env:PATH -split ';' | Where-Object { $_ -eq $codePath })) {
-    [Environment]::SetEnvironmentVariable("PATH", "$env:PATH;$codePath", [EnvironmentVariableTarget]::User)
-    Write-Output "Added VSCode CLI path to user PATH. You may need to restart your terminal."
-} else {
-    Write-Output "VSCode CLI path already in PATH."
-}
-
-# Install VSCode extensions
 $vscodeExtensions = @(
     "cschlosser.doxdocgen",
     "eamodio.gitlens",
@@ -157,17 +139,17 @@ $vscodeExtensions = @(
     "yzhang.markdown-all-in-one"
 )
 
+$installedExtensions = @(Invoke-SetupCommand $code @('--list-extensions'))
 foreach ($ext in $vscodeExtensions) {
-    if (-not (code --list-extensions | Select-String -Pattern $ext)) {
-        code --install-extension $ext
-        Write-Output "Installed VSCode extension: $ext"
-    } else {
+    if ($ext -notin $installedExtensions) {
+        Invoke-SetupCommand $code @('--install-extension', $ext)
+    }
+    else {
         Write-Output "VSCode extension $ext is already installed."
     }
 }
 {{ end -}}
 
-# Final message
-Write-Output "==== Windows core tools setup complete ===="
-Write-Output "You may need to restart your terminal for all changes to take effect."
-{{ end }}
+Write-Output '==== Windows core tools setup complete ===='
+Write-Output 'Open a new PowerShell 7 terminal to load the profile and updated PATH.'
+{{ end -}}

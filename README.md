@@ -46,11 +46,15 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfile
 ```
 
 ### :window: Windows
-The dotfiles for Windows is targeting PowerShell. Install Chezmoi via,
+The Windows setup targets x64 Windows and PowerShell 7. Start in a **non-administrator** terminal (Windows PowerShell 5.1 can bootstrap it), then install Chezmoi:
 ```powershell
 iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --apply hmvege"
 ```
-The PowerShell installer requires a stable version 7.5.0 or newer. If PowerShell 7 is missing, older than 7.5.0, or a preview build, it downloads the latest stable Windows x64 MSI from the [official PowerShell releases](https://github.com/PowerShell/PowerShell/releases/latest) and verifies its published SHA-256 checksum before installation. An existing stable version 7.5.0 or newer is retained; the installer does not upgrade it on every apply.
+The PowerShell installer accepts an existing stable version 7.5.0 or newer. When installation is needed, it selects the newest stable patch in the **7.6 MSI series** from the [official PowerShell releases](https://github.com/PowerShell/PowerShell/releases), verifies the published SHA-256 checksum, and retains an MSI log in the temporary directory. This series selection is intentional; it does not follow newer release series automatically.
+
+If a restart is needed before PowerShell becomes usable, restart Windows and rerun `chezmoi apply -v -S ~/dotfiles`.
+
+After setup, open **PowerShell** in Windows Terminal, or run `pwsh` from a new terminal. `powershell.exe` launches Windows PowerShell 5.1; `pwsh.exe` launches PowerShell 7. The managed profile is `~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1`. In PowerShell 7, `$PROFILE` shows the actual profile location. Machines with redirected Documents folders should check that it matches the deployed path. Choose PowerShell as Windows Terminal's default profile if desired.
 
 ### Pulling latest changing from repository
 Pull latest changes from repository.
@@ -215,12 +219,17 @@ To test on windows, you can run and test in [Sandbox mode](https://learn.microso
   </LogonCommand>
 </Configuration>
 ```
-Once started, run the following commands
-```
+The registry preparation below requires an administrator session. Run the Chezmoi bootstrap separately in a non-administrator session for the user being configured; the Windows setup now elevates only its MSI helper. A Sandbox session running as administrator must switch to a non-elevated user before applying the dotfiles.
+
+```powershell
 # For faster downloading and installing
 Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -Name 'VerifiedAndReputablePolicyState' -Value 0
 & "$env:windir\System32\CiTool.exe" -r
+```
 
+Then, in the non-administrator session:
+
+```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
 iex "& { $(irm 'https://get.chezmoi.io/ps1') } -b '~/bin' -- init --branch <branch-to-test> --apply hmvege"
 ```
