@@ -87,6 +87,7 @@ and then the dotfiles can be applied again.
 
 ## :inbox_tray: Packages to be installed
 
+ - [`ag`](https://github.com/ggreer/the_silver_searcher) (The Silver Searcher), for searching code. Included in full and lite package selections; Rocky 8 attempts installation through EPEL and warns if unavailable.
  - [`fzf`](https://github.com/junegunn/fzf#using-git) fuzzy searching.
  - [`fd`](https://github.com/sharkdp/fd) better `find`.
  - [`lsd`](https://github.com/Peltoche/lsd). Pretties `ls`.

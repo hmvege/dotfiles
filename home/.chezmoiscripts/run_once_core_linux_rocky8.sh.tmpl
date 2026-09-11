@@ -22,6 +22,18 @@ sudo dnf -y --skip-broken install ${packages[@]}
 
 echo "Packages installed."
 
+# Silver Searcher is provided by EPEL on Rocky 8. Keep this optional so an
+# unavailable repository does not prevent the smaller Rocky setup completing.
+if ! command -v ag >/dev/null 2>&1; then
+    if sudo dnf -y install epel-release && sudo dnf -y install the_silver_searcher; then
+        echo "Installed Silver Searcher (ag)."
+    else
+        echo "WARNING: Could not install ag from EPEL; continuing without it." >&2
+    fi
+else
+    echo "Silver Searcher (ag) is already installed."
+fi
+
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
 then
