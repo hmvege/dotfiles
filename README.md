@@ -50,7 +50,7 @@ The dotfiles for Windows is targeting PowerShell. Install Chezmoi via,
 ```powershell
 iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --apply hmvege"
 ```
-The dotfiles setup will download the latest PowerShell 7.4.1.
+The PowerShell installer requires a stable version 7.5.0 or newer. If PowerShell 7 is missing, older than 7.5.0, or a preview build, it downloads the latest stable Windows x64 MSI from the [official PowerShell releases](https://github.com/PowerShell/PowerShell/releases/latest) and verifies its published SHA-256 checksum before installation. An existing stable version 7.5.0 or newer is retained; the installer does not upgrade it on every apply.
 
 ### Pulling latest changing from repository
 Pull latest changes from repository.
@@ -98,6 +98,19 @@ and then the dotfiles can be applied again.
  - [`pipx`](https://pypa.github.io/pipx/). For installing pip packages in independent Python environments.
  - [`gogh`](https://gogh-co.github.io/Gogh/). Terminal colors.
  - [`zoxide`](https://github.com/ajeetdsouza/zoxide). Better change directory `cd`.
+
+### PowerShell Git shortcuts
+
+The profile optionally loads `git-aliases` and `posh-git`, installed for the current user during Windows post-install setup. These preferred shortcuts also work without either module, provided Git is available:
+
+| Shortcut | Command |
+| --- | --- |
+| `gco <branch>` | `git checkout <branch>` |
+| `gc` | `git commit` |
+| `gcmsg "message"` | `git commit --message "message"` |
+| `gcam "message"` | `git commit --all --message "message"` |
+
+Additional arguments are forwarded to Git. `gc` replaces PowerShell's `Get-Content` alias; use `Get-Content` explicitly to read files. The shared Git aliases `git cm "message"` and `git cam "message"` remain available in all shells.
 
 ### Vim plugins
 Plugins used in Vim is,
@@ -210,7 +223,7 @@ Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -Name 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 iex "& { $(irm 'https://get.chezmoi.io/ps1') } -b '~/bin' -- init --branch <branch-to-test> --apply hmvege"
 ```
-The pipeline will also run tests on the windows setup.
+The Windows workflow job is currently disabled (`if: false`); Windows installation requires manual validation.
 
 ### :green_apple: MacOS
 The pipeline will run tests on the MacOS setup.

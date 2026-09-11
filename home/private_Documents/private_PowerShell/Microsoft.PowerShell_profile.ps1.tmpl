@@ -1,153 +1,217 @@
-# Enables gco (git checkout) menu auto-complete
-function Git-Checkout { git checkout $args }
+# ============================================================================
+# Profile startup timing
+#
+# Enable before starting PowerShell with:
+#   $env:PS_PROFILE_TIMING = "1"
+# ============================================================================
+
+$profileTiming = $env:PS_PROFILE_TIMING -eq "1"
+
+if ($profileTiming) {
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    $totalSw = [System.Diagnostics.Stopwatch]::StartNew()
+}
+
+function Write-Timing {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Label
+    )
+
+    if (-not $profileTiming) {
+        return
+    }
+
+    $sw.Stop()
+    "{0}: {1} ms" -f $Label, $sw.ElapsedMilliseconds
+    $sw.Restart()
+}
+
+
+# ============================================================================
+# Git
+# ============================================================================
+
+# Load the broader alias set first so our preferred shortcuts take precedence.
+if (Get-Module -ListAvailable git-aliases) {
+    Import-Module git-aliases
+}
+
+# Short git checkout command.
+#
+# posh-git provides Git completion for the underlying Git command.
+function Git-Checkout {
+    git checkout @args
+}
+
+function Git-Commit {
+    git commit @args
+}
+
+function Git-CommitMessage {
+    git commit --message @args
+}
+
+function Git-CommitAllMessage {
+    git commit --all --message @args
+}
+
+# Override gc (normally Get-Content) and any module-provided shortcuts.
 Set-Alias -Name gco -Value Git-Checkout -Option AllScope -Force
+Set-Alias -Name gc -Value Git-Commit -Option AllScope -Force
+Set-Alias -Name gcmsg -Value Git-CommitMessage -Option AllScope -Force
+Set-Alias -Name gcam -Value Git-CommitAllMessage -Option AllScope -Force
 
-# Initialize oh-my-posh and PSFzf options
-$env:POSH_GIT_ENABLED = $true
-oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\wopian.omp.json" | Invoke-Expression
-Import-Module posh-git -ArgumentList $false, $false, $true
+Write-Timing "Git aliases"
 
-# Tab shows list of files instead of cycling through files
-Import-Module PSReadLine
-Set-PSReadLineOption -EditMode Vi
 
-# Show a menu of all completions (including git branches)
-Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
+# ============================================================================
+# PSReadLine
+# ============================================================================
 
-# Enabling ctrl+r as backward fuzzy search
-Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
+if (Get-Module -ListAvailable PSReadLine) {
+    Import-Module PSReadLine
 
-# Autosuggestions (similar to zsh plugins). NOTE: requires modern PS
-Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-# For dropdown menu listing, enable:
-# Set-PSReadLineOption -PredictionViewStyle ListView
+    Write-Timing "PSReadLine import"
 
-# Delete the next word (forward kill) with Alt+d
-Set-PSReadLineKeyHandler -Key Alt+d -Function KillWord
+    Set-PSReadLineOption `
+        -EditMode Vi `
+        -PredictionSource History `
+        -MaximumHistoryCount 20000 `
+        -HistorySearchCursorMovesToEnd
 
-# Delete the previous word (backward kill) with Ctrl+w
-Set-PSReadLineKeyHandler -Key Ctrl+w -Function BackwardDeleteWord
+    Write-Timing "PSReadLine options"
 
-# Improved ls-custom: Displays files in columns adjusted to terminal width.
-function ls-custom {
-    param (
-        [string]$Path = ".",
-        [int]$Columns = 0  # 0 triggers auto-calculation based on terminal width.
-    )
+    # Completion/history behavior.
+    Set-PSReadLineKeyHandler `
+        -Chord Tab `
+        -Function MenuComplete
 
-    # Retrieve file and directory names
-    $items = Get-ChildItem -Path $Path | Select-Object -ExpandProperty Name
-    if (-not $items) { return }
+    Set-PSReadLineKeyHandler `
+        -Chord UpArrow `
+        -Function HistorySearchBackward `
+        -ViMode Insert
 
-    # Determine the maximum length among the filenames
-    $maxLength = ($items | Measure-Object -Maximum Length).Maximum
-    $columnWidth = $maxLength + 2
+    Set-PSReadLineKeyHandler `
+        -Chord DownArrow `
+        -Function HistorySearchForward `
+        -ViMode Insert
 
-    # Get terminal width; adjust columns if auto-calculation is enabled
-    $terminalWidth = $host.UI.RawUI.WindowSize.Width
-    if ($Columns -le 0) {
-        $Columns = [Math]::Max(1, [Math]::Floor($terminalWidth / $columnWidth))
+    Set-PSReadLineKeyHandler `
+        -Chord Alt+d `
+        -Function KillWord `
+        -ViMode Insert
+
+    Set-PSReadLineKeyHandler `
+        -Chord Ctrl+w `
+        -Function BackwardDeleteWord `
+        -ViMode Insert
+
+    Write-Timing "PSReadLine keybindings"
+}
+
+
+# ============================================================================
+# PSFzf
+# ============================================================================
+
+$hasPsFzf = $null -ne (
+    Get-Command Set-PsFzfOption -ErrorAction SilentlyContinue
+)
+
+Write-Timing "PSFzf detection"
+
+if ($hasPsFzf) {
+    Set-PsFzfOption `
+        -PSReadlineChordProvider 'Ctrl+t' `
+        -PSReadlineChordReverseHistory 'Ctrl+r'
+}
+
+Write-Timing "PSFzf setup"
+
+
+# ============================================================================
+# posh-git
+# ============================================================================
+
+$hasPoshGit = $null -ne (
+    Get-Module -ListAvailable posh-git
+)
+
+Write-Timing "posh-git detection"
+
+if ($hasPoshGit) {
+    $env:POSH_GIT_ENABLED = $true
+    Import-Module posh-git
+
+    Write-Timing "posh-git import"
+}
+
+
+# ============================================================================
+# Oh My Posh
+# ============================================================================
+
+$hasOhMyPosh = $null -ne (
+    Get-Command oh-my-posh -ErrorAction SilentlyContinue
+)
+
+Write-Timing "oh-my-posh detection"
+
+if ($hasOhMyPosh) {
+    $ompConfig = $null
+
+    if ($env:POSH_THEMES_PATH) {
+        $ompConfig = Join-Path `
+            $env:POSH_THEMES_PATH `
+            "wopian.omp.json"
     }
 
-    # Print items in rows with the computed number of columns
-    for ($i = 0; $i -lt $items.Count; $i += $Columns) {
-        $rangeEnd = [math]::Min($i + $Columns - 1, $items.Count - 1)
-        $row = ($items[$i..$rangeEnd] | ForEach-Object { $_.PadRight($columnWidth) }) -join ""
-        Write-Output $row
+    $previousOutputEncoding = [Console]::OutputEncoding
+    [Console]::OutputEncoding = [Text.Encoding]::UTF8
+
+    try {
+        if ($ompConfig -and (Test-Path -LiteralPath $ompConfig)) {
+            oh-my-posh init pwsh --config $ompConfig |
+                Invoke-Expression
+        }
+        else {
+            oh-my-posh init pwsh |
+                Invoke-Expression
+        }
     }
-}
-
-# ls-one: An ls -1 equivalent that lists file/directory names one per line.
-function ls-one {
-    param(
-        [string]$Path = "."
-    )
-    Get-ChildItem -Path $Path | ForEach-Object { $_.Name }
-}
-
-# Existing functions for various 'ls' outputs
-function ll-c {
-    param (
-        [string]$Path = "."
-    )
-    Get-ChildItem -Path $Path | Format-List
-}
-
-function l-c {
-    param (
-        [string]$Path = "."
-    )
-    Get-ChildItem -Path $Path | Format-Table
-}
-
-function la-c {
-    param (
-        [string]$Path = "."
-    )
-    Get-ChildItem -Path $Path -Force | Format-Table
-}
-
-# Aliases for ls-related functions
-Set-Alias lsc ls-custom
-Set-Alias ll ll-c
-Set-Alias la la-c
-Set-Alias l l-c
-Set-Alias ls1 ls-one
-
-# Functions for case-sensitive and case-insensitive find
-function find-f {
-    param (
-        [string]$Path = ".",
-        [string]$Name
-    )
-    Get-ChildItem -Path $Path -Recurse -Filter $Name
-}
-
-function findi-f {
-    param (
-        [string]$Path = ".",
-        [string]$Name
-    )
-    Get-ChildItem -Path $Path -Recurse | Where-Object { $_.Name -like $Name }
-}
-
-Set-Alias find find-f
-Set-Alias findi findi-f
-
-# Grep function for pattern searching with additional options
-function grep {
-    param(
-        [string]$pattern,
-        [string]$path = ".",
-        [switch]$recursive = $false,
-        [switch]$caseInsensitive = $false,
-        [switch]$invertMatch = $false
-    )
-
-    # Prepare parameters for Select-String
-    $parameters = @{}
-
-    if ($recursive) {
-        $parameters.Recurse = $true
+    finally {
+        [Console]::OutputEncoding = $previousOutputEncoding
     }
 
-    # PowerShell is case-insensitive by default. 
-    # The following explicitly sets case sensitivity as needed.
-    $parameters.CaseSensitive = -not $caseInsensitive
-
-    if ($invertMatch) {
-        $parameters.NotMatch = $true
-    }
-
-    $parameters.Pattern = $pattern
-    $parameters.Path = $path
-
-    Select-String @parameters
+    Write-Timing "oh-my-posh init"
 }
 
-# Example usages:
-#   ls1                 -> lists files one per line.
-#   lsc                 -> lists files in dynamic columns.
-#   grep -r -i "pattern" "C:\path\to\search"
 
-Invoke-Expression (& { (zoxide init powershell | Out-String) })
+# ============================================================================
+# zoxide
+# ============================================================================
+
+$hasZoxide = $null -ne (
+    Get-Command zoxide -ErrorAction SilentlyContinue
+)
+
+Write-Timing "zoxide detection"
+
+if ($hasZoxide) {
+    zoxide init powershell |
+        Out-String |
+        Invoke-Expression
+
+    Write-Timing "zoxide init"
+}
+
+
+# ============================================================================
+# Startup timing
+# ============================================================================
+
+if ($profileTiming) {
+    $totalSw.Stop()
+    "Total profile load: $($totalSw.ElapsedMilliseconds) ms"
+}

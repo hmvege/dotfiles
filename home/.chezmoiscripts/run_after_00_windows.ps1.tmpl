@@ -25,5 +25,11 @@ if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
 # module install
 Install-Module PSFzf -Scope CurrentUser -Force
 
+foreach ($moduleName in @('git-aliases', 'posh-git')) {
+    if (-not (Get-Module -ListAvailable -Name $moduleName)) {
+        Install-Module -Name $moduleName -Repository PSGallery -Scope CurrentUser -Force -ErrorAction Stop
+    }
+}
+
 Write-Host "Windows shell tooling is ready."
 {{ end -}}
