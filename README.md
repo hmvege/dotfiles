@@ -24,9 +24,9 @@ The goal for this dotfiles project repository, is following,
 
 ### :question: Prompted Questions
 During the installation, you'll be asked:
-- Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts), with auto-detected recommendation.
-- Whether to perform a **minimal (lite) setup**. If `lite` mode is selected, GUI apps will automatically be skipped (e.g. VSCode, Sublime, tmux, Gogh etc.).
 - **Mail** used for GitHub.
+- Whether to perform a **minimal (lite) setup**. Lite mode forces GUI installation off, but currently still includes development tools such as tmux on Ubuntu.
+- Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts). There is no automatic GUI recommendation; lite mode overrides this choice.
 
 ### :penguin: Linux
 Install Chezmoi and initialize, ensure `curl` and `sudo` is installed,
@@ -37,7 +37,7 @@ then download and apply the dotfiles,
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 ```
-which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
+which will download the Chezmoi binary to `$HOME/.local/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
 ### :green_apple:	MacOS
 On MacOS, you should be able to install Chezmoi via
@@ -179,7 +179,7 @@ Build docker image as,
 ```bash
 docker build \
  --build-arg GIT_BRANCH=master \
- -f tests/LinuxRocky/Dockerfile \
+ -f tests/LinuxRocky8/Dockerfile \
  -t dotfiles-rocky-test --progress=plain . 
 ```
 You can then enter the image and run the dotfiles as,
@@ -203,7 +203,7 @@ docker rmi dotfiles-rocky-test
 This also runs as a GitHub actions pipeline.
 
 ### :window: Windows
-To test on windows, you can run and test in [Sandbox mode](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/. The config file can be something like,
+To test on windows, you can run and test in [Sandbox mode](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/). The config file can be something like,
 ```
 <Configuration>
   <MemoryInMB>8192</MemoryInMB>
