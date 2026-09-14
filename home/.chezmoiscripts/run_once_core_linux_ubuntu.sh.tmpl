@@ -22,22 +22,13 @@ packages=(
     unzip
     wget
     zsh
-    # Various packages needed for development
-    build-essential
-    libbz2-dev
-    libffi-dev
-    liblzma-dev
-    libreadline-dev
-    libsqlite3-dev
-    libssl-dev
-    tk-dev
-    zlib1g-dev
-    # Python + python packages, adhering to Python 3.12+ PEP 668
-    python3
-    python3-venv
-    python3-pip
-    python3-tk
+
 )
+
+{{ if not .lite }}
+# General development tools remain in full mode; uv supplies prebuilt Python.
+packages+=(build-essential)
+{{ end }}
 
 # For Gogh terminal colors
 packages_gogh_requirements=(
@@ -136,134 +127,11 @@ else
     echo "Already installed fzf"
 fi
 
-## pyenv + pyenv-virtualenv
-if ! type -p pyenv >/dev/null 2>&1
-then
-    PYTHON_GLOBAL="3.12.9"
-
-    curl https://pyenv.run | bash
-    echo "Installed pyenv and pyenv-virtualenv"
-
-    # See https://github.com/pyenv/pyenv/wiki#suggested-build-environment
-    # in case the build fails.
-    sudo apt-get install libssl-dev
-    # pyenv calls ensurepip in the background, which will trigger Python 3.12>
-    # safety feature against making changes to global python install, even tho
-    # no packages are being installed in the global Python environment.
-    PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv install $PYTHON_GLOBAL
-    PIP_BREAK_SYSTEM_PACKAGES=1 $HOME/.pyenv/bin/pyenv global $PYTHON_GLOBAL
-else
-    echo "Already installed pyenv and pyenv-virtualenv"
-fi
-
-## pipx
-{{ if (eq .chezmoi.osRelease.versionID "20.04") -}}
-echo "WARNING: Ubuntu 20.04 install script will be deprecated!"
-if ! type -p pipx >/dev/null 2>&1
-then
-    sudo /usr/bin/python3 -m pip install pipx
-    echo "Installed pipx"
-    /usr/local/bin/pipx ensurepath
-    pipx_packages=(
-        black
-        flake8
-        mkdocs
-        mypy
-        pip-tools
-        poetry
-        pre-commit
-    )
-    for pkg in ${pipx_packages[@]}
-    do
-        /usr/local/bin/pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
-    done
-
-    ## Mypy package injections
-    mypy_packages=(
-        types-requests
-    )
-    for pkg in ${mypy_packages[@]}
-    do
-        /usr/local/bin/pipx inject mypy $pkg
-    done
-
-    ## Flake8 package injections
-    flake8_packages=(
-        flake8-broken-line
-        flake8-bugbear
-        flake8-builtins
-        flake8-docstrings
-        flake8-docstrings-complete
-        flake8-import-order
-        flake8-markdown
-        flake8-pie
-        flake8-scream
-        flake8-simplify
-        flake8-use-fstring
-        flake8-useless-assert
-    )
-    for pkg in ${flake8_packages[@]}
-    do
-        /usr/local/bin/pipx inject flake8 $pkg
-    done
-
-else
-    echo "Already installed pipx"
-fi
-{{ else -}}
-if ! type -p pipx >/dev/null 2>&1
-then
-    sudo apt-get install -y pipx
-    echo "Installed pipx"
-
-    pipx ensurepath
-    pipx_packages=(
-        black
-        flake8
-        mkdocs
-        mypy
-        pip-tools
-        poetry
-        pre-commit
-    )
-    for pkg in ${pipx_packages[@]}
-    do
-        pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
-    done
-
-    ## Mypy package injections
-    mypy_packages=(
-        types-requests
-    )
-    for pkg in ${mypy_packages[@]}
-    do
-        pipx inject mypy $pkg
-    done
-
-    ## Flake8 package injections
-    flake8_packages=(
-        flake8-broken-line
-        flake8-bugbear
-        flake8-builtins
-        flake8-docstrings
-        flake8-docstrings-complete
-        flake8-import-order
-        flake8-markdown
-        flake8-pie
-        flake8-scream
-        flake8-simplify
-        flake8-use-fstring
-        flake8-useless-assert
-    )
-    for pkg in ${flake8_packages[@]}
-    do
-        pipx inject flake8 $pkg
-    done
-
-else
-    echo "Already installed pipx"
-fi
-{{ end -}}
+## Python environment management
+{{ includeTemplate "install-uv.sh" . }}
+{{ if not .lite }}
+{{ includeTemplate "python-tools.sh" . }}
+{{ end }}
 
 # ## Brew # NOTE: unused since built in tools cover most of what is needed
 # if ! type -p brew >/dev/null 2>&1

@@ -1,3 +1,14 @@
+# User-installed uv, Python executables, and pipx applications.
+export PATH="$HOME/.local/bin:$PATH"
+{{ if eq .chezmoi.os "darwin" -}}
+# Make Homebrew's uv available in new shells on Apple Silicon and Intel.
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+{{ end -}}
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -85,7 +96,7 @@ plugins=(
     git
     history
     jsontools
-{{ if hasKey .chezmoi.osRelease "id" }}
+{{ if eq .chezmoi.os "linux" }}
 {{ if (ne .chezmoi.osRelease.id "rocky") -}}
     sublime
     tmux
@@ -126,7 +137,7 @@ export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 # fasd shortcuts
 alias fp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias v='f -e vim' # quick opening files with vim
-{{ if hasKey .chezmoi.osRelease "id" }}
+{{ if eq .chezmoi.os "linux" }}
 {{ if ne .chezmoi.osRelease.id "rocky" -}}
 alias o='a -e xdg-open' # quick opening files with xdg-open
 
@@ -151,15 +162,6 @@ export PATH="$PATH:/snap/bin/"
 alias ltsh='lt -l --blocks size --blocks name'
 {{ end }}
 
-# Settings for pyenv and pyenv-virtualenv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
-# Created by `pipx` on 2022-02-16 12:29:05
-export PATH="$HOME/.local/bin:$PATH"
-
 # Zoxide setup
 eval "$(zoxide init zsh)"
 {{ end -}}
@@ -169,8 +171,7 @@ eval "$(zoxide init zsh)"
 # For making alt+c change directory work in MacOS
 bindkey "ç" fzf-cd-widget
 
-alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
-echo 'export PATH="/usr/local/sbin:$PATH"' >> ~/.zshrc
+export PATH="/usr/local/sbin:$PATH"
 
 # Enabling terminal colors
 export TERM=xterm-256color

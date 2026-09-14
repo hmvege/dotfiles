@@ -15,7 +15,6 @@ packages=(
     unzip
     wget
     zsh
-    python3.12
 )
 
 sudo dnf -y --skip-broken install ${packages[@]}
@@ -33,6 +32,12 @@ if ! command -v ag >/dev/null 2>&1; then
 else
     echo "Silver Searcher (ag) is already installed."
 fi
+
+## Python environment management (no additional Python CLI suite on Rocky)
+{{ includeTemplate "install-uv.sh" . }}
+{{ if not .lite }}
+uv python install 3.12
+{{ end }}
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]

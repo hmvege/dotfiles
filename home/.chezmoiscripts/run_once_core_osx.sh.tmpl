@@ -20,9 +20,7 @@ packages=(
     jq
     lsd
     node  # Needed by LSP
-    pipx
-    pyenv
-    pyenv-virtualenv
+    uv
     the_silver_searcher
     tmux
     unzip
@@ -77,70 +75,9 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
       "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 fi
 
-## pyenv
-PYTHON_GLOBAL="3.12.9"
-
-if type -p pyenv >/dev/null 2>&1
-then
-    echo "pyenv exists: proceeding to check if global python is set to $PYTHON_GLOBAL"
-    if ! pyenv which python | grep -q $PYTHON_GLOBAL
-    then
-        echo "Setting up pyenv globals"
-        pyenv install $PYTHON_GLOBAL
-        pyenv global $PYTHON_GLOBAL
-    else
-        echo "Global Python is already set to $PYTHON_GLOBAL"
-    fi
-fi
-
-## pipx
-if ! type -p pipx >/dev/null 2>&1
-then
-    pipx ensurepath
-fi
-
-pipx_packages=(
-    black
-    flake8
-    mkdocs
-    mypy
-    pip-tools
-    poetry
-    pre-commit
-)
-for pkg in ${pipx_packages[@]}
-do
-    pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
-done
-
-## Mypy package injections
-mypy_packages=(
-    types-requests
-)
-for pkg in ${mypy_packages[@]}
-do
-    pipx inject mypy $pkg
-done
-
-## Flake8 package injections
-flake8_packages=(
-    flake8-broken-line
-    flake8-bugbear
-    flake8-builtins
-    flake8-docstrings
-    flake8-docstrings-complete
-    flake8-import-order
-    flake8-markdown
-    flake8-pie
-    flake8-scream
-    flake8-simplify
-    flake8-use-fstring
-    flake8-useless-assert
-)
-for pkg in ${flake8_packages[@]}
-do
-    pipx inject flake8 $pkg
-done
+{{ if not .lite }}
+{{ includeTemplate "python-tools.sh" . }}
+{{ end }}
 
 ## fzf installation completion
 $(brew --prefix)/opt/fzf/install

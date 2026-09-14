@@ -98,11 +98,17 @@ and then the dotfiles can be applied again.
  - [`tmux`](https://github.com/tmux/tmux). Terminal multiplexer.
  - [`tmux-plugins`](https://github.com/tmux-plugins/tpm). Plugins for `tmux`.
  - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug). On-the-go editor.
- - [`pyenv` and `pyenv-virtualenv`](https://github.com/pyenv). Python virtual environment handler.
+ - [`uv`](https://docs.astral.sh/uv/). Python version and project environment manager.
  - `zsh` and [`ohmyzsh`](https://github.com/ohmyzsh/ohmyzsh). Shell and zsh framework.
  - [`pipx`](https://pypa.github.io/pipx/). For installing pip packages in independent Python environments.
  - [`gogh`](https://gogh-co.github.io/Gogh/). Terminal colors.
  - [`zoxide`](https://github.com/ajeetdsouza/zoxide). Better change directory `cd`.
+
+### Python environments
+
+Full setups install Python 3.12 through uv. Ubuntu, macOS, and Windows retain pipx for CLI tools; Rocky installs only uv and Python. Lite setups install uv and leave Python downloads until needed. Existing pyenv environments and Python installations are preserved, but the managed shell no longer initializes pyenv.
+
+For a project, run `uv venv --python 3.12`, then `uv pip install -r requirements.txt` if it has a requirements file. Activate with `source .venv/bin/activate` (Zsh) or `.\.venv\Scripts\Activate.ps1` (PowerShell). Existing environments are not converted automatically; recreate them from the project's dependency files. uv does not replace the system `python` command; use the project's environment or `uv run --python 3.12 python`.
 
 ### PowerShell Git shortcuts
 

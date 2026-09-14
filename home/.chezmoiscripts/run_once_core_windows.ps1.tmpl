@@ -72,7 +72,7 @@ $packages = @(
     'lsd',
     'marp',
     'oh-my-posh',
-    'python',
+    'uv',
     'ripgrep',
     'vim',
     'zoxide'
@@ -84,29 +84,41 @@ if (Test-Path -LiteralPath (Join-Path $scoopRoot 'apps\psfzf\current\install.jso
     Invoke-SetupCommand scoop @('uninstall', 'psfzf')
 }
 
-# Use Scoop's Python explicitly to avoid the Windows Store execution alias.
-$python = Join-Path $scoopRoot 'apps\python\current\python.exe'
-$global:LASTEXITCODE = 0
-& $python -m pip show pipx *> $null
-if ($LASTEXITCODE -ne 0) {
-    Invoke-SetupCommand $python @('-m', 'pip', 'install', '--user', 'pipx')
+# Scoop owns uv; no separate Scoop Python is needed for new installations.
+$uv = Join-Path $scoopRoot 'shims\uv.exe'
+{{ if not .lite -}}
+Invoke-SetupCommand $uv @('python', 'install', '3.12')
+$python = Invoke-SetupCommand $uv @('python', 'find', '--managed-python', '3.12')
+
+# Retain an existing pipx; bootstrap a missing copy with uv's managed Python.
+$uvToolBin = Invoke-SetupCommand $uv @('tool', 'dir', '--bin')
+# Persist only the additional user tool directory, never the merged process PATH.
+$userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+if ($uvToolBin -notin ($userPath -split ';')) {
+    $userPaths = @($userPath, $uvToolBin) | Where-Object { $_ }
+    [Environment]::SetEnvironmentVariable('Path', ($userPaths -join ';'), 'User')
 }
-Invoke-SetupCommand $python @('-m', 'pipx', 'ensurepath')
+$env:PATH = "$uvToolBin;$env:PATH"
+if (-not (Get-Command pipx -ErrorAction SilentlyContinue)) {
+    Invoke-SetupCommand $uv @('tool', 'install', '--python', $python, 'pipx')
+}
+Invoke-SetupCommand pipx @('ensurepath')
 Update-SetupPath
-$pipxBin = Invoke-SetupCommand $python @('-m', 'pipx', 'environment', '--value', 'PIPX_BIN_DIR')
-$env:PATH = "$pipxBin;$env:PATH"
+$pipxBin = Invoke-SetupCommand pipx @('environment', '--value', 'PIPX_BIN_DIR')
+$env:PATH = "$uvToolBin;$pipxBin;$env:PATH"
 
 $pipxPkgs = @('black', 'flake8', 'mypy', 'pre-commit', 'poetry', 'pip-tools', 'mkdocs')
-$pipxState = (Invoke-SetupCommand $python @('-m', 'pipx', 'list', '--json')) | ConvertFrom-Json
+$pipxState = (Invoke-SetupCommand pipx @('list', '--json')) | ConvertFrom-Json
 $installedPipx = @($pipxState.venvs.PSObject.Properties.Name)
 foreach ($pkg in $pipxPkgs) {
     if ($pkg -notin $installedPipx) {
-        Invoke-SetupCommand $python @('-m', 'pipx', 'install', $pkg)
+        Invoke-SetupCommand pipx @('install', '--python', $python, $pkg)
     }
     else {
         Write-Output "$pkg is already installed with pipx."
     }
 }
+{{ end -}}
 
 {{ if and .gui (not .lite) -}}
 Ensure-ScoopBucket 'extras'

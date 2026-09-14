@@ -29,11 +29,7 @@
             // override the default, inherited ENV.
             // "env": {"PATH": "/home/{{ .chezmoi.username }}/anaconda3/bin"},
 
-            // **Only valid for PythonLinter**
-            // Specify which python to use. Either a number or full path
-            // to a python binary. SL will then basically use 'python -m'
-            // to run the linter.
-            "python": "/home/{{ .chezmoi.username }}/.pyenv/shims/python3",
+            // The configured pipx executable supplies its own interpreter.
 
             // **Only valid for NodeLinter**
             // If true, will *not* use a globally installed binary
@@ -48,7 +44,6 @@
                 "--check-untyped-defs",
             ],
             "executable": "/home/{{ .chezmoi.username }}/.local/bin/mypy",
-            "python": "/home/{{ .chezmoi.username }}/.pyenv/shims/python3",
             "lint_mode": "save",
         }
     },
