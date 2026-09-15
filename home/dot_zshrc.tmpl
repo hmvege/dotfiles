@@ -1,12 +1,7 @@
 # User-installed uv, Python executables, and pipx applications.
 export PATH="$HOME/.local/bin:$PATH"
 {{ if eq .chezmoi.os "darwin" -}}
-# Make Homebrew's uv available in new shells on Apple Silicon and Intel.
-if [[ -x /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [[ -x /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-fi
+{{ includeTemplate "homebrew-env.sh" . }}
 {{ end -}}
 
 # If you come from bash you might have to change your $PATH.
@@ -147,31 +142,32 @@ if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
 fi
 
 {{ if not .lite}}
-# LSD settings
-alias ls="lsd"
-alias l="lsd -l"
-alias lt="lsd --tree"
-alias la="lsd -laht"
-alias tree="ls --tree"
-alias ltsh='lt -l --blocks size --blocks name'
-
-# For making LSD work with
+# Keep ordinary ls available if the distro has no lsd package.
+if command -v lsd >/dev/null 2>&1; then
+    alias ls="lsd"
+    alias l="lsd -l"
+    alias lt="lsd --tree"
+    alias la="lsd -laht"
+    alias tree="lsd --tree"
+    alias ltsh='lt -l --blocks size --blocks name'
+fi
 export PATH="$PATH:/snap/bin/"
-
-# LSD aliases
-alias ltsh='lt -l --blocks size --blocks name'
 {{ end }}
 
-# Zoxide setup
-eval "$(zoxide init zsh)"
 {{ end -}}
 {{ end -}}
+
+# Use zoxide on every platform and in lite mode. Do not load OMZ's z plugin.
+# Clear a legacy alias when re-sourcing this profile after migration.
+unalias z zi 2>/dev/null || true
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+fi
+# Without zoxide, use the shell's ordinary cd command.
 
 {{ if (eq .chezmoi.os "darwin") -}}
 # For making alt+c change directory work in MacOS
 bindkey "ç" fzf-cd-widget
-
-export PATH="/usr/local/sbin:$PATH"
 
 # Enabling terminal colors
 export TERM=xterm-256color

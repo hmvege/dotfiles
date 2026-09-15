@@ -5,12 +5,6 @@
 # failures.
 set -euo pipefail
 
-if ! type -p xcodebuild >/dev/null 2>&1
-then
-    # Starts by installing basic developer tools for OSX
-    xcode-select --install
-fi
-
 packages=(
     bat
     fd
@@ -30,29 +24,20 @@ packages=(
     zsh
 )
 
-## Brew
-if ! type -p brew >/dev/null 2>&1
-then
+## Brew (the installer also handles missing Command Line Tools)
+{{ includeTemplate "homebrew-env.sh" . }}
+if ! command -v brew >/dev/null 2>&1; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    echo "Installed Brew"
-else
-    echo "Brew is already installed"
+    {{ includeTemplate "homebrew-env.sh" . }}
 fi
-
-if [[ "$(uname -m)" == "arm64" ]]; then
-    # Apple Silicon typically uses /opt/homebrew
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-else
-    # Intel typically uses /usr/local
-    eval "$(/usr/local/bin/brew shellenv)"
-fi
+command -v brew >/dev/null 2>&1 || { echo "Homebrew is unavailable" >&2; exit 1; }
 
 brew update
-brew upgrade
-
-for pkg in ${packages[@]}
-do
-    brew install $pkg
+# Leave upgrades to the user. Dependencies of new packages may still be updated.
+for pkg in "${packages[@]}"; do
+    if ! brew list --formula "$pkg" >/dev/null 2>&1; then
+        brew install --formula "$pkg"
+    fi
 done
 echo "Packages installed"
 
@@ -80,7 +65,7 @@ fi
 {{ end }}
 
 ## fzf installation completion
-$(brew --prefix)/opt/fzf/install
+"$(brew --prefix fzf)/install" --key-bindings --completion --no-update-rc --no-fish
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
@@ -94,9 +79,11 @@ fi
 
 {{ if and .gui (not .lite) }}
 ## VSCode installation
-if [ ! type -p code >/dev/null 2>&1 ]
+if ! command -v code >/dev/null 2>&1
 then
-    brew install --cask visual-studio-code
+    if ! brew list --cask visual-studio-code >/dev/null 2>&1; then
+        brew install --cask visual-studio-code
+    fi
     echo "VSCode installed."
 else
     echo "VSCode already installed"
@@ -128,11 +115,11 @@ vscode_extensions=(
 )
 
 installed_extensions=$(code --list-extensions)
-for extension in ${vscode_extensions[@]}
+for extension in "${vscode_extensions[@]}"
 do
-    if ! echo $installed_extensions | grep -q $extension
+    if ! grep -Fqx -- "$extension" <<< "$installed_extensions"
     then
-        code --install-extension $extension
+        code --install-extension "$extension"
         echo "Installed $extension"
     else
         echo "VSCode extension $extension found"

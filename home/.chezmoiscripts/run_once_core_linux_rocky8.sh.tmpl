@@ -33,6 +33,8 @@ else
     echo "Silver Searcher (ag) is already installed."
 fi
 
+{{ includeTemplate "install-zoxide.sh" . }}
+
 ## Python environment management and Ruff (no broader CLI suite on Rocky)
 {{ includeTemplate "install-uv.sh" . }}
 {{ if not .lite }}

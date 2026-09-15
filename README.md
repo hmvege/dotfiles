@@ -29,6 +29,8 @@ During the installation, you'll be asked:
 - Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts). There is no automatic GUI recommendation. Lite mode overrides GUI choice and no GUI apps are installed.
 
 ### :penguin: Linux
+Ubuntu targets are 22.04, 24.04, and 26.04. Ubuntu 20.04 is deprecated but retained for migration. Runtime validation is pending.
+
 Install Chezmoi and initialize, ensure `curl` and `sudo` is installed,
 ```bash
 apt-get update && apt-get install -y curl sudo
@@ -40,6 +42,8 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfile
 which will download the Chezmoi binary to `$HOME/.local/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
 ### :green_apple:	MacOS
+Setup discovers Homebrew on Intel and Apple Silicon. It installs missing packages without a blanket upgrade. fzf setup is noninteractive and leaves shell startup files under Chezmoi control.
+
 On MacOS, you should be able to install Chezmoi via
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
@@ -132,6 +136,17 @@ See the [Ruff rules](https://docs.astral.sh/ruff/rules/), [broken-line tracking 
 
 Use `ruff check .` and `ruff format .` from the CLI. To use the same 79-character preference outside the editors, set `line-length = 79` under `[tool.ruff]` in the project's `pyproject.toml`. Projects using Black can override VSCode's Python formatter or disable Sublime's `lsp_format_on_save`, and re-enable their chosen linter. GUI installers add the Ruff and mypy VSCode extensions. Sublime uses LSP-ruff. See [Ruff editor configuration](https://docs.astral.sh/ruff/editors/settings/) for project precedence.
 
+### Directory jumping
+
+Zoxide provides `z` on Zsh and PowerShell. `zi` opens an fzf picker. Full and lite setups attempt installation on all platforms. If it fails, use ordinary `cd`. Other installer failures are not yet best-effort.
+
+If applying dotfiles on a system previously using the `z` plugin, one can import `zsh-z`'s history to `zoxide` via,
+```sh
+zoxide import --from=z "${ZSHZ_DATA:-$HOME/.z}"
+```
+
+The old database is preserved. For a skipped installation, retry with `sudo apt-get install zoxide`, `brew install zoxide`, or `scoop install zoxide`. On Rocky, try `sudo dnf install zoxide` or the [upstream installer](https://github.com/ajeetdsouza/zoxide#installation).
+
 ### PowerShell Git shortcuts
 
 The profile optionally loads `git-aliases` and `posh-git`, installed for the current user during Windows post-install setup. These preferred shortcuts also work without either module, provided Git is available:
@@ -162,7 +177,6 @@ Following plugins are used:
  - jsontools
  - sublime
  - tmux
- - z
  - zsh-autosuggestions
  - zsh-syntax-highlighting
 
@@ -176,6 +190,8 @@ Sublime Text 4 still installed for a full Linux and MacOS setup, even tho VSCode
 A basic Vim setup is installed.
 
 ### Gogh
+Ubuntu enables Gogh in full GUI mode, including WSL with GNOME Terminal and a graphical D-Bus session. Lite skips it. This does not theme Windows Terminal.
+
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
 
 ## :alembic: Testing

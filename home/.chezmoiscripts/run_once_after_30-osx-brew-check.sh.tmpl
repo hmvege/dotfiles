@@ -1,13 +1,14 @@
 {{ if (eq .chezmoi.os "darwin") -}}
 #!/bin/bash
-
-# Verifying Brew install
-brew doctor -q
+set -euo pipefail
 
 # ## Workaround for fuzzy-find alt+c: https://github.com/junegunn/fzf/issues/164
 # bindkey "ç" fzf-cd-widget
 
-echo "Brew doctor successfully run"
-echo "Install complete"
-
+{{ includeTemplate "homebrew-env.sh" . }}
+if brew doctor; then
+    echo "Homebrew checks passed"
+else
+    echo "WARNING: Homebrew reported issues. Review the output above." >&2
+fi
 {{ end -}}
