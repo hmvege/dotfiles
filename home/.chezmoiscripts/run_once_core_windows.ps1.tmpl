@@ -99,6 +99,9 @@ if ($uvToolBin -notin ($userPath -split ';')) {
     [Environment]::SetEnvironmentVariable('Path', ($userPaths -join ';'), 'User')
 }
 $env:PATH = "$uvToolBin;$env:PATH"
+if (-not (Get-Command ruff -ErrorAction SilentlyContinue)) {
+    Invoke-SetupCommand $uv @('tool', 'install', '--python', $python, 'ruff')
+}
 if (-not (Get-Command pipx -ErrorAction SilentlyContinue)) {
     Invoke-SetupCommand $uv @('tool', 'install', '--python', $python, 'pipx')
 }
@@ -137,6 +140,8 @@ $vscodeExtensions = @(
     "eamodio.gitlens",
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
+    "charliermarsh.ruff",
+    "ms-python.mypy-type-checker",
     "ms-python.python",
     "ms-toolsai.jupyter",
     "ms-vscode-remote.remote-containers",

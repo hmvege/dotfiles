@@ -99,6 +99,7 @@ and then the dotfiles can be applied again.
  - [`tmux-plugins`](https://github.com/tmux-plugins/tpm). Plugins for `tmux`.
  - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug). On-the-go editor.
  - [`uv`](https://docs.astral.sh/uv/). Python version and project environment manager.
+ - [`Ruff`](https://docs.astral.sh/ruff/). Python linting and formatting in full setups.
  - `zsh` and [`ohmyzsh`](https://github.com/ohmyzsh/ohmyzsh). Shell and zsh framework.
  - [`pipx`](https://pypa.github.io/pipx/). For installing pip packages in independent Python environments.
  - [`gogh`](https://gogh-co.github.io/Gogh/). Terminal colors.
@@ -106,9 +107,30 @@ and then the dotfiles can be applied again.
 
 ### Python environments
 
-Full setups install Python 3.12 through uv. Ubuntu, macOS, and Windows retain pipx for CLI tools; Rocky installs only uv and Python. Lite setups install uv and leave Python downloads until needed. Existing pyenv environments and Python installations are preserved, but the managed shell no longer initializes pyenv.
+Full setups install Python 3.12 through uv. Ubuntu, macOS, and Windows retain pipx for CLI tools, while Rocky installs uv, Python, and Ruff without the broader pipx suite. Lite setups install uv and leave Python downloads until needed. Existing pyenv environments and Python installations are preserved, but the managed shell no longer initializes pyenv.
 
-For a project, run `uv venv --python 3.12`, then `uv pip install -r requirements.txt` if it has a requirements file. Activate with `source .venv/bin/activate` (Zsh) or `.\.venv\Scripts\Activate.ps1` (PowerShell). Existing environments are not converted automatically; recreate them from the project's dependency files. uv does not replace the system `python` command; use the project's environment or `uv run --python 3.12 python`.
+For a project, run `uv venv --python 3.12`, then `uv pip install -r requirements.txt` if it has a requirements file. Activate with `source .venv/bin/activate` (Zsh) or `.\.venv\Scripts\Activate.ps1` (PowerShell). uv does not replace the system `python` command.
+
+### Python linting and formatting
+
+Full setups install missing Ruff with `uv tool install` using managed Python 3.12. An existing Ruff on PATH is retained. Black, Flake8, and mypy remain available through pipx on Ubuntu, macOS, and Windows. Lite skips this tooling.
+
+The Linux and macOS VSCode and Sublime settings default to Ruff linting and formatting on save, with a 79-character fallback. Project `pyproject.toml`, `ruff.toml`, or `.ruff.toml` settings take precedence. The editor fallback selects `E`, `F`, `W`, and `C90`, retaining the old VSCode rule families and `E203` exclusion. Note, Ruff has no `W503` rule. This does not reproduce every Sublime Flake8 plugin check: those settings and tools remain available, with automatic Flake8 linting disabled. Mypy remains enabled separately, and Sublime Black remains available for manual use.
+
+The editor fallback also enables these Flake8-plugin equivalents (Ruff implements rules internally, so Flake8 package version bounds do not apply):
+
+| Flake8 plugin | Ruff coverage |
+| --- | --- |
+| `flake8-bugbear` | `B` |
+| `flake8-comprehensions` | `C4` |
+| `flake8-use-fstring` | `UP031` and `UP032` for percent-format conversion and f-strings |
+| `flake8-useless-assert` | Partial: `PLW0129` checks string literals. Existing `F631` checks tuples, and `B011` checks `assert False`. Other constant expressions and formatted-string assertions are not fully covered. |
+| `flake8-broken-line` | No direct lint rule. Ruff formatting handles line continuations, but is not an equivalent diagnostic. |
+| `flake8-markdown` | No equivalent lint rule for Python blocks in Markdown. Markdown formatting support is separate. |
+
+See the [Ruff rules](https://docs.astral.sh/ruff/rules/), [broken-line tracking issue](https://github.com/astral-sh/ruff/issues/3465), and [original useless-assert checks](https://pypi.org/project/flake8-useless-assert/). The existing Flake8 tooling remains available for missing checks. These additions remain editor fallbacks. A project Ruff configuration takes precedence.
+
+Use `ruff check .` and `ruff format .` from the CLI. To use the same 79-character preference outside the editors, set `line-length = 79` under `[tool.ruff]` in the project's `pyproject.toml`. Projects using Black can override VSCode's Python formatter or disable Sublime's `lsp_format_on_save`, and re-enable their chosen linter. GUI installers add the Ruff and mypy VSCode extensions. Sublime uses LSP-ruff. See [Ruff editor configuration](https://docs.astral.sh/ruff/editors/settings/) for project precedence.
 
 ### PowerShell Git shortcuts
 

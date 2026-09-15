@@ -23,6 +23,7 @@
 		"LSP",
 		"LSP-json",
 		"LSP-pyright",
+		"LSP-ruff",
 		"MarkdownPreview",
 		"MarkdownTOC",
 		"Material Theme",

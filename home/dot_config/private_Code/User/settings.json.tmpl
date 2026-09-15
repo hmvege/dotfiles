@@ -10,39 +10,23 @@
     "window.titleBarStyle": "custom",
     "window.customMenuBarAltFocus": false,
     // Python
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Path": "{{ .chezmoi.homeDir }}/.local/bin/flake8",
-    "python.linting.flake8Args": [
-        "--max-line-length",
-        "79",
-        "--exclude",
-        "__pycache__",
-        ".pyc",
-        ".git",
-        "--select",
-        "E",
-        "F",
-        "W",
-        "C90",
-        "--extend-ignore",
-        "E203",
-        "W503"
-    ],
-    "python.linting.mypyEnabled": true,
-    "python.linting.mypyPath": "{{ .chezmoi.homeDir }}/.local/bin/mypy",
-    "python.linting.enabled": true,
-    "python.linting.lintOnSave": true,
+    // Ruff supplies Python linting and formatting; project Ruff configuration wins.
+    "ruff.configurationPreference": "filesystemFirst",
+    "ruff.configuration": {
+        "line-length": 79,
+        "lint": {
+            "select": ["E", "F", "W", "C90", "B", "C4", "UP031", "UP032", "PLW0129"],
+            "ignore": ["E203"]
+        }
+    },
+    "mypy-type-checker.path": ["{{ .chezmoi.homeDir }}/.local/bin/mypy"],
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingImports": "none",
         "reportMissingModuleSource": "none"
     },
-    "python.formatting.provider": "black",
-    "python.formatting.blackPath": "{{ .chezmoi.homeDir }}.local/bin/black",
-    "python.formatting.blackArgs": [
-        "-l 79"
-    ],
     "[python]": {
-        "editor.formatOnType": true
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true
     },
     // C++
     "[cpp]": {

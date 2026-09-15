@@ -1,0 +1,5 @@
+{
+    // LSP-ruff handles Python formatting; override in project settings as needed.
+    "lsp_format_on_save": true,
+    "rulers": [79]
+}

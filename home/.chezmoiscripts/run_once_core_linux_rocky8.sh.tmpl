@@ -33,10 +33,15 @@ else
     echo "Silver Searcher (ag) is already installed."
 fi
 
-## Python environment management (no additional Python CLI suite on Rocky)
+## Python environment management and Ruff (no broader CLI suite on Rocky)
 {{ includeTemplate "install-uv.sh" . }}
 {{ if not .lite }}
 uv python install 3.12
+uv_tool_bin="$(uv tool dir --bin)"
+export PATH="$uv_tool_bin:$PATH"
+if ! command -v ruff >/dev/null 2>&1; then
+    uv tool install --python "$(uv python find --managed-python 3.12)" ruff
+fi
 {{ end }}
 
 ## vim plugin manager

@@ -1,9 +1,12 @@
-# Keep pipx as the owner of the existing CLI tools; uv manages Python itself.
+# Keep pipx as the owner of the existing CLI tools; uv manages Python and Ruff.
 export PATH="$HOME/.local/bin:$PATH"
 uv python install 3.12
 python_for_tools="$(uv python find --managed-python 3.12)"
 uv_tool_bin="$(uv tool dir --bin)"
 export PATH="$uv_tool_bin:$PATH"
+if ! command -v ruff >/dev/null 2>&1; then
+    uv tool install --python "$python_for_tools" ruff
+fi
 if ! command -v pipx >/dev/null 2>&1; then
     uv tool install --python "$python_for_tools" pipx
 fi

@@ -1,0 +1,18 @@
+{
+    // Reuse the installed CLI from PATH instead of downloading another copy.
+    "server_path": "ruff",
+    // LSP prepends these entries to PATH, including when opened from the desktop.
+    "env": {
+        "PATH": ["{{ .chezmoi.homeDir }}/.local/bin", "/opt/homebrew/bin", "/usr/local/bin"]
+    },
+    "initialization_options": {
+        "settings.configurationPreference": "filesystemFirst",
+        "settings.configuration": {
+            "line-length": 79,
+            "lint": {
+                "select": ["E", "F", "W", "C90", "B", "C4", "UP031", "UP032", "PLW0129"],
+                "ignore": ["E203"]
+            }
+        }
+    }
+}

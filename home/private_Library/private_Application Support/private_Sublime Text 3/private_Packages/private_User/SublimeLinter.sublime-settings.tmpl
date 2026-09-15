@@ -4,8 +4,8 @@
     "linters": {
         // The name of the linter you installed
         "flake8": {
-            // Disables the linter. The default here is 'not set'
-            "disable": false,
+            // Ruff is the default; projects can re-enable this legacy linter.
+            "disable": true,
 
             // Additional arguments for the command line. Either a string
             // or an array. If set to a string, we 'shlex.split' it*.

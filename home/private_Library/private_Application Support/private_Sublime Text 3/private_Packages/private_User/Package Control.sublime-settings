@@ -13,6 +13,7 @@
 		"GithubEmoji",
 		"LSP",
 		"LSP-pyright",
+		"LSP-ruff",
 		"MarkdownPreview",
 		"MarkdownTOC",
 		"Package Control",

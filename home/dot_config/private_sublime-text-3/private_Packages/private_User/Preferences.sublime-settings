@@ -28,10 +28,6 @@
 		"dataclasses",
 		"invariants",
 	],
-	"settings":
-	{
-		"SublimeLinter.linters.flake8.disable": false,
-	},
 	"spell_check": true,
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true,

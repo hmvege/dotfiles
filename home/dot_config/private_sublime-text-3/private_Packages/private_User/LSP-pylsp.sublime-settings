@@ -1,4 +1,12 @@
-// Settings in here override those in "LSP-pylsp/LSP-pylsp.sublime-settings"
+// Legacy server: Ruff handles linting and formatting by default.
 {
-	"pylsp.plugins.flake8.enabled": true,
+    "settings": {
+        "pylsp.plugins.flake8.enabled": false,
+        "pylsp.plugins.pycodestyle.enabled": false,
+        "pylsp.plugins.pyflakes.enabled": false,
+        "pylsp.plugins.mccabe.enabled": false,
+        "pylsp.plugins.autopep8.enabled": false,
+        "pylsp.plugins.yapf.enabled": false,
+        "pylsp.plugins.black.enabled": false,
+    }
 }
