@@ -3,6 +3,11 @@
 
 echo ""
 echo ""
+{{ if .lite -}}
+echo "==== LITE DOTFILES CONFIGURATION APPLIED ===="
+echo "Optional tools may have been skipped. Use zsh if installed, or keep your current shell."
+echo "Retry skipped tools directly with your package manager."
+{{ else -}}
 echo "==== DOTFILES SETUP COMPLETE ===="
 echo "You may need to logout and log in into your user($USER) for the dotfiles to effect."
 
@@ -36,5 +41,6 @@ then
     echo 'or restart your terminal session.'
 fi
 
+{{ end -}}
 {{ end -}}
 {{ end -}}

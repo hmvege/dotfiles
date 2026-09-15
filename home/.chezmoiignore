@@ -53,8 +53,20 @@ scripts/install_powershell.ps1
 # Ignoring all linux related config files
 {{ if eq .chezmoi.os "windows" }}
 .zshrc
+{{ if not .lite }}
 .vimrc
+{{ end }}
 .tmux.conf
 .oh-my-zsh/
 .htop
+{{ end }}
+
+{{ if .lite }}
+.oh-my-zsh/
+.tmux.conf
+.config/htop/
+.config/Code/
+.config/sublime-text-3/
+Library/Application Support/Code/
+Library/Application Support/Sublime Text 3/
 {{ end }}

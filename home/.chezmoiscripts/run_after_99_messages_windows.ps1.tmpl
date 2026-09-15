@@ -1,6 +1,11 @@
 {{ if (eq .chezmoi.os "windows") -}}
 Write-Output ""
 Write-Output ""
+{{ if .lite -}}
+Write-Output "==== LITE DOTFILES CONFIGURATION APPLIED ===="
+Write-Output "Optional tools may have been skipped. Retry them directly with Scoop."
+{{ else -}}
 Write-Output "==== DOTFILES SETUP COMPLETE ===="
+{{ end -}}
 Write-Output "You may need to restart your terminal and start up latest PowerShell terminal for the dotfiles to effect."
 {{ end -}}

@@ -1,11 +1,30 @@
 {{ if eq .chezmoi.os "windows" -}}
+{{ if .lite -}}
+try {
 {{ includeTemplate "windows-pwsh-bootstrap.ps1" . }}
+}
+catch {
+    Write-Warning "Skipping optional Windows setup: $_"
+    exit 0
+}
+{{ else -}}
+{{ includeTemplate "windows-pwsh-bootstrap.ps1" . }}
+{{ end -}}
 <#
     Post‑install script for Windows
     Installs required PowerShell modules for the current user under PowerShell 7.
     Idempotent – safe to re‑run.
 #>
 
+{{ if .lite -}}
+# PSFzf is optional and cannot provide history search without fzf.
+if (-not (Get-Command fzf -ErrorAction SilentlyContinue)) {
+    Write-Output 'Skipping optional PSFzf because fzf is unavailable.'
+    exit 0
+}
+if (Get-Module -ListAvailable -Name PSFzf) { exit 0 }
+try {
+{{ end -}}
 # ── Ensure NuGet provider + PSGallery trust (silent & idempotent) ──────────────
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -24,11 +43,23 @@ if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
 # ───────────────────────────────────────────────────────────────────────────────
 
 # PSGallery is the sole installation owner for PSFzf.
-foreach ($moduleName in @('PSFzf', 'git-aliases', 'posh-git')) {
+{{ if .lite -}}
+$modules = @('PSFzf')
+{{ else -}}
+$modules = @('PSFzf', 'git-aliases', 'posh-git')
+{{ end -}}
+foreach ($moduleName in $modules) {
     if (-not (Get-Module -ListAvailable -Name $moduleName)) {
         Install-Module -Name $moduleName -Repository PSGallery -Scope CurrentUser -Force -ErrorAction Stop
     }
 }
 
+{{ if .lite -}}
+}
+catch {
+    Write-Warning "Skipping optional PSFzf setup: $_"
+}
+{{ else -}}
 Write-Host "Windows shell tooling is ready."
+{{ end -}}
 {{ end -}}

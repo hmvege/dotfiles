@@ -4,6 +4,9 @@ export PATH="$HOME/.local/bin:$PATH"
 {{ includeTemplate "homebrew-env.sh" . }}
 {{ end -}}
 
+{{ if .lite -}}
+{{ includeTemplate "zsh-lite.zsh" . }}
+{{ else -}}
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -157,14 +160,6 @@ export PATH="$PATH:/snap/bin/"
 {{ end -}}
 {{ end -}}
 
-# Use zoxide on every platform and in lite mode. Do not load OMZ's z plugin.
-# Clear a legacy alias when re-sourcing this profile after migration.
-unalias z zi 2>/dev/null || true
-if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh)"
-fi
-# Without zoxide, use the shell's ordinary cd command.
-
 {{ if (eq .chezmoi.os "darwin") -}}
 # For making alt+c change directory work in MacOS
 bindkey "ç" fzf-cd-widget
@@ -173,3 +168,13 @@ bindkey "ç" fzf-cd-widget
 export TERM=xterm-256color
 
 {{ end -}}
+
+{{ end -}}
+
+# Use zoxide on every platform and in lite mode. Do not load OMZ's z plugin.
+# Clear a legacy alias when re-sourcing this profile after migration.
+unalias z zi 2>/dev/null || true
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+fi
+# Without zoxide, use the shell's ordinary cd command.

@@ -6,6 +6,10 @@
 # failures.
 set -euo pipefail
 
+{{ if .lite -}}
+{{ includeTemplate "install-lite-linux.sh" . }}
+{{ else -}}
+
 {{ if eq .chezmoi.osRelease.version_id "20.04" }}
 echo "Warning: Ubuntu 20.04 support is deprecated. Prefer 22.04, 24.04, or 26.04. Installation remains available but unvalidated." >&2
 {{ end }}
@@ -30,12 +34,10 @@ packages=(
 
 )
 
-{{ if not .lite }}
 # General development tools remain in full mode; uv supplies prebuilt Python.
 packages+=(build-essential)
-{{ end }}
 
-{{ if and .gui (not .lite) }}
+{{ if .gui }}
 # Gogh is available in full GUI mode, including WSL with a Linux desktop terminal.
 packages_gogh_requirements=(
     dconf-cli
@@ -92,7 +94,6 @@ else
     echo "zsh-autosuggestions already installed"
 fi
 
-{{ if not .lite }}
 ## tmux plugins
 if [ ! -d "${HOME}/.tmux/plugins/tpm" ]
 then
@@ -101,7 +102,6 @@ then
 else
     echo "tmux plugin manager already installed."
 fi
-{{ end }}
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
@@ -134,9 +134,7 @@ fi
 
 ## Python environment management
 {{ includeTemplate "install-uv.sh" . }}
-{{ if not .lite }}
 {{ includeTemplate "python-tools.sh" . }}
-{{ end }}
 
 # ## Brew # NOTE: unused since built in tools cover most of what is needed
 # if ! type -p brew >/dev/null 2>&1
@@ -145,7 +143,7 @@ fi
 #     echo "Installed Brew"
 # fi
 
-{{ if and .gui (not .lite) }}
+{{ if .gui }}
 # We only install VSCode if snap is available on the system
 if command -v snap &> /dev/null; then
     if ! type -p code >/dev/null 2>&1
@@ -198,7 +196,6 @@ else
 fi
 {{ end -}}
 
-{{ if not .lite }}
 ## Prefer architecture-matched packages from the configured Ubuntu repositories.
 if ! command -v lsd >/dev/null 2>&1; then
     if sudo apt-get install -y lsd; then

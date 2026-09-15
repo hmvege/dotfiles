@@ -6,6 +6,10 @@
 # failures.
 set -euo pipefail
 
+{{ if .lite -}}
+{{ includeTemplate "install-lite-linux.sh" . }}
+{{ else -}}
+
 sudo dnf -y update
 
 packages=(
@@ -37,14 +41,12 @@ fi
 
 ## Python environment management and Ruff (no broader CLI suite on Rocky)
 {{ includeTemplate "install-uv.sh" . }}
-{{ if not .lite }}
 uv python install 3.12
 uv_tool_bin="$(uv tool dir --bin)"
 export PATH="$uv_tool_bin:$PATH"
 if ! command -v ruff >/dev/null 2>&1; then
     uv tool install --python "$(uv python find --managed-python 3.12)" ruff
 fi
-{{ end }}
 
 ## vim plugin manager
 if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
@@ -82,5 +84,6 @@ else
     echo "zsh-autosuggestions already installed"
 fi
 
+{{ end -}}
 {{ end -}}
 {{ end -}}

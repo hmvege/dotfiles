@@ -32,11 +32,13 @@ function Write-Timing {
 # Git
 # ============================================================================
 
+{{ if not .lite -}}
 # Load the broader alias set first so our preferred shortcuts take precedence.
 if (Get-Module -ListAvailable git-aliases) {
     Import-Module git-aliases
 }
 
+{{ end -}}
 # Short git checkout command.
 #
 # posh-git provides Git completion for the underlying Git command.
@@ -82,6 +84,9 @@ if (Get-Module -ListAvailable PSReadLine) {
 
     Write-Timing "PSReadLine options"
 
+    # Native history search remains available when PSFzf is absent.
+    Set-PSReadLineKeyHandler -Chord Ctrl+r -Function ReverseSearchHistory
+
     # Completion/history behavior.
     Set-PSReadLineKeyHandler `
         -Chord Tab `
@@ -115,7 +120,7 @@ if (Get-Module -ListAvailable PSReadLine) {
 # PSFzf
 # ============================================================================
 
-$hasPsFzf = $null -ne (
+$hasPsFzf = (Get-Command fzf -ErrorAction SilentlyContinue) -and (
     Get-Command Set-PsFzfOption -ErrorAction SilentlyContinue
 )
 
@@ -130,6 +135,7 @@ if ($hasPsFzf) {
 Write-Timing "PSFzf setup"
 
 
+{{ if not .lite -}}
 # ============================================================================
 # posh-git
 # ============================================================================
@@ -188,6 +194,7 @@ if ($hasOhMyPosh) {
 }
 
 
+{{ end -}}
 # ============================================================================
 # zoxide
 # ============================================================================

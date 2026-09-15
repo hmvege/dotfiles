@@ -5,6 +5,28 @@
 # failures.
 set -euo pipefail
 
+{{ if .lite -}}
+{{ includeTemplate "homebrew-env.sh" . }}
+# Lite uses an existing Homebrew to avoid bootstrapping developer tools.
+if command -v brew >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
+    # Avoid updates and retain existing tools, including macOS Git, Vim and Zsh.
+    for pkg in git zsh vim fzf the_silver_searcher uv zoxide; do
+        tool="$pkg"
+        [ "$pkg" != the_silver_searcher ] || tool=ag
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            if ! HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_UPGRADE=1 brew install --formula "$pkg"; then
+                echo "Warning: could not install $pkg. Continuing lite setup." >&2
+            fi
+        fi
+    done
+else
+    echo "Skipping optional packages: lite requires an existing Homebrew and a non-root user."
+fi
+
+{{ includeTemplate "install-uv.sh" . }}
+echo "Lite setup attempted. Start zsh to load the configuration."
+{{ else -}}
+
 packages=(
     bat
     fd
@@ -60,9 +82,7 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
       "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 fi
 
-{{ if not .lite }}
 {{ includeTemplate "python-tools.sh" . }}
-{{ end }}
 
 ## fzf installation completion
 "$(brew --prefix fzf)/install" --key-bindings --completion --no-update-rc --no-fish
@@ -77,7 +97,7 @@ else
     echo "vim plugin manager already installed"
 fi
 
-{{ if and .gui (not .lite) }}
+{{ if .gui }}
 ## VSCode installation
 if ! command -v code >/dev/null 2>&1
 then
@@ -125,5 +145,6 @@ do
         echo "VSCode extension $extension found"
     fi
 done
+{{ end -}}
 {{ end -}}
 {{ end -}}
