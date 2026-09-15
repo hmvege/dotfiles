@@ -26,7 +26,7 @@ The goal for this dotfiles project repository, is following,
 During the installation, you'll be asked:
 - **Mail** used for GitHub.
 - Whether to perform a **minimal (lite) setup**. Lite mode forces GUI installation off, but currently still includes development tools such as tmux on Ubuntu.
-- Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts). There is no automatic GUI recommendation; lite mode overrides this choice.
+- Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts). There is no automatic GUI recommendation. Lite mode overrides GUI choice and no GUI apps are installed.
 
 ### :penguin: Linux
 Install Chezmoi and initialize, ensure `curl` and `sudo` is installed,
@@ -50,11 +50,11 @@ The Windows setup targets x64 Windows and PowerShell 7. Start in a **non-adminis
 ```powershell
 iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --apply hmvege"
 ```
-The PowerShell installer accepts an existing stable version 7.5.0 or newer. When installation is needed, it selects the newest stable patch in the **7.6 MSI series** from the [official PowerShell releases](https://github.com/PowerShell/PowerShell/releases), verifies the published SHA-256 checksum, and retains an MSI log in the temporary directory. This series selection is intentional; it does not follow newer release series automatically.
+The PowerShell installer accepts an existing stable version 7.5.0 or newer. When installation is needed, it selects the newest stable patch in the **7.6 MSI series** from the [official PowerShell releases](https://github.com/PowerShell/PowerShell/releases), verifies the published SHA-256 checksum, and retains an MSI log in the temporary directory.
 
 If a restart is needed before PowerShell becomes usable, restart Windows and rerun `chezmoi apply -v -S ~/dotfiles`.
 
-After setup, open **PowerShell** in Windows Terminal, or run `pwsh` from a new terminal. `powershell.exe` launches Windows PowerShell 5.1; `pwsh.exe` launches PowerShell 7. The managed profile is `~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1`. In PowerShell 7, `$PROFILE` shows the actual profile location. Machines with redirected Documents folders should check that it matches the deployed path. Choose PowerShell as Windows Terminal's default profile if desired.
+After setup, open **PowerShell** in Windows Terminal, or run `pwsh` from a new terminal. `powershell.exe` launches Windows PowerShell 5.1, and `pwsh.exe` launches PowerShell 7. The managed profile is `~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1`. In PowerShell 7, `$PROFILE` shows the actual profile location. Machines with redirected Documents folders should check that it matches the deployed path. Choose PowerShell as Windows Terminal's default profile if desired.
 
 ### Pulling latest changing from repository
 Pull latest changes from repository.
@@ -91,7 +91,7 @@ and then the dotfiles can be applied again.
 
 ## :inbox_tray: Packages to be installed
 
- - [`ag`](https://github.com/ggreer/the_silver_searcher) (The Silver Searcher), for searching code. Included in full and lite package selections; Rocky 8 attempts installation through EPEL and warns if unavailable.
+ - [`ag`](https://github.com/ggreer/the_silver_searcher) (The Silver Searcher), for searching code. Included in full and lite package selections. Rocky 8 attempts installation through EPEL and warns if unavailable.
  - [`fzf`](https://github.com/junegunn/fzf#using-git) fuzzy searching.
  - [`fd`](https://github.com/sharkdp/fd) better `find`.
  - [`lsd`](https://github.com/Peltoche/lsd). Pretties `ls`.
@@ -143,7 +143,7 @@ The profile optionally loads `git-aliases` and `posh-git`, installed for the cur
 | `gcmsg "message"` | `git commit --message "message"` |
 | `gcam "message"` | `git commit --all --message "message"` |
 
-Additional arguments are forwarded to Git. `gc` replaces PowerShell's `Get-Content` alias; use `Get-Content` explicitly to read files. The shared Git aliases `git cm "message"` and `git cam "message"` remain available in all shells.
+Additional arguments are forwarded to Git. `gc` replaces PowerShell's `Get-Content` alias. Instead, use `Get-Content` explicitly to read files. The shared Git aliases `git cm "message"` and `git cam "message"` remain available in all shells.
 
 ### Vim plugins
 Plugins used in Vim is,
@@ -247,7 +247,7 @@ To test on windows, you can run and test in [Sandbox mode](https://learn.microso
   </LogonCommand>
 </Configuration>
 ```
-The registry preparation below requires an administrator session. Run the Chezmoi bootstrap separately in a non-administrator session for the user being configured; the Windows setup now elevates only its MSI helper. A Sandbox session running as administrator must switch to a non-elevated user before applying the dotfiles.
+The registry preparation below requires an administrator session. Run the Chezmoi bootstrap separately in a non-administrator session for the user being configured. The Windows setup only elevates its MSI helper. A Sandbox session running as administrator must switch to a non-elevated user before applying the dotfiles.
 
 ```powershell
 # For faster downloading and installing
@@ -261,7 +261,7 @@ Then, in the non-administrator session:
 Set-ExecutionPolicy Bypass -Scope Process -Force
 iex "& { $(irm 'https://get.chezmoi.io/ps1') } -b '~/bin' -- init --branch <branch-to-test> --apply hmvege"
 ```
-The Windows workflow job is currently disabled (`if: false`); Windows installation requires manual validation.
+The Windows workflow job is currently disabled (`if: false`). Windows installation requires manual validation.
 
 ### :green_apple: MacOS
 The pipeline will run tests on the MacOS setup.
