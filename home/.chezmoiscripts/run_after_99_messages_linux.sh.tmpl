@@ -1,46 +1,66 @@
 {{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
 #!/bin/bash
 
-echo ""
-echo ""
+export PATH="$HOME/.local/bin:$HOME/.fzf/bin:$PATH"
+{{ if eq .chezmoi.os "darwin" -}}
+{{ includeTemplate "homebrew-env.sh" . }}
+{{ end -}}
+
+report_tool() {
+    local label="$1" command="$2" executable version
+    if executable="$(command -v "$command" 2>/dev/null)"; then
+        version="$(NO_COLOR=1 "$executable" --version 2>/dev/null | head -n 1)"
+        printf '  %-12s %s\n' "$label" "${version:-available}"
+    else
+        printf '  %-12s not found\n' "$label"
+    fi
+}
+
+report_available() {
+    local label="$1" command="$2"
+    if command -v "$command" >/dev/null 2>&1; then
+        printf '  %-12s available\n' "$label"
+    else
+        printf '  %-12s not found\n' "$label"
+    fi
+}
+
+printf '\n==== DOTFILES TOOL STATUS ====\n'
+printf 'Platform: {{ .chezmoi.os }}{{ if eq .chezmoi.os "linux" }} / {{ .chezmoi.osRelease.id }} {{ .chezmoi.osRelease.version_id }}{{ if .chezmoi.kernel.osrelease | lower | contains "microsoft" }} / WSL{{ end }}{{ end }}\n'
+printf 'Mode: {{ if .lite }}lite{{ else if .gui }}full GUI{{ else }}full CLI{{ end }}\n'
+printf 'Available now:\n'
+report_tool git git
+report_tool vim vim
+report_tool zsh zsh
+report_tool fzf fzf
+report_tool ag ag
+report_tool uv uv
+report_tool zoxide zoxide
+{{ if not .lite -}}
+report_tool ruff ruff
+report_available bat bat
+report_available fd fd
+report_tool lsd lsd
+report_tool tmux tmux
+report_tool jq jq
+{{ end -}}
+{{ if and .gui (not .lite) -}}
+report_available code code
+report_available subl subl
+report_available smerge smerge
+{{ end -}}
+
+printf '\nMissing tools may have been skipped or failed. Review installer messages above.\n'
+printf 'This inventory reflects command availability, not installation history or verified shell/editor integration.\n'
 {{ if .lite -}}
-echo "==== LITE DOTFILES CONFIGURATION APPLIED ===="
-echo "Optional tools may have been skipped. Use zsh if installed, or keep your current shell."
-echo "Retry skipped tools directly with your package manager."
-{{ else -}}
-echo "==== DOTFILES SETUP COMPLETE ===="
-echo "You may need to logout and log in into your user($USER) for the dotfiles to effect."
-
-{{ if (eq .chezmoi.os "linux") -}}
-{{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
-{{ if not (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
-
-# Only runs if we have a desktop
-{{ if .gui }}
-echo ""
-echo "Note on Sublime: be aware that some packages may need to be downloaded manually."
-
-echo "Packages used in sublime by dotfiles which may need to be installed manually (ctrl+p -> select 'Package Control: Install Package'):"
-old_ifs="$IFS"
-IFS="
-"
-for p in $(awk '/\[/,/\]/' $HOME/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings | tr -d "[" | tr -d "]" | tr -d '"' | tr -d ',' | sed '/^[[:space:]]*$/d')
-do
-    echo "    $p"
-done
-IFS="$old_ifs"
+printf 'Lite excludes developer suites, managed Python, GUI apps, fonts, and downloaded shell/Vim plugins.\n'
 {{ end -}}
-{{ end -}}
-{{ end -}}
-
-if [[ $SHELL != "/bin/zsh" ]]
-then
-    echo "NOTE: Current shell is $SHELL."
-    echo "Make sure to change your shell:"
-    echo 'chsh -s $(which zsh)'
-    echo 'or restart your terminal session.'
-fi
-
-{{ end -}}
+printf 'Open a new terminal. Run zsh if installed, otherwise keep your current shell.\n'
+printf 'Useful commands (when installed): git status | uv venv | uv pip install -r requirements.txt\n'
+printf 'Ctrl+r searches history. z jumps to directories, or use ordinary cd.\n'
+printf 'Retry skipped tools directly with apt-get, dnf, or brew as appropriate.\n'
+printf 'An unchanged run_once script does not retry skipped tools. See README for retry commands.\n'
+{{ if and .gui (not .lite) -}}
+printf 'In Sublime, use Package Control: Install Package if editor packages are missing (ctrl+p -> select 'Package Control: Install Package' and install missing packages).\n'
 {{ end -}}
 {{ end -}}

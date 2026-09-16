@@ -1,11 +1,60 @@
 {{ if (eq .chezmoi.os "windows") -}}
-Write-Output ""
-Write-Output ""
-{{ if .lite -}}
-Write-Output "==== LITE DOTFILES CONFIGURATION APPLIED ===="
-Write-Output "Optional tools may have been skipped. Retry them directly with Scoop."
-{{ else -}}
-Write-Output "==== DOTFILES SETUP COMPLETE ===="
+$scoopRoot = $env:SCOOP
+if (-not $scoopRoot) { $scoopRoot = Join-Path $env:USERPROFILE 'scoop' }
+$scoopShims = Join-Path $scoopRoot 'shims'
+if (Test-Path -LiteralPath $scoopShims) { $env:PATH = "$scoopShims;$env:PATH" }
+
+function Show-Tool {
+    param([string]$Name)
+
+    $command = Get-Command $Name -CommandType Application,ExternalScript -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+    if (-not $command) {
+        Write-Output ('  {0,-12} not found' -f $Name)
+        return
+    }
+    try {
+        $lines = @(& $command.Source --version 2>$null)
+        $version = if ($LASTEXITCODE -eq 0 -and $lines.Count -gt 0) { $lines[0] } else { 'available' }
+    }
+    catch {
+        $version = 'available'
+    }
+    Write-Output ('  {0,-12} {1}' -f $Name, $version)
+}
+
+function Show-ModuleVersion {
+    param([string]$Name)
+
+    $module = Get-Module -ListAvailable -Name $Name | Sort-Object Version -Descending | Select-Object -First 1
+    $version = if ($module) { $module.Version } else { 'not found' }
+    Write-Output ('  {0,-12} {1}' -f "$Name module", $version)
+}
+
+Write-Output "`n==== DOTFILES TOOL STATUS ===="
+Write-Output 'Platform: Windows'
+Write-Output 'Mode: {{ if .lite }}lite{{ else if .gui }}full GUI{{ else }}full CLI{{ end }}'
+Write-Output 'Available now:'
+foreach ($tool in @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide', 'pwsh')) { Show-Tool $tool }
+{{ if not .lite -}}
+foreach ($tool in @('bat', 'fd', 'lsd', 'cloc', 'cppcheck', 'rg', 'pipx', 'ruff')) { Show-Tool $tool }
+{{ if .gui -}}
+foreach ($tool in @('code', 'smerge')) { Show-Tool $tool }
 {{ end -}}
-Write-Output "You may need to restart your terminal and start up latest PowerShell terminal for the dotfiles to effect."
+$modules = @('PSFzf', 'git-aliases', 'posh-git')
+{{ else -}}
+$modules = @('PSFzf')
+{{ end -}}
+foreach ($name in $modules) { Show-ModuleVersion $name }
+
+Write-Output "`nMissing tools may have been skipped or failed. Review installer messages above."
+Write-Output 'This inventory reflects command availability, not installation history or verified shell/editor integration.'
+{{ if .lite -}}
+Write-Output 'Lite excludes developer suites, managed Python, GUI apps, fonts, and downloaded shell/Vim plugins.'
+{{ end -}}
+Write-Output 'Open a new PowerShell 7 terminal with pwsh. Windows PowerShell (powershell.exe) uses a different profile.'
+Write-Output 'Useful commands (when installed): git status | uv venv | uv pip install -r requirements.txt'
+Write-Output 'Ctrl+r searches history. z jumps to directories, or use ordinary cd.'
+Write-Output 'Retry skipped tools with scoop install <package>, or Install-Module PSFzf -Scope CurrentUser.'
+Write-Output 'An unchanged run_once script does not retry skipped tools. See README for bootstrap and retry commands.'
 {{ end -}}

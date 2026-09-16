@@ -135,6 +135,17 @@ export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 # fasd shortcuts
 alias fp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias v='f -e vim' # quick opening files with vim
+{{ if not .lite}}
+# Full setups prefer lsd when it is available. Lite keeps its native ls aliases.
+if command -v lsd >/dev/null 2>&1; then
+    alias ls="lsd"
+    alias l="lsd -l"
+    alias lt="lsd --tree"
+    alias la="lsd -laht"
+    alias tree="lsd --tree"
+    alias ltsh='lt -l --blocks size --blocks name'
+fi
+{{ end }}
 {{ if eq .chezmoi.os "linux" }}
 {{ if ne .chezmoi.osRelease.id "rocky" -}}
 alias o='a -e xdg-open' # quick opening files with xdg-open
@@ -145,15 +156,6 @@ if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
 fi
 
 {{ if not .lite}}
-# Keep ordinary ls available if the distro has no lsd package.
-if command -v lsd >/dev/null 2>&1; then
-    alias ls="lsd"
-    alias l="lsd -l"
-    alias lt="lsd --tree"
-    alias la="lsd -laht"
-    alias tree="lsd --tree"
-    alias ltsh='lt -l --blocks size --blocks name'
-fi
 export PATH="$PATH:/snap/bin/"
 {{ end }}
 

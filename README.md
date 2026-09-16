@@ -41,6 +41,8 @@ Lite attempts to install,
 * zoxide. Ordinary `cd` fallback if install fails.
 * Zsh on Unix with prerequisites. Zsh provides `l`, `la`, and `lt` using native `ls`.
 
+Full Ubuntu and macOS setups install lsd and use it for Zsh listing shortcuts when available. Lite uses native `ls`. Windows installs lsd in full mode but keeps PowerShell's native `ls` (`Get-ChildItem`). Rocky does not install lsd but honors an existing one.
+
 Note: lite does not upgrade the system or change the login shell. Start `zsh` after applying, or keep using your current shell if Zsh could not be installed. The managed Zsh configuration requires Zsh.
 
 macOS uses existing Homebrew and skips its bootstrap to avoid installing developer tools. Without Homebrew it still attempts standalone uv. Windows retains the PowerShell bootstrap and uses Scoop. A failed bootstrap can leave optional tools unavailable while configuration files are deployed.
