@@ -116,7 +116,8 @@ $uv = Join-Path $scoopRoot 'shims\uv.exe'
 Invoke-SetupCommand $uv @('python', 'install', '3.12')
 $python = Invoke-SetupCommand $uv @('python', 'find', '--managed-python', '3.12')
 
-# Retain an existing pipx; bootstrap a missing copy with uv's managed Python.
+# uv owns Python CLI tools. Existing non-uv commands are
+# preserved and reported so their environments can be migrated explicitly.
 $uvToolBin = Invoke-SetupCommand $uv @('tool', 'dir', '--bin')
 # Persist only the additional user tool directory, never the merged process PATH.
 $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
@@ -125,28 +126,60 @@ if ($uvToolBin -notin ($userPath -split ';')) {
     [Environment]::SetEnvironmentVariable('Path', ($userPaths -join ';'), 'User')
 }
 $env:PATH = "$uvToolBin;$env:PATH"
-if (-not (Get-Command ruff -ErrorAction SilentlyContinue)) {
-    Invoke-SetupCommand $uv @('tool', 'install', '--python', $python, 'ruff')
-}
-if (-not (Get-Command pipx -ErrorAction SilentlyContinue)) {
-    Invoke-SetupCommand $uv @('tool', 'install', '--python', $python, 'pipx')
-}
-Invoke-SetupCommand pipx @('ensurepath')
-Update-SetupPath
-$pipxBin = Invoke-SetupCommand pipx @('environment', '--value', 'PIPX_BIN_DIR')
-$env:PATH = "$uvToolBin;$pipxBin;$env:PATH"
+$uvToolNames = @(
+    Invoke-SetupCommand $uv @('tool', 'list') | ForEach-Object {
+        if ($_ -match '^(\S+) v') { $Matches[1] }
+    }
+)
 
-$pipxPkgs = @('black', 'flake8', 'mypy', 'pre-commit', 'poetry', 'pip-tools', 'mkdocs')
-$pipxState = (Invoke-SetupCommand pipx @('list', '--json')) | ConvertFrom-Json
-$installedPipx = @($pipxState.venvs.PSObject.Properties.Name)
-foreach ($pkg in $pipxPkgs) {
-    if ($pkg -notin $installedPipx) {
-        Invoke-SetupCommand pipx @('install', '--python', $python, $pkg)
+function Install-UvTool {
+    param(
+        [string]$Package,
+        [string]$Command,
+        [string[]]$With = @()
+    )
+
+    if ($Package -in $uvToolNames) {
+        Write-Output "$Package is already installed with uv; preserving its environment."
+        return
     }
-    else {
-        Write-Output "$pkg is already installed with pipx."
+
+    $existing = Get-Command $Command -CommandType Application,ExternalScript -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+    if ($existing) {
+        Write-Warning "Skipping uv tool install $Package because $Command is already provided by $($existing.Source)."
+        Write-Warning 'Record and remove the existing tool explicitly before migrating it to uv. See README.md.'
+        return
     }
+
+    $arguments = @('tool', 'install', '--python', $python)
+    foreach ($dependency in $With) { $arguments += @('--with', $dependency) }
+    $arguments += $Package
+    Invoke-SetupCommand $uv $arguments
 }
+
+Install-UvTool -Package 'ruff' -Command 'ruff'
+Install-UvTool -Package 'black' -Command 'black'
+$flake8Dependencies = @(
+    'flake8-broken-line',
+    'flake8-bugbear',
+    'flake8-builtins',
+    'flake8-docstrings',
+    'flake8-docstrings-complete',
+    'flake8-import-order',
+    'flake8-markdown',
+    'flake8-pie',
+    'flake8-scream',
+    'flake8-simplify',
+    'flake8-use-fstring',
+    'flake8-useless-assert'
+)
+Install-UvTool -Package 'flake8' -Command 'flake8' -With $flake8Dependencies
+Install-UvTool -Package 'mkdocs' -Command 'mkdocs'
+Install-UvTool -Package 'mypy' -Command 'mypy' -With @('types-requests')
+Install-UvTool -Package 'pip-tools' -Command 'pip-compile'
+Install-UvTool -Package 'poetry' -Command 'poetry'
+Install-UvTool -Package 'pre-commit' -Command 'pre-commit'
 {{ end -}}
 
 {{ if and .gui (not .lite) -}}

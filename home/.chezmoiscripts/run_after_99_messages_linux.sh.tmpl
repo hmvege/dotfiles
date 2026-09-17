@@ -5,6 +5,10 @@ export PATH="$HOME/.local/bin:$HOME/.fzf/bin:$PATH"
 {{ if eq .chezmoi.os "darwin" -}}
 {{ includeTemplate "homebrew-env.sh" . }}
 {{ end -}}
+if command -v uv >/dev/null 2>&1; then
+    uv_tool_bin="$(uv tool dir --bin)"
+    export PATH="$uv_tool_bin:$PATH"
+fi
 
 report_tool() {
     local label="$1" command="$2" executable version
@@ -37,6 +41,15 @@ report_tool ag ag
 report_tool uv uv
 report_tool zoxide zoxide
 {{ if not .lite -}}
+{{ if or (eq .chezmoi.os "darwin") (and (eq .chezmoi.os "linux") (ne .chezmoi.osRelease.id "rocky")) -}}
+report_tool black black
+report_tool flake8 flake8
+report_tool mkdocs mkdocs
+report_tool mypy mypy
+report_tool pip-compile pip-compile
+report_tool poetry poetry
+report_tool pre-commit pre-commit
+{{ end -}}
 report_tool ruff ruff
 report_available bat bat
 report_available fd fd

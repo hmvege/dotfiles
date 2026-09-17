@@ -1,42 +1,48 @@
-# Keep pipx as the owner of the existing CLI tools; uv manages Python and Ruff.
+# uv owns newly provisioned Python CLI tools. Existing non-uv commands are
+# preserved and reported so their environments can be migrated explicitly.
 export PATH="$HOME/.local/bin:$PATH"
+export UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-$HOME/.local/bin}"
 uv python install 3.12
 python_for_tools="$(uv python find --managed-python 3.12)"
 uv_tool_bin="$(uv tool dir --bin)"
 export PATH="$uv_tool_bin:$PATH"
-if ! command -v ruff >/dev/null 2>&1; then
-    uv tool install --python "$python_for_tools" ruff
-fi
-if ! command -v pipx >/dev/null 2>&1; then
-    uv tool install --python "$python_for_tools" pipx
-fi
-pipx ensurepath
-pipx_bin="$(pipx environment --value PIPX_BIN_DIR)"
-export PATH="$pipx_bin:$PATH"
+uv_tool_state="$(uv tool list)"
 
-pipx_packages=(black flake8 mkdocs mypy pip-tools poetry pre-commit)
-pipx_state="$(pipx list --json)"
-for pkg in "${pipx_packages[@]}"; do
-    if ! jq -e --arg package "$pkg" '.venvs | has($package)' <<< "$pipx_state" >/dev/null; then
-        pipx install --python "$python_for_tools" "$pkg"
-    else
-        echo "$pkg is already installed with pipx."
+install_uv_tool() {
+    local package="$1" command="$2" existing
+    shift 2
+
+    if grep -q "^${package} v" <<< "$uv_tool_state"; then
+        echo "$package is already installed with uv; preserving its environment."
+        return
     fi
-done
 
-pipx inject mypy types-requests
-flake8_packages=(
-    flake8-broken-line
-    flake8-bugbear
-    flake8-builtins
-    flake8-docstrings
-    flake8-docstrings-complete
-    flake8-import-order
-    flake8-markdown
-    flake8-pie
-    flake8-scream
-    flake8-simplify
-    flake8-use-fstring
-    flake8-useless-assert
-)
-pipx inject flake8 "${flake8_packages[@]}"
+    if existing="$(command -v "$command" 2>/dev/null)"; then
+        echo "Warning: skipping uv tool install $package because $command is already provided by $existing." >&2
+        echo "Record and remove the existing tool explicitly before migrating it to uv. See README.md." >&2
+        return
+    fi
+
+    uv tool install --python "$python_for_tools" "$@" "$package"
+}
+
+install_uv_tool ruff ruff
+install_uv_tool black black
+install_uv_tool flake8 flake8 \
+    --with flake8-broken-line \
+    --with flake8-bugbear \
+    --with flake8-builtins \
+    --with flake8-docstrings \
+    --with flake8-docstrings-complete \
+    --with flake8-import-order \
+    --with flake8-markdown \
+    --with flake8-pie \
+    --with flake8-scream \
+    --with flake8-simplify \
+    --with flake8-use-fstring \
+    --with flake8-useless-assert
+install_uv_tool mkdocs mkdocs
+install_uv_tool mypy mypy --with types-requests
+install_uv_tool pip-tools pip-compile
+install_uv_tool poetry poetry
+install_uv_tool pre-commit pre-commit

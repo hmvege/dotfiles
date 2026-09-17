@@ -130,22 +130,43 @@ and then the dotfiles can be applied again.
  - [`tmux`](https://github.com/tmux/tmux). Terminal multiplexer.
  - [`tmux-plugins`](https://github.com/tmux-plugins/tpm). Plugins for `tmux`.
  - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug). On-the-go editor.
- - [`uv`](https://docs.astral.sh/uv/). Python version and project environment manager.
+ - [`uv`](https://docs.astral.sh/uv/). Python version, project environment, and persistent CLI tool manager.
  - [`Ruff`](https://docs.astral.sh/ruff/). Python linting and formatting in full setups.
  - `zsh` and [`ohmyzsh`](https://github.com/ohmyzsh/ohmyzsh). Shell and zsh framework.
- - [`pipx`](https://pypa.github.io/pipx/). For installing pip packages in independent Python environments.
  - [`gogh`](https://gogh-co.github.io/Gogh/). Terminal colors.
  - [`zoxide`](https://github.com/ajeetdsouza/zoxide). Better change directory `cd`.
 
 ### Python environments
 
-Full setups install Python 3.12 through uv. Ubuntu, macOS, and Windows retain pipx for CLI tools, while Rocky installs uv, Python, and Ruff without the broader pipx suite. Lite setups install uv and leave Python downloads until needed. Existing pyenv environments and Python installations are preserved, but the managed shell no longer initializes pyenv.
+Full setups install Python 3.12 through uv. Ubuntu, macOS, and Windows use persistent uv tool environments for the Python CLI suite, while Rocky installs only uv, Python, and Ruff. Lite setups install uv and leave Python downloads until needed. Existing pyenv environments, pipx environments, and Python installations are preserved, but new setup no longer provisions pyenv or pipx.
 
 For a project, run `uv venv --python 3.12`, then `uv pip install -r requirements.txt` if it has a requirements file. Activate with `source .venv/bin/activate` (Zsh) or `.\.venv\Scripts\Activate.ps1` (PowerShell). uv does not replace the system `python` command.
 
+### Persistent and occasional Python tools
+
+Full Ubuntu, macOS, and Windows setups persistently install Ruff, Black, Flake8, MkDocs, mypy, pip-tools, Poetry, and pre-commit with `uv tool install`. Flake8 retains the configured plugin set through repeated `--with` options, and mypy includes `types-requests`. The executable directory reported by `uv tool dir --bin` is placed on PATH. 
+
+Setup preserves an existing uv tool environment. If a command is instead supplied by pipx or another installation, setup reports its path and skips that tool rather than overwriting or shadowing it. To migrate a pipx tool, first record its version and injected dependencies with `pipx list --json` and `pipx runpip <tool> freeze`, then run `pipx uninstall <tool>`. Reapply the dotfiles or install the corresponding uv tool explicitly `uv tool install --python 3.12 <tool>`.
+
+To install with additional plugins for mypy, run:
+```sh
+uv tool install --python 3.12 --with types-requests mypy
+```
+
+Flake8 has quite a few plugins. To install them, run:
+```sh
+uv tool install --python 3.12 \
+  --with flake8-broken-line --with flake8-bugbear \
+  --with flake8-builtins --with flake8-docstrings \
+  --with flake8-docstrings-complete --with flake8-import-order \
+  --with flake8-markdown --with flake8-pie --with flake8-scream \
+  --with flake8-simplify --with flake8-use-fstring \
+  --with flake8-useless-assert flake8
+```
+
 ### Python linting and formatting
 
-Full setups install missing Ruff with `uv tool install` using managed Python 3.12. An existing Ruff on PATH is retained. Black, Flake8, and mypy remain available through pipx on Ubuntu, macOS, and Windows. Lite skips this tooling.
+Full setups install missing Ruff with `uv tool install` using managed Python 3.12. Existing uv tool environments and conflicting commands are retained. Black, Flake8, and mypy are also persistent uv tools on Ubuntu, macOS, and Windows. Lite skips this tooling.
 
 The Linux and macOS VSCode and Sublime settings default to Ruff linting and formatting on save, with a 79-character fallback. Project `pyproject.toml`, `ruff.toml`, or `.ruff.toml` settings take precedence. The editor fallback selects `E`, `F`, `W`, and `C90`, retaining the old VSCode rule families and `E203` exclusion. Note, Ruff has no `W503` rule. This does not reproduce every Sublime Flake8 plugin check: those settings and tools remain available, with automatic Flake8 linting disabled. Mypy remains enabled separately, and Sublime Black remains available for manual use.
 

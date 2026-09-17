@@ -1,5 +1,6 @@
-# User-installed uv, Python executables, and pipx applications.
-export PATH="$HOME/.local/bin:$PATH"
+# User-installed uv, Python executables, and persistent uv tools.
+export UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-$HOME/.local/bin}"
+export PATH="$UV_TOOL_BIN_DIR:$HOME/.local/bin:$PATH"
 {{ if eq .chezmoi.os "darwin" -}}
 {{ includeTemplate "homebrew-env.sh" . }}
 {{ end -}}
