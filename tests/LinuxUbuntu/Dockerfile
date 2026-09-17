@@ -1,5 +1,5 @@
-# Use a build argument to choose the Ubuntu version (default: 20.04)
-ARG UBUNTU_VERSION=20.04
+# Use a build argument to choose the Ubuntu version (default: 24.04)
+ARG UBUNTU_VERSION=24.04
 FROM ubuntu:${UBUNTU_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -23,16 +23,8 @@ USER developer
 WORKDIR /home/developer
 ENV HOME=/home/developer
 
-# Determine Ubuntu version and install correct Chezmoi version into $HOME/.local/bin
-# Ubuntu 20.04 and previously require an older Chezmoi version in order to work
-# due to missing GLIBC library.
-RUN UBUNTU_VERSION=$(awk -F= '/^VERSION_ID/ { print $2 }' /etc/os-release | tr -d '"') && \
-    if [ "$(echo "$UBUNTU_VERSION" | cut -d. -f1)" -ge 22 ]; then \
-    CHEZMOI_VERSION="latest"; \
-    else \
-    CHEZMOI_VERSION="v2.49.1"; \
-    fi && \
-    cd $HOME && sh -c "$(curl -fsLS get.chezmoi.io)" -- -t "$CHEZMOI_VERSION" -b "$HOME/.local/bin/"
+# Install Chezmoi into $HOME/.local/bin
+RUN cd "$HOME" && sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/"
 
 # Update PATH so Chezmoi is found
 ENV PATH=$HOME/.local/bin:$PATH

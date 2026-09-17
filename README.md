@@ -12,9 +12,9 @@ The goal for this dotfiles project repository, is following,
 * Have the setup **install packages automatically**.
 * Have a **cross-platform** dotfiles setup, working for
    * MacOS
-   * Ubuntu 20.04
    * Ubuntu 22.04
    * Ubuntu 24.04
+   * Ubuntu 26.04
    * Rocky8
    * WSL 2
    * Windows 11
@@ -57,7 +57,7 @@ Skipped tools are not automatically retried by an unchanged run_once script. Ret
 | Windows | `scoop install fzf ag uv zoxide` |
 
 ### :penguin: Linux
-Ubuntu targets are 22.04, 24.04, and 26.04. Ubuntu 20.04 is deprecated but retained for migration. Runtime validation is pending.
+Ubuntu targets are 22.04, 24.04, and 26.04. Ubuntu 20.04 is unsupported. Runtime validation is pending.
 
 Install Chezmoi and initialize, ensure `curl` and `sudo` is installed,
 ```bash
@@ -250,7 +250,7 @@ To manually test that the dotfiles work as intended, you can use the Dockerfiles
 Build docker image as,
 ```bash
 docker build \
- --build-arg UBUNTU_VERSION=22.04 \
+ --build-arg UBUNTU_VERSION=24.04 \
  --build-arg GIT_BRANCH=master \
  -f tests/LinuxUbuntu/Dockerfile \
  -t dotfiles-ubuntu-img --progress=plain . 
