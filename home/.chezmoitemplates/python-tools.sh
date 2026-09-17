@@ -2,8 +2,6 @@
 # preserved and reported so their environments can be migrated explicitly.
 export PATH="$HOME/.local/bin:$PATH"
 export UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-$HOME/.local/bin}"
-uv python install 3.12
-python_for_tools="$(uv python find --managed-python 3.12)"
 uv_tool_bin="$(uv tool dir --bin)"
 export PATH="$uv_tool_bin:$PATH"
 uv_tool_state="$(uv tool list)"
@@ -23,7 +21,7 @@ install_uv_tool() {
         return
     fi
 
-    uv tool install --python "$python_for_tools" "$@" "$package"
+    uv tool install --managed-python "$@" "$package"
 }
 
 install_uv_tool ruff ruff

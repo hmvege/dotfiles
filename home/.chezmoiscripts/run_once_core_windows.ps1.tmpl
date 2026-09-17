@@ -111,10 +111,9 @@ if (Test-Path -LiteralPath (Join-Path $scoopRoot 'apps\psfzf\current\install.jso
     Invoke-SetupCommand scoop @('uninstall', 'psfzf')
 }
 
-# Scoop owns uv; no separate Scoop Python is needed for new installations.
+# Scoop owns uv. Tool environments use a compatible uv-managed Python without
+# setting a user-global Python version.
 $uv = Join-Path $scoopRoot 'shims\uv.exe'
-Invoke-SetupCommand $uv @('python', 'install', '3.12')
-$python = Invoke-SetupCommand $uv @('python', 'find', '--managed-python', '3.12')
 
 # uv owns Python CLI tools. Existing non-uv commands are
 # preserved and reported so their environments can be migrated explicitly.
@@ -152,7 +151,7 @@ function Install-UvTool {
         return
     }
 
-    $arguments = @('tool', 'install', '--python', $python)
+    $arguments = @('tool', 'install', '--managed-python')
     foreach ($dependency in $With) { $arguments += @('--with', $dependency) }
     $arguments += $Package
     Invoke-SetupCommand $uv $arguments
