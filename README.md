@@ -144,7 +144,7 @@ Run `uv venv` or `uv sync` in a project. Activate with `source .venv/bin/activat
 
 ### Persistent and occasional Python tools
 
-Full Ubuntu, macOS, and Windows setups install Ruff, Black, Flake8, MkDocs, mypy, pip-tools, Poetry, and pre-commit with `uv tool install --managed-python`. Rocky installs only Ruff. Lite skips Python tools.
+Full Ubuntu, macOS, and Windows setups install Ruff, Black, Flake8, MkDocs, mypy, pip-tools, and pre-commit with `uv tool install --managed-python`. Rocky installs only Ruff. Lite skips Python tools.
 
 Existing uv tool environments are preserved. Inspect their interpreters with `uv tool list --show-python`. Conflicting pipx or other commands are reported and skipped. Before migrating a pipx tool, record `pipx list --json` and `pipx runpip <tool> freeze`, then uninstall it and reapply or run `uv tool install --managed-python <tool>`.
 

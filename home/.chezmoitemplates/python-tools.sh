@@ -42,5 +42,4 @@ install_uv_tool flake8 flake8 \
 install_uv_tool mkdocs mkdocs
 install_uv_tool mypy mypy --with types-requests
 install_uv_tool pip-tools pip-compile
-install_uv_tool poetry poetry
 install_uv_tool pre-commit pre-commit
