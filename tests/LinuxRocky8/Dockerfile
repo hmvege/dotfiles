@@ -1,32 +1,25 @@
-# Use Rocky 8 as the base image
+# syntax=docker/dockerfile:1
 FROM rockylinux:8
 
-# Update and install necessary packages (curl, sudo, git)
-RUN dnf -y update && \
-    dnf -y install curl sudo git && \
+# Prepare the base system only. Dotfiles are initialized and applied at runtime.
+RUN dnf -y install ca-certificates curl git sudo && \
     dnf clean all
 
-# Create a non-root user for testing (optional, but recommended)
-RUN useradd -ms /bin/bash developer && \
-    echo "developer ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN groupadd --gid 1010 developer && \
+    useradd --create-home --shell /bin/bash --uid 1010 --gid 1010 developer && \
+    printf 'developer ALL=(ALL) NOPASSWD:ALL\n' > /etc/sudoers.d/developer && \
+    chmod 0440 /etc/sudoers.d/developer
+
+# Rocky stays on the compatibility version used by the existing setup.
+RUN sh -c "$(curl -fsLS https://get.chezmoi.io)" -- \
+    -t v2.49.1 -b /usr/local/bin
+
+COPY .chezmoiroot /dotfiles/.chezmoiroot
+COPY home/ /dotfiles/home/
+RUN chmod -R a+rX /dotfiles
 
 USER developer
 WORKDIR /home/developer
 ENV HOME=/home/developer
 
-# Install Chezmoi into $HOME/.local/bin
-RUN sh -c "$(curl -fsLS get.chezmoi.io)" -- -t v2.49.1 -b "$HOME/.local/bin/"
-
-# Update PATH so Chezmoi is found
-ENV PATH=$HOME/.local/bin:$PATH
-
-# Initialize and apply the dotfiles using Chezmoi
-ARG GIT_BRANCH=master
-RUN cd $HOME && chezmoi init \
-    --promptString "Enter GitHub mail for this machine=testmail@example.com" \
-    --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
-    --promptBool "Install GUI tools (y/n)=n" \
-    --branch "$GIT_BRANCH" hmvege
-
-# Set default command to an interactive shell
 CMD ["/bin/bash"]

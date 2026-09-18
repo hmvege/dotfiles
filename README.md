@@ -244,92 +244,9 @@ Ubuntu enables Gogh in full GUI mode, including WSL with GNOME Terminal and a gr
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
 
 ## :alembic: Testing
-To manually test that the dotfiles work as intended, you can use the Dockerfiles found in `tests`.
+Pull requests run template, syntax, whitespace, and workflow smoke checks without installing packages. Pushes to `master` run Linux, macOS, and WSL2 installation coverage. Windows installation runs only by manual workflow dispatch. Ubuntu GUI desktop behavior is accepted manually on 22.04, 24.04, and 26.04.
 
-### :penguin: Linux: Ubuntu
-Build docker image as,
-```bash
-docker build \
- --build-arg UBUNTU_VERSION=24.04 \
- --build-arg GIT_BRANCH=master \
- -f tests/LinuxUbuntu/Dockerfile \
- -t dotfiles-ubuntu-img --progress=plain . 
-```
-You can then enter the image and run the dotfiles as,
-```bash
-docker run -it -d --name ubuntu-dotfiles-test-1 dotfiles-ubuntu-img:latest
-docker exec -it ubuntu-dotfiles-test-1 bash
-```
-Once inside, 
-```bash
-chezmoi update -n # To ensure the latest changes are picked up
-chezmoi apply # To start installing dotfiles
-```
-
-To clean up, run
-```bash
-docker stop ubuntu-dotfiles-test-1 && docker rm ubuntu-dotfiles-test-1
-```
-
-### :penguin: Linux: Rocky 8
-Build docker image as,
-```bash
-docker build \
- --build-arg GIT_BRANCH=master \
- -f tests/LinuxRocky8/Dockerfile \
- -t dotfiles-rocky-test --progress=plain . 
-```
-You can then enter the image and run the dotfiles as,
-```bash
-docker run -it -d --name rocky-dotfiles-test-1 dotfiles-rocky-test:latest bash
-docker exec -it rocky-dotfiles-test-1 bash
-```
-Once inside, 
-```bash
-chezmoi --version || echo "Chezmoi is missing!"
-chezmoi update -n # To ensure the latest changes are picked up
-chezmoi apply # To start installing dotfiles
-```
-
-To clean up, run
-```bash
-docker stop rocky-dotfiles-test-1 && docker rm rocky-dotfiles-test-1
-docker rmi dotfiles-rocky-test
-```
-
-This also runs as a GitHub actions pipeline.
-
-### :window: Windows
-To test on windows, you can run and test in [Sandbox mode](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/). The config file can be something like,
-```
-<Configuration>
-  <MemoryInMB>8192</MemoryInMB>
-  <ProcessorCount>8</ProcessorCount>
-  <VGpu>Enable</VGpu>
-
-  <LogonCommand>
-    <Command>powershell.exe -ExecutionPolicy Bypass -NoLogo -NoExit</Command>
-  </LogonCommand>
-</Configuration>
-```
-The registry preparation below requires an administrator session. Run the Chezmoi bootstrap separately in a non-administrator session for the user being configured. The Windows setup only elevates its MSI helper. A Sandbox session running as administrator must switch to a non-elevated user before applying the dotfiles.
-
-```powershell
-# For faster downloading and installing
-Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -Name 'VerifiedAndReputablePolicyState' -Value 0
-& "$env:windir\System32\CiTool.exe" -r
-```
-
-Then, in the non-administrator session:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force
-iex "& { $(irm 'https://get.chezmoi.io/ps1') } -b '~/bin' -- init --branch <branch-to-test> --apply hmvege"
-```
-The Windows workflow job is currently disabled (`if: false`). Windows installation requires manual validation.
-
-### :green_apple: MacOS
-The pipeline will run tests on the MacOS setup.
+See [Dotfiles testing](docs/dotfiles-testing.md) for the matrix, local commands, repeat-apply policy, failure logs, and manual VMware/Windows/WSLg/macOS checklists.
 
 ## :question: Troubleshooting
 

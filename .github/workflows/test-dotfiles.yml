@@ -2,122 +2,549 @@ name: Test Dotfiles Installation
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
-    branches:
-      - master
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  test-linux-dotfiles:
-    runs-on: ubuntu-latest
+  smoke-unix:
+    if: github.event_name == 'pull_request'
     strategy:
+      fail-fast: false
       matrix:
-        include:
-            - os: ubuntu22-04
-              ubuntu_version: "22.04"
-              dockerfile_path: "LinuxUbuntu"
-              lite: "false"
-            - os: ubuntu24-04
-              ubuntu_version: "24.04"
-              dockerfile_path: "LinuxUbuntu"
-              lite: "false"
-            - os: ubuntu26-04
-              ubuntu_version: "26.04"
-              dockerfile_path: "LinuxUbuntu"
-              lite: "false"
-            - os: rocky8
-              ubuntu_version: "8"
-              dockerfile_path: "LinuxRocky8"
-              lite: "false"
-            # Lite install tests
-            - os: ubuntu22-04-lite
-              ubuntu_version: "22.04"
-              dockerfile_path: "LinuxUbuntu"
-              lite: "true"
-            - os: ubuntu24-04-lite
-              ubuntu_version: "24.04"
-              dockerfile_path: "LinuxUbuntu"
-              lite: "true"
-            - os: ubuntu26-04-lite
-              ubuntu_version: "26.04"
-              dockerfile_path: "LinuxUbuntu"
-              lite: "true"
-              
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Build Docker Image for ${{ matrix.os }}
-        run: |
-          docker build \
-            --build-arg UBUNTU_VERSION=${{ matrix.ubuntu_version }} \
-            --build-arg GIT_BRANCH=${{ github.head_ref }} \
-            --build-arg LITE=${{ matrix.lite }} \
-            -t dotfiles-test-image-${{ matrix.os }} \
-            -f tests/${{ matrix.dockerfile_path }}/Dockerfile .
-
-      - name: Installing dotfiles and verifying successful installation
-        run: |
-          docker run --rm dotfiles-test-image-${{ matrix.os }} \
-            bash -c "chezmoi apply && echo 'SUCCESSFUL INSTALL' || (echo 'INSTALL FAILED'; exit 1)"
-
-      - name: Idempotency Check
-        run: |
-          docker run --rm dotfiles-test-image-${{ matrix.os }} \
-            bash -c "chezmoi apply -n | tee diff.txt && \
-              if [ -s diff.txt ]; then echo 'Not idempotent!'; cat diff.txt; exit 1; else echo 'Idempotent'; fi"
-    
-
-  test-macos-dotfiles:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install ChezMoi & Apply Dotfiles
-        run: |
-          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init -S ~/dotfiles \
-            --promptString "Enter GitHub mail for this machine=testmail@example.com" \
-            --promptBool "Do you want a minimal (lite) setup (y/n)=n" \
-            --promptBool "Install GUI tools (y/n)=n" \
-            --apply \
-            --branch "${{ github.head_ref }}" \
-            hmvege
-
-      - name: Idempotency Check
-        run: |
-          chezmoi -S "$HOME/.local/bin" apply -n | tee diff.txt
-          if [ -s diff.txt ]; then echo "Not idempotent"; cat diff.txt; exit 1; else echo "Idempotent"; fi
-
-
-  test-windows-dotfiles:
-    runs-on: windows-latest
-    # NOTE: disabled windows test due to scoop Get-FileHash bug in powershell.
-    # May at some point enable after having switched to chocolatey or winget.
-    if: false
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: MinoruSekine/setup-scoop@v4.0.1
+        with:
+          fetch-depth: 0
 
-      - name: Install Chezmoi
-        run: iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$env:RUNNER_TEMP/bin'"
+      - name: Check changed-file whitespace
+        run: git diff --check "${{ github.event.pull_request.base.sha }}...HEAD"
 
-      - name: Apply Dotfiles
+      - name: Install Chezmoi test binary
         run: |
-            & "$env:RUNNER_TEMP/bin/chezmoi.exe" init -S "$PWD" `
-            --promptString "Enter GitHub mail for this machine=testmail@example.com" `
-            --promptBool "Do you want a minimal (lite) setup (y/n)=n" `
-            --promptBool "Install GUI tools (y/n)=n" `
-            --apply hmvege --branch "${{ github.head_ref }}"
+          mkdir -p "$RUNNER_TEMP/bin"
+          sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b "$RUNNER_TEMP/bin"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
 
-      - name: Idempotency Check
+      - name: Render templates and check shell syntax
+        run: bash tests/smoke-unix.sh
+
+  smoke-windows:
+    if: github.event_name == 'pull_request'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check changed-file whitespace
+        shell: bash
+        run: git diff --check "${{ github.event.pull_request.base.sha }}...HEAD"
+
+      - name: Install Chezmoi test binary
+        shell: pwsh
         run: |
-          $env:RUNNER_TEMP/bin/chezmoi.exe apply -n | Tee-Object diff.txt
-          if ((Get-Content diff.txt).Length -ne 0) {
-            Write-Output "Not idempotent!"
-            Get-Content diff.txt
-            exit 1
-          } else {
-            Write-Output "Idempotent"
+          New-Item -ItemType Directory -Force -Path "$env:RUNNER_TEMP\bin" | Out-Null
+          iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$env:RUNNER_TEMP\bin'"
+          "$env:RUNNER_TEMP\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Render templates and check PowerShell syntax
+        shell: pwsh
+        run: ./tests/smoke-windows.ps1
+
+  validate-workflow:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate GitHub Actions workflow YAML
+        uses: docker://rhysd/actionlint:1.7.7
+
+  linux:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ubuntu-22.04-lite
+            family: ubuntu
+            version: "22.04"
+            dockerfile: LinuxUbuntu
+            mode: lite
+            lite: "true"
+            gui: "false"
+          - name: ubuntu-22.04-full-cli
+            family: ubuntu
+            version: "22.04"
+            dockerfile: LinuxUbuntu
+            mode: full-cli
+            lite: "false"
+            gui: "false"
+          - name: ubuntu-24.04-lite
+            family: ubuntu
+            version: "24.04"
+            dockerfile: LinuxUbuntu
+            mode: lite
+            lite: "true"
+            gui: "false"
+          - name: ubuntu-24.04-full-cli
+            family: ubuntu
+            version: "24.04"
+            dockerfile: LinuxUbuntu
+            mode: full-cli
+            lite: "false"
+            gui: "false"
+          - name: ubuntu-26.04-lite
+            family: ubuntu
+            version: "26.04"
+            dockerfile: LinuxUbuntu
+            mode: lite
+            lite: "true"
+            gui: "false"
+          - name: ubuntu-26.04-full-cli
+            family: ubuntu
+            version: "26.04"
+            dockerfile: LinuxUbuntu
+            mode: full-cli
+            lite: "false"
+            gui: "false"
+          - name: rocky-8-lite
+            family: rocky
+            version: "8"
+            dockerfile: LinuxRocky8
+            mode: lite
+            lite: "true"
+            gui: "false"
+          - name: rocky-8-full-cli
+            family: rocky
+            version: "8"
+            dockerfile: LinuxRocky8
+            mode: full-cli
+            lite: "false"
+            gui: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build ${{ matrix.name }} image
+        run: |
+          docker build \
+            --build-arg UBUNTU_VERSION=${{ matrix.version }} \
+            --tag dotfiles-${{ matrix.name }} \
+            --file tests/${{ matrix.dockerfile }}/Dockerfile .
+
+      - name: Apply twice and verify ${{ matrix.name }}
+        env:
+          CASE_NAME: ${{ matrix.name }}
+          LITE: ${{ matrix.lite }}
+          GUI: ${{ matrix.gui }}
+          MODE: ${{ matrix.mode }}
+        run: |
+          set -o pipefail
+          container="dotfiles-${CASE_NAME}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker run --name "$container" \
+            --env DOTFILES_INSTALL_LOG=/tmp/install.log \
+            --env LITE --env GUI --env MODE \
+            --volume "$GITHUB_WORKSPACE/tests:/tests:ro" \
+            "dotfiles-${CASE_NAME}" bash -lc '
+              set -euo pipefail
+              # Chezmoi creates Git metadata. Give each disposable user a writable copy.
+              cp -R /dotfiles "$HOME/dotfiles"
+              chezmoi init -S "$HOME/dotfiles" \
+                --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+                --promptBool "Do you want a minimal (lite) setup (y/n)=$LITE" \
+                --promptBool "Install GUI tools (y/n)=$GUI" \
+                --apply 2>&1 | tee "$DOTFILES_INSTALL_LOG"
+              bash /tests/verify-unix.sh "$MODE"
+              # Rerun run_once scripts without resetting config or installed files.
+              chezmoi -S "$HOME/dotfiles" state delete-bucket --bucket=scriptState
+              chezmoi -S "$HOME/dotfiles" apply 2>&1 | tee -a "$DOTFILES_INSTALL_LOG"
+              bash /tests/verify-unix.sh "$MODE"
+              # run_after scripts always appear pending. Verify deployed files.
+              chezmoi -S "$HOME/dotfiles" verify --exclude=scripts
+            ' 2>&1 | tee "$RUNNER_TEMP/${CASE_NAME}.log"
+
+      - name: Remove test container
+        if: always()
+        run: |
+          container="dotfiles-${{ matrix.name }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker rm -f "$container" 2>/dev/null || true
+
+      - name: Upload failed installation log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log-${{ matrix.name }}
+          path: ${{ runner.temp }}/${{ matrix.name }}.log
+          if-no-files-found: warn
+
+  linux-edge-cases:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: root-no-sudo
+            user: root
+            home: /root
+          - name: unprivileged-no-sudo
+            user: nosudo
+            home: /home/nosudo
+          - name: optional-package-failure
+            user: root
+            home: /root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Ubuntu 24.04 edge-case image
+        run: |
+          docker build --build-arg UBUNTU_VERSION=24.04 \
+            --tag dotfiles-edge-${{ matrix.name }} \
+            --file tests/LinuxUbuntu/Dockerfile .
+
+      - name: Verify an existing non-uv command is preserved
+        if: matrix.name == 'optional-package-failure'
+        run: |
+          docker run --rm --volume "$GITHUB_WORKSPACE:/repo:ro" \
+            dotfiles-edge-${{ matrix.name }} \
+            bash /repo/tests/test-python-tool-conflict.sh
+
+      - name: Exercise ${{ matrix.name }}
+        env:
+          EDGE_CASE: ${{ matrix.name }}
+          TEST_HOME: ${{ matrix.home }}
+        run: |
+          set -o pipefail
+          container="dotfiles-edge-${EDGE_CASE}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker run --name "$container" --user "${{ matrix.user }}" \
+            --workdir "$TEST_HOME" \
+            --env HOME="$TEST_HOME" --env USER="${{ matrix.user }}" \
+            --env EDGE_CASE \
+            --volume "$GITHUB_WORKSPACE/tests:/tests:ro" \
+            "dotfiles-edge-${EDGE_CASE}" bash -lc '
+              set -euo pipefail
+              verification_args=()
+              if [ "$EDGE_CASE" = root-no-sudo ]; then
+                mv /usr/bin/sudo /usr/bin/sudo.disabled
+                ! command -v sudo
+              elif [ "$EDGE_CASE" = optional-package-failure ]; then
+                mkdir -p /tmp/mockbin
+                printf "#!/bin/sh\necho mocked apt-get failure >&2\nexit 1\n" > /tmp/mockbin/apt-get
+                chmod +x /tmp/mockbin/apt-get
+                export PATH="/tmp/mockbin:$PATH"
+              else
+                # Confirm this is really the no-passwordless-sudo case.
+                if sudo -n true 2>/dev/null; then
+                  echo "Unexpected sudo access" >&2
+                  exit 1
+                fi
+              fi
+              # These two cases test configuration despite missing optional tools.
+              # The normal lite matrix and root case still require every tool.
+              if [ "$EDGE_CASE" != root-no-sudo ]; then
+                verification_args=(--configuration-only)
+              fi
+              log=/tmp/install.log
+              cp -R /dotfiles "$HOME/dotfiles"
+              chezmoi init -S "$HOME/dotfiles" \
+                --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+                --promptBool "Do you want a minimal (lite) setup (y/n)=true" \
+                --promptBool "Install GUI tools (y/n)=false" \
+                --apply 2>&1 | tee "$log"
+              if [ "$EDGE_CASE" = optional-package-failure ]; then
+                grep -Fq "mocked apt-get failure" "$log"
+                grep -Fq "Continuing lite setup" "$log"
+              fi
+              bash /tests/verify-unix.sh lite "${verification_args[@]}"
+              chezmoi -S "$HOME/dotfiles" state delete-bucket --bucket=scriptState
+              chezmoi -S "$HOME/dotfiles" apply 2>&1 | tee -a "$log"
+              bash /tests/verify-unix.sh lite "${verification_args[@]}"
+              chezmoi -S "$HOME/dotfiles" verify --exclude=scripts
+            ' 2>&1 | tee "$RUNNER_TEMP/${EDGE_CASE}.log"
+
+      - name: Remove test container
+        if: always()
+        run: |
+          container="dotfiles-edge-${{ matrix.name }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker rm -f "$container" 2>/dev/null || true
+
+      - name: Upload failed installation log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log-edge-${{ matrix.name }}
+          path: ${{ runner.temp }}/${{ matrix.name }}.log
+          if-no-files-found: warn
+
+  macos:
+    if: github.event_name != 'pull_request'
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: lite
+            lite: "true"
+            gui: "false"
+          - mode: full-cli
+            lite: "false"
+            gui: "false"
+          - mode: full-gui
+            lite: "false"
+            gui: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Chezmoi test binary
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b "$RUNNER_TEMP/bin"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Apply twice and verify macOS ${{ matrix.mode }}
+        env:
+          LITE: ${{ matrix.lite }}
+          GUI: ${{ matrix.gui }}
+          MODE: ${{ matrix.mode }}
+          DOTFILES_INSTALL_LOG: ${{ runner.temp }}/macos-${{ matrix.mode }}.log
+        run: |
+          set -o pipefail
+          # Capture verifier and state-reset errors as well as installation output.
+          exec > >(tee "$DOTFILES_INSTALL_LOG") 2>&1
+          chezmoi init -S "$GITHUB_WORKSPACE" \
+            --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+            --promptBool "Do you want a minimal (lite) setup (y/n)=$LITE" \
+            --promptBool "Install GUI tools (y/n)=$GUI" \
+            --apply
+          bash tests/verify-unix.sh "$MODE"
+          chezmoi -S "$GITHUB_WORKSPACE" state delete-bucket --bucket=scriptState
+          chezmoi -S "$GITHUB_WORKSPACE" apply
+          bash tests/verify-unix.sh "$MODE"
+          chezmoi -S "$GITHUB_WORKSPACE" verify --exclude=scripts
+
+      - name: Upload failed installation log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log-macos-${{ matrix.mode }}
+          path: ${{ runner.temp }}/macos-${{ matrix.mode }}.log
+          if-no-files-found: warn
+
+  windows:
+    # Installation uses a temporary standard-user logon. Keep it opt-in because
+    # Windows hosted-runner minutes cost more than Linux runner minutes.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: lite
+            lite: "true"
+            gui: "false"
+          - mode: full-cli
+            lite: "false"
+            gui: "false"
+          - mode: full-gui
+            lite: "false"
+            gui: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply as a temporary standard user
+        shell: pwsh
+        env:
+          MODE: ${{ matrix.mode }}
+          LITE: ${{ matrix.lite }}
+          GUI: ${{ matrix.gui }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $user = 'dotfiles-ci'
+          $passwordText = 'Df!' + [guid]::NewGuid().ToString('N')
+          $password = ConvertTo-SecureString $passwordText -AsPlainText -Force
+          New-LocalUser -Name $user -Password $password -PasswordNeverExpires | Out-Null
+
+          $logDir = 'C:\dotfiles-ci-logs'
+          New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+          icacls $env:GITHUB_WORKSPACE /grant "${env:COMPUTERNAME}\${user}:(OI)(CI)RX" /T | Out-Null
+          icacls $logDir /grant "${env:COMPUTERNAME}\${user}:(OI)(CI)M" /T | Out-Null
+
+          $caseScript = Join-Path $logDir 'run-case.ps1'
+          @'
+          param([string]$Mode, [string]$Lite, [string]$Gui, [string]$Source, [string]$Log)
+          $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path $Log -Force
+          try {
+              # Own the source copy so Chezmoi can initialize Git metadata.
+              $checkout = Join-Path $HOME 'dotfiles'
+              New-Item -ItemType Directory -Path $checkout | Out-Null
+              Copy-Item (Join-Path $Source '.chezmoiroot') $checkout
+              Copy-Item (Join-Path $Source 'home') $checkout -Recurse
+              Copy-Item (Join-Path $Source 'tests') $checkout -Recurse
+              $Source = $checkout
+              $bin = Join-Path $HOME 'bin'
+              New-Item -ItemType Directory -Force -Path $bin | Out-Null
+              iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$bin'"
+              $chezmoi = Join-Path $bin 'chezmoi.exe'
+              & $chezmoi init -S $Source `
+                  --promptString 'Enter GitHub mail for this machine=testmail@example.com' `
+                  --promptBool "Do you want a minimal (lite) setup (y/n)=$Lite" `
+                  --promptBool "Install GUI tools (y/n)=$Gui" --apply
+              if ($LASTEXITCODE -ne 0) { throw 'First Chezmoi apply failed' }
+              & pwsh -NoLogo -NoProfile -File (Join-Path $Source 'tests\verify-windows.ps1') -Mode $Mode
+              if ($LASTEXITCODE -ne 0) { throw 'First verification failed' }
+              & $chezmoi -S $Source state delete-bucket --bucket=scriptState
+              if ($LASTEXITCODE -ne 0) { throw 'Run-once state reset failed' }
+              & $chezmoi -S $Source apply
+              if ($LASTEXITCODE -ne 0) { throw 'Second Chezmoi apply failed' }
+              & pwsh -NoLogo -NoProfile -File (Join-Path $Source 'tests\verify-windows.ps1') -Mode $Mode
+              if ($LASTEXITCODE -ne 0) { throw 'Second verification failed' }
+              & $chezmoi -S $Source verify --exclude=scripts
+              if ($LASTEXITCODE -ne 0) { throw 'Chezmoi verify failed' }
           }
+          finally {
+              Stop-Transcript -ErrorAction SilentlyContinue
+          }
+          '@ | Set-Content -LiteralPath $caseScript
+
+          $taskName = "dotfiles-ci-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          $log = Join-Path $logDir "windows-$env:MODE.log"
+          $arguments = @(
+              '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
+              '-File', "`"$caseScript`"", '-Mode', $env:MODE, '-Lite', $env:LITE,
+              '-Gui', $env:GUI, '-Source', "`"$env:GITHUB_WORKSPACE`"", '-Log', "`"$log`""
+          ) -join ' '
+          # Task Scheduler supplies a real standard-user logon and user profile.
+          # RunLevel Limited preserves the production non-admin safeguard.
+          $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $arguments
+          Register-ScheduledTask -TaskName $taskName -Action $action `
+              -User "$env:COMPUTERNAME\$user" -Password $passwordText -RunLevel Limited -Force | Out-Null
+          Start-ScheduledTask -TaskName $taskName
+          $deadline = (Get-Date).AddMinutes(45)
+          do {
+              Start-Sleep -Seconds 5
+              $task = Get-ScheduledTask -TaskName $taskName
+              if ((Get-Date) -gt $deadline) {
+                  Stop-ScheduledTask -TaskName $taskName
+                  throw 'Standard-user installation exceeded 45 minutes'
+              }
+          } while ($task.State -eq 'Running')
+          $result = (Get-ScheduledTaskInfo -TaskName $taskName).LastTaskResult
+          if ($result -ne 0) {
+              if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log }
+              throw "Standard-user task failed with exit code $result"
+          }
+
+      - name: Clean up temporary Windows user
+        if: always()
+        shell: pwsh
+        run: |
+          Get-ScheduledTask -TaskName "dotfiles-ci-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT" `
+            -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
+          Remove-LocalUser -Name 'dotfiles-ci' -ErrorAction SilentlyContinue
+
+      - name: Upload failed installation log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log-windows-${{ matrix.mode }}
+          path: C:/dotfiles-ci-logs/windows-${{ matrix.mode }}.log
+          if-no-files-found: warn
+
+  wsl:
+    if: github.event_name != 'pull_request'
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: lite
+            lite: "true"
+          - mode: full-cli
+            lite: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Import Ubuntu 24.04 and run ${{ matrix.mode }}
+        shell: pwsh
+        env:
+          MODE: ${{ matrix.mode }}
+          LITE: ${{ matrix.lite }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $distro = "dotfiles-$env:MODE-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          $installDir = Join-Path $env:RUNNER_TEMP $distro
+          $rootfs = Join-Path $env:RUNNER_TEMP 'ubuntu-noble-wsl.rootfs.tar.gz'
+          Invoke-WebRequest `
+            -Uri 'https://cloud-images.ubuntu.com/wsl/releases/noble/current/ubuntu-noble-wsl-amd64-wsl.rootfs.tar.gz' `
+            -OutFile $rootfs
+          wsl --import $distro $installDir $rootfs --version 2
+          if ($LASTEXITCODE -ne 0) { throw 'WSL import failed' }
+
+          $wslWorkspace = (& wsl -d $distro -u root -- wslpath -a $env:GITHUB_WORKSPACE).Trim()
+          & wsl -d $distro -u root -- bash -lc "
+            set -e
+            mkdir -p /dotfiles
+            cp -a '$wslWorkspace/.' /dotfiles/
+            apt-get update
+            apt-get install -y ca-certificates curl git sudo
+            useradd --create-home --shell /bin/bash developer
+            echo 'developer ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/developer
+            chmod 0440 /etc/sudoers.d/developer
+            chown -R developer:developer /home/developer /dotfiles
+          " 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\wsl-$env:MODE.log"
+          if ($LASTEXITCODE -ne 0) { throw 'WSL preparation failed' }
+
+          # Keep Bash literal. Pass the two mode values as positional arguments.
+          $linuxScript = @'
+          set -euo pipefail
+          lite="$1"
+          mode="$2"
+          mkdir -p "$HOME/.local/bin"
+          sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          export PATH="$HOME/.local/bin:$PATH"
+          log=/tmp/install.log
+          chezmoi init -S /dotfiles \
+            --promptString "Enter GitHub mail for this machine=testmail@example.com" \
+            --promptBool "Do you want a minimal (lite) setup (y/n)=$lite" \
+            --promptBool "Install GUI tools (y/n)=false" \
+            --apply 2>&1 | tee "$log"
+          bash /dotfiles/tests/verify-unix.sh "$mode"
+          chezmoi -S /dotfiles state delete-bucket --bucket=scriptState
+          chezmoi -S /dotfiles apply 2>&1 | tee -a "$log"
+          bash /dotfiles/tests/verify-unix.sh "$mode"
+          chezmoi -S /dotfiles verify --exclude=scripts
+          '@
+          $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($linuxScript))
+          & wsl -d $distro -u developer -- env HOME=/home/developer bash -lc `
+            "echo '$encoded' | base64 -d | bash -s -- $env:LITE $env:MODE" 2>&1 |
+            Tee-Object -FilePath "$env:RUNNER_TEMP\wsl-$env:MODE.log" -Append
+          $result = $LASTEXITCODE
+          if ($result -ne 0) { throw "WSL case failed with exit code $result" }
+
+      - name: Unregister ephemeral WSL distribution
+        if: always()
+        shell: pwsh
+        env:
+          MODE: ${{ matrix.mode }}
+        run: |
+          $distro = "dotfiles-$env:MODE-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          if ((wsl --list --quiet) -contains $distro) {
+              wsl --unregister $distro
+          }
+
+      - name: Upload failed installation log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log-wsl-${{ matrix.mode }}
+          path: ${{ runner.temp }}/wsl-${{ matrix.mode }}.log
+          if-no-files-found: warn

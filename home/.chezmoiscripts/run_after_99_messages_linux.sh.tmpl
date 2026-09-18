@@ -30,7 +30,7 @@ report_available() {
 }
 
 printf '\n==== DOTFILES TOOL STATUS ====\n'
-printf 'Platform: {{ .chezmoi.os }}{{ if eq .chezmoi.os "linux" }} / {{ .chezmoi.osRelease.id }} {{ .chezmoi.osRelease.version_id }}{{ if .chezmoi.kernel.osrelease | lower | contains "microsoft" }} / WSL{{ end }}{{ end }}\n'
+printf 'Platform: {{ .chezmoi.os }}{{ if eq .chezmoi.os "linux" }} / {{ .chezmoi.osRelease.id }} {{ .chezmoi.osRelease.versionID }}{{ if .chezmoi.kernel.osrelease | lower | contains "microsoft" }} / WSL{{ end }}{{ end }}\n'
 printf 'Mode: {{ if .lite }}lite{{ else if .gui }}full GUI{{ else }}full CLI{{ end }}\n'
 printf 'Available now:\n'
 report_tool git git
