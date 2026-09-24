@@ -51,10 +51,10 @@ foreach ($package in $excluded) {
     }
 }
 
-$commands = @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide', 'pwsh')
+$commands = @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide', 'pwsh', 'bat')
 if ($Mode -ne 'lite') {
     $commands += @(
-        'bat', 'cloc', 'cppcheck', 'fd', 'jq', 'lsd', 'rg', 'ls.exe', 'cat.exe',
+        'cloc', 'cppcheck', 'fd', 'jq', 'lsd', 'rg', 'ls.exe', 'cat.exe',
         'black', 'flake8', 'mkdocs', 'mypy', 'pip-compile', 'pre-commit', 'ruff'
     )
 }

@@ -10,7 +10,7 @@ set -euo pipefail
 # Lite uses an existing Homebrew to avoid bootstrapping developer tools.
 if command -v brew >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
     # Avoid updates and retain existing tools, including macOS Git, Vim and Zsh.
-    for pkg in git zsh vim fzf the_silver_searcher uv zoxide; do
+    for pkg in git zsh vim fzf the_silver_searcher uv zoxide bat; do
         tool="$pkg"
         [ "$pkg" != the_silver_searcher ] || tool=ag
         if ! command -v "$tool" >/dev/null 2>&1; then

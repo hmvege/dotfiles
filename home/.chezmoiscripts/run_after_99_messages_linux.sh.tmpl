@@ -40,6 +40,7 @@ report_tool fzf fzf
 report_tool ag ag
 report_tool uv uv
 report_tool zoxide zoxide
+report_available bat bat
 {{ if not .lite -}}
 {{ if or (eq .chezmoi.os "darwin") (and (eq .chezmoi.os "linux") (ne .chezmoi.osRelease.id "rocky")) -}}
 report_tool black black
@@ -50,7 +51,6 @@ report_tool pip-compile pip-compile
 report_tool pre-commit pre-commit
 {{ end -}}
 report_tool ruff ruff
-report_available bat bat
 report_available fd fd
 report_tool lsd lsd
 report_tool tmux tmux

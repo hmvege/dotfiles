@@ -32,7 +32,7 @@ During the installation, you'll be asked:
 
 Choose lite for a quick setup, providing only the bare minimum tooling.
 
-The basic set of tools are **Git**, **Vim**, **fzf**, **ag**, **uv**, and **zoxide**. On unix, **zsh** is also attempted.
+The basic set of tools are **Git**, **Vim**, **fzf**, **ag**, **uv**, **zoxide**, and **bat**. On unix, **zsh** is also attempted.
 
 Note: lite does not upgrade the system or change the login shell. Start `zsh` after applying, or keep using your current shell if Zsh could not be installed. The managed Zsh configuration requires Zsh.
 
@@ -40,10 +40,12 @@ Note: lite does not upgrade the system or change the login shell. Start `zsh` af
 
 | Platform | Example retries                                                                                               |
 | -------- | ------------------------------------------------------------------------------------------------------------- |
-| Ubuntu   | `apt-get install -y zsh fzf silversearcher-ag zoxide` as root, or with sudo                                   |
-| Rocky 8  | `dnf install -y epel-release`, then `dnf install -y zsh fzf the_silver_searcher zoxide` as root, or with sudo |
-| macOS    | `brew install fzf the_silver_searcher uv zoxide`                                                              |
-| Windows  | `scoop install fzf ag uv zoxide`                                                                              |
+| Ubuntu   | `apt-get install -y zsh fzf silversearcher-ag zoxide bat` as root, or with sudo                                   |
+| Rocky 8  | `dnf install -y epel-release`, then `dnf install -y zsh fzf the_silver_searcher zoxide bat` as root, or with sudo |
+| macOS    | `brew install fzf the_silver_searcher uv zoxide bat`                                                              |
+| Windows  | `scoop install fzf ag uv zoxide bat`                                                                              |
+
+On Ubuntu, a manually retried bat installation may provide `batcat`. Use that command if the setup did not create the `bat` link.
 
 ### :penguin: Linux
 Ubuntu targets are 22.04, 24.04, and 26.04. Ubuntu 20.04 is unsupported. Runtime validation is pending.

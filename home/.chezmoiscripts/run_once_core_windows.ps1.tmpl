@@ -77,7 +77,7 @@ function Ensure-ScoopBucket {
 }
 
 {{ if .lite -}}
-$packages = @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide')
+$packages = @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide', 'bat')
 foreach ($pkg in $packages) {
     try { Ensure-ScoopPackage $pkg }
     catch { Write-Warning "Skipping optional package ${pkg}: $_" }

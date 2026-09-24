@@ -53,18 +53,7 @@ echo "Packages installed."
 
 sudo chsh -s "$(command -v zsh)"
 
-## Ubuntu uses batcat/fdfind names; preserve any user-provided destinations.
-mkdir -p "$HOME/.local/bin"
-link_ubuntu_command() {
-    local source_command="$1" destination="$HOME/.local/bin/$2" source_path
-    if [ -e "$destination" ] || [ -L "$destination" ]; then
-        echo "Keeping existing $destination"
-    elif source_path="$(command -v "$source_command")"; then
-        ln -s "$source_path" "$destination"
-    else
-        echo "Warning: $source_command is unavailable; skipping $destination" >&2
-    fi
-}
+{{ includeTemplate "link-ubuntu-command.sh" . }}
 link_ubuntu_command batcat bat
 link_ubuntu_command fdfind fd
 

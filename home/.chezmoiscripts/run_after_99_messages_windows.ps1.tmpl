@@ -35,9 +35,9 @@ Write-Output "`n==== DOTFILES TOOL STATUS ===="
 Write-Output 'Platform: Windows'
 Write-Output 'Mode: {{ if .lite }}lite{{ else if .gui }}full GUI{{ else }}full CLI{{ end }}'
 Write-Output 'Available now:'
-foreach ($tool in @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide', 'pwsh')) { Show-Tool $tool }
+foreach ($tool in @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide', 'pwsh', 'bat')) { Show-Tool $tool }
 {{ if not .lite -}}
-foreach ($tool in @('bat', 'fd', 'lsd', 'cloc', 'cppcheck', 'rg', 'black', 'flake8', 'mkdocs', 'mypy', 'pip-compile', 'pre-commit', 'ruff')) { Show-Tool $tool }
+foreach ($tool in @('fd', 'lsd', 'cloc', 'cppcheck', 'rg', 'black', 'flake8', 'mkdocs', 'mypy', 'pip-compile', 'pre-commit', 'ruff')) { Show-Tool $tool }
 {{ if .gui -}}
 foreach ($tool in @('code', 'smerge')) { Show-Tool $tool }
 {{ end -}}

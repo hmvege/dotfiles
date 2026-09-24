@@ -61,5 +61,6 @@ for platform in "${platforms[@]}"; do
 done
 
 bash "$repo_root/tests/test-python-tool-conflict.sh"
+bash "$repo_root/tests/test-ubuntu-command-links.sh"
 
 echo "Unix template smoke checks passed."

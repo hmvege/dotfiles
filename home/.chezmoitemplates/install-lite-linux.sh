@@ -13,10 +13,10 @@ fi
 
 {{ if eq .chezmoi.osRelease.id "ubuntu" -}}
 install_package=(apt-get install -y --no-install-recommends)
-packages=(ca-certificates curl git zsh vim fzf silversearcher-ag zoxide)
+packages=(ca-certificates curl git zsh vim fzf silversearcher-ag zoxide bat)
 {{ else -}}
 install_package=(dnf install -y --setopt=install_weak_deps=False)
-packages=(ca-certificates curl git zsh vim-enhanced fzf the_silver_searcher zoxide)
+packages=(ca-certificates curl git zsh vim-enhanced fzf the_silver_searcher zoxide bat)
 {{ end -}}
 
 if [ "$can_install" = true ]; then
@@ -25,7 +25,7 @@ if [ "$can_install" = true ]; then
         echo "Warning: package index refresh failed. Trying the available indexes." >&2
     fi
     {{ else -}}
-    # EPEL supplies fzf and ag on Rocky. Other packages can still succeed without it.
+    # EPEL supplies fzf, ag and bat on Rocky. Other packages can succeed without it.
     if ! "${privilege[@]}" dnf install -y epel-release; then
         echo "Warning: EPEL is unavailable. Some optional tools may be skipped." >&2
     fi
@@ -45,6 +45,11 @@ if [ "$can_install" = true ]; then
         fi
     done
 fi
+
+{{ if eq .chezmoi.osRelease.id "ubuntu" -}}
+{{ includeTemplate "link-ubuntu-command.sh" . }}
+link_ubuntu_command batcat bat
+{{ end -}}
 
 {{ includeTemplate "install-uv.sh" . }}
 

@@ -65,6 +65,9 @@ if [ "$configuration_only" = false ]; then
 fi
 
 if [ "$mode" = lite ]; then
+    if [ "$configuration_only" = false ]; then
+        required+=(bat)
+    fi
     [ ! -e "$HOME/.tmux.conf" ] || fail "lite mode deployed .tmux.conf"
     [ ! -e "$HOME/.oh-my-zsh" ] || fail "lite mode installed Oh My Zsh"
     [ ! -e "$HOME/.config/Code" ] || fail "lite mode deployed VSCode settings"
