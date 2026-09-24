@@ -28,33 +28,22 @@ During the installation, you'll be asked:
 - Whether to perform a **minimal (lite) setup**. Lite mode provides basic shell and Vim configuration with a small optional tool set. It skips GUI apps and development suites.
 - Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts). There is no automatic GUI recommendation. Lite mode skips this question and installs no GUI apps.
 
-### :feather: Lite setup for containers and VMs
+### :feather: Lite setup for containers and limited environments
 
-Choose lite for a quick setup. Unix uses plain Zsh with history, completion, a basic prompt, and Git shortcuts. Vim uses no downloaded plugins. On Windows, an existing `_vimrc` takes precedence over the deployed `.vimrc`. PowerShell retains native listing and history search, with optional PSFzf.
+Choose lite for a quick setup, providing only the bare minimum tooling.
 
-Lite attempts to install,
-* Git
-* Vim
-* fzf
-* ag
-* uv
-* zoxide. Ordinary `cd` fallback if install fails.
-* Zsh on Unix with prerequisites. Zsh provides `l`, `la`, and `lt` using native `ls`.
-
-Full Ubuntu and macOS setups install lsd and use it for Zsh listing shortcuts when available. Lite uses native `ls`. Windows installs lsd in full mode but keeps PowerShell's native `ls` (`Get-ChildItem`). Rocky does not install lsd but honors an existing one.
+The basic set of tools are **Git**, **Vim**, **fzf**, **ag**, **uv**, and **zoxide**. On unix, **zsh** is also attempted.
 
 Note: lite does not upgrade the system or change the login shell. Start `zsh` after applying, or keep using your current shell if Zsh could not be installed. The managed Zsh configuration requires Zsh.
 
-macOS uses existing Homebrew and skips its bootstrap to avoid installing developer tools. Without Homebrew it still attempts standalone uv. Windows retains the PowerShell bootstrap and uses Scoop. A failed bootstrap can leave optional tools unavailable while configuration files are deployed.
+**Skipped tools** are not automatically retried by an unchanged run_once script. Retry individual packages directly:
 
-Skipped tools are not automatically retried by an unchanged run_once script. Retry individual packages directly:
-
-| Platform | Example retries |
-| --- | --- |
-| Ubuntu | `apt-get install -y zsh fzf silversearcher-ag zoxide` as root, or with sudo |
-| Rocky 8 | `dnf install -y epel-release`, then `dnf install -y zsh fzf the_silver_searcher zoxide` as root, or with sudo |
-| macOS | `brew install fzf the_silver_searcher uv zoxide` |
-| Windows | `scoop install fzf ag uv zoxide` |
+| Platform | Example retries                                                                                               |
+| -------- | ------------------------------------------------------------------------------------------------------------- |
+| Ubuntu   | `apt-get install -y zsh fzf silversearcher-ag zoxide` as root, or with sudo                                   |
+| Rocky 8  | `dnf install -y epel-release`, then `dnf install -y zsh fzf the_silver_searcher zoxide` as root, or with sudo |
+| macOS    | `brew install fzf the_silver_searcher uv zoxide`                                                              |
+| Windows  | `scoop install fzf ag uv zoxide`                                                                              |
 
 ### :penguin: Linux
 Ubuntu targets are 22.04, 24.04, and 26.04. Ubuntu 20.04 is unsupported. Runtime validation is pending.
@@ -200,12 +189,12 @@ The old database is preserved. For a skipped installation, retry with `sudo apt-
 
 The profile optionally loads `git-aliases` and `posh-git`, installed for the current user during Windows post-install setup. These preferred shortcuts also work without either module, provided Git is available:
 
-| Shortcut | Command |
-| --- | --- |
-| `gco <branch>` | `git checkout <branch>` |
-| `gc` | `git commit` |
-| `gcmsg "message"` | `git commit --message "message"` |
-| `gcam "message"` | `git commit --all --message "message"` |
+| Shortcut          | Command                                |
+| ----------------- | -------------------------------------- |
+| `gco <branch>`    | `git checkout <branch>`                |
+| `gc`              | `git commit`                           |
+| `gcmsg "message"` | `git commit --message "message"`       |
+| `gcam "message"`  | `git commit --all --message "message"` |
 
 Additional arguments are forwarded to Git. `gc` replaces PowerShell's `Get-Content` alias. Instead, use `Get-Content` explicitly to read files. The shared Git aliases `git cm "message"` and `git cam "message"` remain available in all shells.
 
@@ -291,6 +280,10 @@ dotfiles
 - https://github.com/twpayne
 - Script for installing fonts: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0
 
+
+## TODOs
+- Run verifications tests for containers.
+- Run full VM tests on Windows.
 
 ## :balance_scale: License
 MIT License.
