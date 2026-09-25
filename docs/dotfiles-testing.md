@@ -2,6 +2,8 @@
 
 Use smoke checks for source safety, automated installation for non-GUI paths, Windows Sandbox for quick local Windows testing, and manual desktop checks for GUI behavior.
 
+Manual installation acceptance starts in a fresh VM, snapshot, or Sandbox with no cloned repository or previous dotfiles installation. Use the platform's README bootstrap command and let Chezmoi download the repository. Branch tests require a published branch. Source-only checks and Docker investigation are separate developer checks.
+
 ## Test matrix
 
 | Layer                               | Trigger                  | Platform and mode                               | Purpose                                                                                                         |
@@ -23,7 +25,7 @@ Every installation case applies once, runs the platform verifier, clears only Ch
 
 The full CLI Vim setup can currently block a repeat apply with `Press ENTER`. Treat that as an automated-installation failure. Do not bypass the prompt and call the case unattended success.
 
-Run source-only checks locally:
+Run source-only developer checks from a local checkout:
 
 ```sh
 bash tests/smoke-unix.sh
@@ -72,27 +74,34 @@ runas.exe /profile /user:"$env:COMPUTERNAME\dotfiles-test" "powershell.exe -NoLo
 
 Enter the test user's password at the `runas` prompt. Continue in the new window. Confirm that `whoami` identifies `dotfiles-test` and `$HOME` points to that user's profile. Keep the original administrator window open.
 
-### Install the checkout
+### Install from GitHub
 
-In the test user's window, replace the branch name and run the following. Use a test email and choose lite, full CLI, or full GUI when prompted.
+In the test user's window, start logging. Use a test email and choose lite, full CLI, or full GUI when prompted. When the PowerShell MSI helper requests elevation, enter the sandbox administrator credentials. Keep Chezmoi running as `dotfiles-test`.
 
 ```powershell
 $ErrorActionPreference = 'Stop'
 Set-Location $HOME
 Start-Transcript -Path "$HOME\dotfiles-test.log"
-Invoke-Expression "& { $(Invoke-RestMethod 'https://get.chezmoi.io/ps1') } -b '$HOME\bin'"
-$chezmoi = Join-Path $HOME 'bin\chezmoi.exe'
-$source = Join-Path $HOME 'dotfiles'
-$branch = 'update/dotfiles-polishing-2026-0'
-& $chezmoi init -S $source --branch $branch hmvege
-if ($LASTEXITCODE -ne 0) { throw 'Chezmoi initialization failed' }
 ```
 
-Apply the configuration. When the PowerShell MSI helper requests elevation, enter the sandbox administrator credentials. Keep Chezmoi running as `dotfiles-test`.
+Run the Windows README bootstrap command:
 
 ```powershell
-& $chezmoi apply -v -S $source
+iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --apply hmvege"
 if ($LASTEXITCODE -ne 0) { throw 'First apply failed' }
+```
+
+To test a published branch, use this instead of the preceding command:
+
+```powershell
+$branch = 'your-published-branch'
+iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --branch '$branch' --apply hmvege"
+if ($LASTEXITCODE -ne 0) { throw 'First apply failed' }
+```
+
+After the chosen bootstrap command succeeds, stop logging:
+
+```powershell
 Stop-Transcript
 ```
 
@@ -112,6 +121,8 @@ $mode = 'lite'
 $source = Join-Path $HOME 'dotfiles'
 $chezmoi = Join-Path $HOME 'bin\chezmoi.exe'
 Start-Transcript -Path "$HOME\dotfiles-test.log" -Append
+git -C $source rev-parse HEAD
+if ($LASTEXITCODE -ne 0) { throw 'Cannot record tested commit' }
 & "$source\tests\verify-windows.ps1" -Mode $mode
 
 & $chezmoi -S $source state delete-bucket --bucket=scriptState
@@ -144,33 +155,46 @@ gh run watch
 
 ## Manual Ubuntu desktop GUI acceptance
 
-Run these commands from a checkout at the commit under test on a fresh Ubuntu Desktop 22.04, 24.04, or 26.04 VM or snapshot. Use a normal sudo-capable user.
+Start with a fresh Ubuntu Desktop 22.04, 24.04, or 26.04 VM or snapshot and a normal sudo-capable user. Do not clone the repository first. Install the README prerequisites:
 
-```sh
-set -euo pipefail
+```bash
 sudo apt-get update
-sudo apt-get install -y curl git
-sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b "$HOME/.local/bin"
-export PATH="$HOME/.local/bin:$PATH"
-
-chezmoi init -S "$PWD" \
-  --promptString "Enter GitHub mail for this machine=testmail@example.com" \
-  --promptBool "Do you want a minimal (lite) setup (y/n)=false" \
-  --promptBool "Install GUI tools (y/n)=true" \
-  --apply
-bash tests/verify-unix.sh full-gui
-
-chezmoi -S "$PWD" state delete-bucket --bucket=scriptState
-chezmoi -S "$PWD" apply
-bash tests/verify-unix.sh full-gui
-chezmoi -S "$PWD" verify --exclude=scripts
+sudo apt-get install -y curl sudo
 ```
 
-Confirm Zsh startup, fzf history, zoxide, lsd aliases, Vim, Gogh in GNOME Terminal, VSCode and Sublime configuration, Ruff and mypy discovery, Nerd Font glyphs, and Sublime Merge. Record the date, commit SHA, release, mode, result, and any failure.
+Run the Linux README bootstrap command:
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
+```
+
+To test a published branch, use this instead:
+
+```bash
+branch='your-published-branch'
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --branch "$branch" --apply hmvege
+```
+
+Use a test email. For desktop GUI acceptance, answer no to lite and yes to GUI. Stop at any installation error and save the terminal output.
+
+Verify the downloaded configuration, then force the installers to run again in the same home:
+
+```bash
+set -euo pipefail
+git -C "$HOME/dotfiles" rev-parse HEAD
+bash "$HOME/dotfiles/tests/verify-unix.sh" full-gui
+
+"$HOME/.local/bin/chezmoi" -S "$HOME/dotfiles" state delete-bucket --bucket=scriptState
+"$HOME/.local/bin/chezmoi" -S "$HOME/dotfiles" apply
+bash "$HOME/dotfiles/tests/verify-unix.sh" full-gui
+"$HOME/.local/bin/chezmoi" -S "$HOME/dotfiles" verify -x scripts
+```
+
+Separately open a new terminal and start Zsh normally. Confirm shell startup, fzf history, zoxide, lsd aliases, Vim, Gogh in GNOME Terminal, VSCode and Sublime configuration, Ruff and mypy discovery, Nerd Font glyphs, and Sublime Merge. Record the date, downloaded commit SHA, release, mode, result, and any failure.
 
 ## Local Docker investigation
 
-Docker is useful for non-GUI Linux installation issues. It is not desktop acceptance. Build and enter the container on the host:
+This developer check uses a local checkout copied into the image at build time. It helps investigate non-GUI Linux installation issues but does not test the README bootstrap or desktop acceptance. Build and enter the container on the host:
 
 ```sh
 ubuntu_version=24.04
@@ -212,4 +236,4 @@ docker logs dotfiles-manual-test > dotfiles-manual-test.log 2>&1
 docker rm dotfiles-manual-test
 ```
 
-Rebuild the image after changing `home/` or `.chezmoiroot`.
+Rebuild the image and create a new container after changing `home/` or `.chezmoiroot`. An existing container retains its old source files even after the image is rebuilt.
