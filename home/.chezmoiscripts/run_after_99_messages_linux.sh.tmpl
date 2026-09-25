@@ -88,4 +88,7 @@ printf 'An unchanged run_once script does not retry skipped tools. See README fo
 {{ if and .gui (not .lite) -}}
 printf '%s\n' 'In Sublime, open the Command Palette and select "Package Control: Install Package" to install missing packages.'
 {{ end -}}
+{{ if and .gui (not .lite) (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") -}}
+printf '%s\n' 'In GNOME Terminal, select the Afterglow profile to apply the Gogh theme.'
+{{ end -}}
 {{ end -}}
