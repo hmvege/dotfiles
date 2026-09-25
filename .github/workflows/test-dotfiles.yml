@@ -156,16 +156,19 @@ jobs:
               set -euo pipefail
               # Chezmoi creates Git metadata. Give each disposable user a writable copy.
               cp -R /dotfiles "$HOME/dotfiles"
+              root_shell_before="$(getent passwd root | cut -d: -f7)"
               chezmoi init -S "$HOME/dotfiles" \
                 --promptString "Enter GitHub mail for this machine=testmail@example.com" \
                 --promptBool "Do you want a minimal (lite) setup (y/n)=$LITE" \
                 --promptBool "Install GUI tools (y/n)=$GUI" \
                 --apply 2>&1 | tee "$DOTFILES_INSTALL_LOG"
               bash /tests/verify-unix.sh "$MODE"
+              test "$(getent passwd root | cut -d: -f7)" = "$root_shell_before"
               # Rerun run_once scripts without resetting config or installed files.
               chezmoi -S "$HOME/dotfiles" state delete-bucket --bucket=scriptState
               chezmoi -S "$HOME/dotfiles" apply 2>&1 | tee -a "$DOTFILES_INSTALL_LOG"
               bash /tests/verify-unix.sh "$MODE"
+              test "$(getent passwd root | cut -d: -f7)" = "$root_shell_before"
               # run_after scripts always appear pending. Verify deployed files.
               chezmoi -S "$HOME/dotfiles" verify --exclude=scripts
             ' 2>&1 | tee "$RUNNER_TEMP/${CASE_NAME}.log"
@@ -318,15 +321,18 @@ jobs:
           set -o pipefail
           # Capture verifier and state-reset errors as well as installation output.
           exec > >(tee "$DOTFILES_INSTALL_LOG") 2>&1
+          root_shell_before="$(dscl . -read /Users/root UserShell)"
           chezmoi init -S "$GITHUB_WORKSPACE" \
             --promptString "Enter GitHub mail for this machine=testmail@example.com" \
             --promptBool "Do you want a minimal (lite) setup (y/n)=$LITE" \
             --promptBool "Install GUI tools (y/n)=$GUI" \
             --apply
           bash tests/verify-unix.sh "$MODE"
+          test "$(dscl . -read /Users/root UserShell)" = "$root_shell_before"
           chezmoi -S "$GITHUB_WORKSPACE" state delete-bucket --bucket=scriptState
           chezmoi -S "$GITHUB_WORKSPACE" apply
           bash tests/verify-unix.sh "$MODE"
+          test "$(dscl . -read /Users/root UserShell)" = "$root_shell_before"
           chezmoi -S "$GITHUB_WORKSPACE" verify --exclude=scripts
 
       - name: Upload failed installation log
@@ -512,15 +518,18 @@ jobs:
           sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b "$HOME/.local/bin"
           export PATH="$HOME/.local/bin:$PATH"
           log=/tmp/install.log
+          root_shell_before="$(getent passwd root | cut -d: -f7)"
           chezmoi init -S /dotfiles \
             --promptString "Enter GitHub mail for this machine=testmail@example.com" \
             --promptBool "Do you want a minimal (lite) setup (y/n)=$lite" \
             --promptBool "Install GUI tools (y/n)=false" \
             --apply 2>&1 | tee "$log"
           bash /dotfiles/tests/verify-unix.sh "$mode"
+          test "$(getent passwd root | cut -d: -f7)" = "$root_shell_before"
           chezmoi -S /dotfiles state delete-bucket --bucket=scriptState
           chezmoi -S /dotfiles apply 2>&1 | tee -a "$log"
           bash /dotfiles/tests/verify-unix.sh "$mode"
+          test "$(getent passwd root | cut -d: -f7)" = "$root_shell_before"
           chezmoi -S /dotfiles verify --exclude=scripts
           '@
           $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($linuxScript))

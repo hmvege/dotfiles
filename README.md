@@ -122,6 +122,7 @@ and then the dotfiles can be applied again.
  - [`tmux-plugins`](https://github.com/tmux-plugins/tpm). Plugins for `tmux`.
  - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug). On-the-go editor.
  - [`uv`](https://docs.astral.sh/uv/). Python version, project environment, and persistent CLI tool manager.
+ - Codex CLI in full setups, except Rocky.
  - [`Ruff`](https://docs.astral.sh/ruff/). Python linting and formatting in full setups.
  - `zsh` and [`ohmyzsh`](https://github.com/ohmyzsh/ohmyzsh). Shell and zsh framework.
  - [`gogh`](https://gogh-co.github.io/Gogh/). Terminal colors.
@@ -222,6 +223,8 @@ Following plugins are used:
 
 ### VSCode
 VSCode is now the preferred Editor.
+
+Extensions are installed in one batch. If Node emits DEP0169, check for VSCode updates.
 
 ### Sublime Text 4
 Sublime Text 4 still installed for a full Linux and MacOS setup, even tho VSCode is now the preferred editor. [Package Control](https://packagecontrol.io/) is used for managing plugins in ST4.

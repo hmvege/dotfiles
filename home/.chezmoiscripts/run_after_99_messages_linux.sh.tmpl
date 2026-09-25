@@ -51,6 +51,9 @@ report_tool pip-compile pip-compile
 report_tool pre-commit pre-commit
 {{ end -}}
 report_tool ruff ruff
+{{ if not (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "rocky")) -}}
+report_tool codex codex
+{{ end -}}
 report_available fd fd
 report_tool lsd lsd
 report_tool tmux tmux
@@ -67,12 +70,22 @@ printf 'This inventory reflects command availability, not installation history o
 {{ if .lite -}}
 printf 'Lite excludes developer suites, managed Python, GUI apps, fonts, and downloaded shell/Vim plugins.\n'
 {{ end -}}
+{{ if or .lite (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "rocky")) -}}
+{{ if and (not .lite) (eq .chezmoi.osRelease.id "rocky") -}}
+printf '%s\n' 'Zsh is installed. Run zsh to start it; the login shell is unchanged.'
+{{ else -}}
 printf 'Open a new terminal. Run zsh if installed, otherwise keep your current shell.\n'
+{{ end -}}
+{{ else -}}
+{{ includeTemplate "login-shell.sh" . }}
+report_login_shell
+printf '%s\n' 'Run codex interactively to sign in on first launch.'
+{{ end -}}
 printf 'Useful commands (when installed): git status | uv venv | uv pip install -r requirements.txt\n'
 printf 'Ctrl+r searches history. z jumps to directories, or use ordinary cd.\n'
 printf 'Retry skipped tools directly with apt-get, dnf, or brew as appropriate.\n'
 printf 'An unchanged run_once script does not retry skipped tools. See README for retry commands.\n'
 {{ if and .gui (not .lite) -}}
-printf 'In Sublime, use Package Control: Install Package if editor packages are missing (ctrl+p -> select 'Package Control: Install Package' and install missing packages).\n'
+printf '%s\n' 'In Sublime, open the Command Palette and select "Package Control: Install Package" to install missing packages.'
 {{ end -}}
 {{ end -}}

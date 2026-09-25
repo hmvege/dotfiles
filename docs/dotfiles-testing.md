@@ -190,7 +190,7 @@ bash "$HOME/dotfiles/tests/verify-unix.sh" full-gui
 "$HOME/.local/bin/chezmoi" -S "$HOME/dotfiles" verify -x scripts
 ```
 
-Separately open a new terminal and start Zsh normally. Confirm shell startup, fzf history, zoxide, lsd aliases, Vim, Gogh in GNOME Terminal, VSCode and Sublime configuration, Ruff and mypy discovery, Nerd Font glyphs, and Sublime Merge. Record the date, downloaded commit SHA, release, mode, result, and any failure.
+Log out and log in, then open a new terminal. Confirm it starts Zsh automatically without running Zsh manually. Check terminal-profile command overrides if it does not. Confirm shell startup, fzf history, zoxide, lsd aliases, Vim, Gogh in GNOME Terminal, VSCode and Sublime configuration, Ruff and mypy discovery, Nerd Font glyphs, and Sublime Merge. Run Codex interactively to check first-launch sign-in. Record the date, downloaded commit SHA, release, mode, result, and any failure. Rocky keeps its existing login shell.
 
 ## Local Docker investigation
 

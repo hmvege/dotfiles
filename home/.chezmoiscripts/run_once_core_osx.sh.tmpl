@@ -84,6 +84,21 @@ fi
 
 {{ includeTemplate "python-tools.sh" . }}
 
+# Install the official standalone Codex CLI without modifying managed profiles.
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v codex >/dev/null 2>&1; then
+    if [ -e "$HOME/.local/bin/codex" ] || [ -L "$HOME/.local/bin/codex" ]; then
+        echo "Cannot install Codex: conflicting $HOME/.local/bin/codex. Move it explicitly and retry." >&2
+        exit 1
+    fi
+    installer="$(mktemp)"
+    trap 'rm -f "$installer"' EXIT
+    curl -fsSL https://chatgpt.com/codex/install.sh -o "$installer"
+    CODEX_NON_INTERACTIVE=1 CODEX_INSTALL_DIR="$HOME/.local/bin" \
+        sh "$installer" --release latest
+fi
+codex --version
+
 ## fzf installation completion
 "$(brew --prefix fzf)/install" --key-bindings --completion --no-update-rc --no-fish
 
@@ -134,17 +149,26 @@ vscode_extensions=(
     yzhang.markdown-all-in-one
 )
 
-installed_extensions=$(code --list-extensions)
-for extension in "${vscode_extensions[@]}"
-do
-    if ! grep -Fqx -- "$extension" <<< "$installed_extensions"
-    then
-        code --install-extension "$extension"
-        echo "Installed $extension"
-    else
-        echo "VSCode extension $extension found"
+installed_extensions="$(code --list-extensions)"
+install_arguments=()
+for extension in "${vscode_extensions[@]}"; do
+    if ! grep -Fqix -- "$extension" <<< "$installed_extensions"; then
+        install_arguments+=(--install-extension "$extension")
     fi
 done
+if [ "${#install_arguments[@]}" -eq 0 ]; then
+    echo 'All requested VS Code extensions are already installed.'
+else
+    code "${install_arguments[@]}"
+    installed_extensions="$(code --list-extensions)"
+    for extension in "${vscode_extensions[@]}"; do
+        if ! grep -Fqix -- "$extension" <<< "$installed_extensions"; then
+            echo "VS Code extension missing after installation: $extension" >&2
+            exit 1
+        fi
+    done
+    echo 'Verified all requested VS Code extensions.'
+fi
 {{ end -}}
 {{ end -}}
 {{ end -}}

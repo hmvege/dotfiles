@@ -41,7 +41,7 @@ if ($Mode -eq 'lite') { Assert-Path (Join-Path $HOME '.vimrc') }
 $scoopRoot = if ($env:SCOOP) { $env:SCOOP } else { Join-Path $HOME 'scoop' }
 # These checks assume a fresh disposable test user, not a personal workstation.
 $excluded = @()
-if ($Mode -eq 'lite') { $excluded += @('lsd', 'oh-my-posh', 'cppcheck', 'coreutils') }
+if ($Mode -eq 'lite') { $excluded += @('codex', 'lsd', 'oh-my-posh', 'cppcheck', 'coreutils') }
 if ($Mode -ne 'full-gui') {
     $excluded += @('vscode', 'sublime-merge', 'windirstat', 'Meslo-NF', 'JetBrainsMono-NF')
 }
@@ -54,11 +54,15 @@ foreach ($package in $excluded) {
 $commands = @('git', 'vim', 'fzf', 'ag', 'uv', 'zoxide', 'pwsh', 'bat')
 if ($Mode -ne 'lite') {
     $commands += @(
-        'cloc', 'cppcheck', 'fd', 'jq', 'lsd', 'rg', 'ls.exe', 'cat.exe',
+        'codex', 'cloc', 'cppcheck', 'fd', 'jq', 'lsd', 'rg', 'ls.exe', 'cat.exe',
         'black', 'flake8', 'mkdocs', 'mypy', 'pip-compile', 'pre-commit', 'ruff'
     )
 }
 foreach ($name in $commands) { Assert-Command $name | Out-Null }
+if ($Mode -ne 'lite') {
+    & codex --version
+    if ($LASTEXITCODE -ne 0) { throw 'Codex cannot report its version' }
+}
 
 Assert-Module 'PSFzf'
 if ($Mode -eq 'lite') {

@@ -87,10 +87,10 @@ else
             required+=(jq ruff)
             ;;
         ubuntu|wsl)
-            required+=(bat fd jq lsd ruff tmux)
+            required+=(bat codex fd jq lsd ruff tmux)
             ;;
         macos)
-            required+=(bat fd jq lsd ruff tmux)
+            required+=(bat codex fd jq lsd ruff tmux)
             ;;
     esac
 fi
@@ -98,6 +98,18 @@ fi
 for command_name in "${required[@]}"; do
     require_command "$command_name"
 done
+
+if [ "$mode" != lite ] && [ "$platform" != rocky ]; then
+    codex --version || fail 'Codex cannot report its version'
+    if [ "$(id -un)" != root ]; then
+        case "$(uname -s)" in
+            Darwin) login_shell="$(dscl . -read "/Users/$(id -un)" UserShell | awk '{print $2}')" ;;
+            Linux) login_shell="$(getent passwd "$(id -un)" | cut -d: -f7)" ;;
+        esac
+        [ "${login_shell##*/}" = zsh ] && [ -x "$login_shell" ] || fail "saved login shell is not executable Zsh: $login_shell"
+        grep -Fqx "$login_shell" /etc/shells || fail "saved Zsh is not registered: $login_shell"
+    fi
+fi
 
 if command -v zsh >/dev/null 2>&1; then
     if [ "$mode" = lite ]; then
