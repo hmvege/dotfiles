@@ -219,23 +219,23 @@ $vscodeExtensions = @(
 )
 
 $installedExtensions = @(Invoke-SetupCommand $code @('--list-extensions'))
-$installArguments = @()
 foreach ($extension in $vscodeExtensions) {
     if ($extension -notin $installedExtensions) {
-        $installArguments += @('--install-extension', $extension)
+        try {
+            Invoke-SetupCommand $code @('--install-extension', $extension)
+        }
+        catch {
+            Write-Warning "VS Code reported an error while installing $extension; checking the final state. $_"
+        }
+    }
+    else {
+        Write-Output "VSCode extension $extension is already installed."
     }
 }
-if ($installArguments.Count -eq 0) {
-    Write-Output 'All requested VS Code extensions are already installed.'
-}
-else {
-    Invoke-SetupCommand $code $installArguments
-    $installedExtensions = @(Invoke-SetupCommand $code @('--list-extensions'))
-    $missingExtensions = @($vscodeExtensions | Where-Object { $_ -notin $installedExtensions })
-    if ($missingExtensions.Count -gt 0) {
-        throw "VS Code extensions missing after installation: $($missingExtensions -join ', ')"
-    }
-    Write-Output 'Verified all requested VS Code extensions.'
+$installedExtensions = @(Invoke-SetupCommand $code @('--list-extensions'))
+$missingExtensions = @($vscodeExtensions | Where-Object { $_ -notin $installedExtensions })
+if ($missingExtensions.Count -gt 0) {
+    throw "VS Code extensions missing after installation: $($missingExtensions -join ', ')"
 }
 {{ end -}}
 

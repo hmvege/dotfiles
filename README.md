@@ -224,7 +224,7 @@ Following plugins are used:
 ### VSCode
 VSCode is now the preferred Editor.
 
-Extensions are installed in one batch. If Node emits DEP0169, check for VSCode updates.
+If Node emits DEP0169 during extension installation, check for VSCode updates.
 
 ### Sublime Text 4
 Sublime Text 4 still installed for a full Linux and MacOS setup, even tho VSCode is now the preferred editor. [Package Control](https://packagecontrol.io/) is used for managing plugins in ST4.
