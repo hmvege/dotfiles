@@ -71,9 +71,9 @@ if [ "$mode" = lite ]; then
     [ ! -e "$HOME/.tmux.conf" ] || fail "lite mode deployed .tmux.conf"
     [ ! -e "$HOME/.oh-my-zsh" ] || fail "lite mode installed Oh My Zsh"
     [ ! -e "$HOME/.config/Code" ] || fail "lite mode deployed VSCode settings"
-    [ ! -e "$HOME/.config/sublime-text-3" ] || fail "lite mode deployed Sublime settings"
+    [ ! -e "$HOME/.config/sublime-text" ] || fail "lite mode deployed Sublime settings"
     [ ! -e "$HOME/Library/Application Support/Code" ] || fail "lite mode deployed macOS editor settings"
-    [ ! -e "$HOME/Library/Application Support/Sublime Text 3" ] || fail "lite mode deployed macOS Sublime settings"
+    [ ! -e "$HOME/Library/Application Support/Sublime Text" ] || fail "lite mode deployed macOS Sublime settings"
     [ ! -e "$HOME/.vim/autoload/plug.vim" ] || fail "lite installed Vim plugins"
     if command -v uv >/dev/null 2>&1; then
         [ -z "$(uv tool list)" ] || fail "lite provisioned uv tools"
@@ -166,7 +166,8 @@ if [ "$mode" = full-gui ]; then
     case "$platform" in
         ubuntu|wsl)
             require_file "$HOME/.config/Code/User/settings.json"
-            require_file "$HOME/.config/sublime-text-3/Packages/User/Preferences.sublime-settings"
+            require_file "$HOME/.config/sublime-text/Packages/User/Preferences.sublime-settings"
+            require_file "$HOME/.config/sublime-text/Installed Packages/Package Control.sublime-package"
             require_command subl
             require_command smerge
             # Missing snap/VSCode is a coverage failure, not a successful GUI install.
@@ -184,7 +185,8 @@ if [ "$mode" = full-gui ]; then
             ;;
         macos)
             require_file "$HOME/Library/Application Support/Code/User/settings.json"
-            require_file "$HOME/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings"
+            require_file "$HOME/Library/Application Support/Sublime Text/Packages/User/Preferences.sublime-settings"
+            require_file "$HOME/Library/Application Support/Sublime Text/Installed Packages/Package Control.sublime-package"
             require_command code
             require_command subl
             require_command smerge

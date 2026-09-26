@@ -15,6 +15,36 @@ command -v zsh >/dev/null 2>&1 || {
     exit 1
 }
 
+sublime_user_dirs=(
+    "$repo_root/home/dot_config/private_sublime-text/private_Packages/private_User"
+    "$repo_root/home/private_Library/private_Application Support/private_Sublime Text/private_Packages/private_User"
+)
+legacy_sublime_dirs=(
+    "$repo_root/home/dot_config/private_sublime-text-3"
+    "$repo_root/home/private_Library/private_Application Support/private_Sublime Text 3"
+)
+for user_dir in "${sublime_user_dirs[@]}"; do
+    package_settings="$user_dir/Package Control.sublime-settings"
+    if [ ! -f "$package_settings" ]; then
+        echo "Missing ST4 Package Control settings: $package_settings" >&2
+        exit 1
+    fi
+    grep -Fq '"LSP-ruff"' "$package_settings" || {
+        echo "ST4 Package Control settings do not install LSP-ruff: $package_settings" >&2
+        exit 1
+    }
+    if grep -Fq '"AutoPEP8"' "$package_settings"; then
+        echo "Obsolete AutoPEP8 package remains listed: $package_settings" >&2
+        exit 1
+    fi
+done
+for legacy_dir in "${legacy_sublime_dirs[@]}"; do
+    if [ -d "$legacy_dir" ]; then
+        echo "Legacy ST3 source directory remains: $legacy_dir" >&2
+        exit 1
+    fi
+done
+
 render() {
     local source_file="$1" destination="$2" lite="$3" gui="$4"
     local config="$scratch/config-$lite-$gui.toml"
@@ -24,6 +54,9 @@ render() {
     # This exercises guarded Rocky and WSL branches without installing packages.
     {
         case "$platform" in
+            macos)
+                printf '%s' '{{ $_ := set .chezmoi "os" "darwin" }}'
+                ;;
             rocky)
                 printf '%s' '{{ $_ := set .chezmoi "osRelease" (dict "id" "rocky" "versionID" "8") }}'
                 ;;
@@ -37,7 +70,7 @@ render() {
 
 platforms=(native)
 if [ "$(uname -s)" = Linux ]; then
-    platforms+=(rocky wsl)
+    platforms+=(rocky wsl macos)
 fi
 for platform in "${platforms[@]}"; do
     for case_name in lite full-cli full-gui; do

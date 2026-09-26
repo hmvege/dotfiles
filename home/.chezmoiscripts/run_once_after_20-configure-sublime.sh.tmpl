@@ -5,8 +5,8 @@ set -euo pipefail
 
 {{ if eq .chezmoi.osRelease.id "ubuntu" -}}
 
-package_dir=${HOME}/.config/sublime-text-3/Packages
-installed_packages_dir=${HOME}/.config/sublime-text-3/Installed\ Packages/
+package_dir=${HOME}/.config/sublime-text/Packages
+installed_packages_dir=${HOME}/.config/sublime-text/Installed\ Packages/
 mkdir -pv "$package_dir" "$installed_packages_dir"
 
 # Scope the repository key instead of adding it to apt's global trust store.
@@ -30,7 +30,7 @@ if [ ! -f "${installed_packages_dir}/Package Control.sublime-package" ]; then
         -o "$package_file"
     mv "$package_file" "${installed_packages_dir}/Package Control.sublime-package"
 fi
-echo "Package Control downloaded — run Sublime Text to finish plugin setup"
+echo "Package Control is ready — run Sublime Text to finish plugin setup"
 
 echo "Note: Remember to enter licenses if you have one"
 
@@ -55,6 +55,20 @@ done
 
 echo "Installed Sublime Text 4"
 echo "Installed Sublime Merge"
+
+installed_packages_dir="$HOME/Library/Application Support/Sublime Text/Installed Packages"
+mkdir -p "$installed_packages_dir"
+package_file=""
+trap 'rm -f "${package_file:-}"' EXIT
+if [ ! -f "$installed_packages_dir/Package Control.sublime-package" ]; then
+    package_file="$(mktemp "$installed_packages_dir/.package-control.XXXXXX")"
+    curl -fsSL "https://packagecontrol.io/Package%20Control.sublime-package" \
+        -o "$package_file"
+    mv "$package_file" "$installed_packages_dir/Package Control.sublime-package"
+    package_file=""
+fi
+echo "Package Control is ready — run Sublime Text to finish plugin setup"
+
 echo "Note: Remember to enter licenses if you have one"
 
 {{ end -}}
