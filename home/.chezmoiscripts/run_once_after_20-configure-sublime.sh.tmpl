@@ -26,8 +26,7 @@ echo "Installed Sublime Text 4 and Sublime Merge"
 
 # Replace stale or corrupt copies instead of trusting file existence alone.
 package_file="$(mktemp "${installed_packages_dir}/.package-control.XXXXXX")"
-curl -fsSL "https://packagecontrol.io/Package%20Control.sublime-package" \
-    -o "$package_file"
+curl -fsSL "https://download.sublimetext.com/Package%20Control.sublime-package" -o "$package_file"
 if ! python3 -c 'import sys, zipfile; archive = zipfile.ZipFile(sys.argv[1]); sys.exit(archive.testzip() is not None)' "$package_file"; then
     echo "Downloaded Package Control archive is invalid; the existing installation was left unchanged." >&2
     exit 1
@@ -66,8 +65,7 @@ package_file=""
 trap 'rm -f "${package_file:-}"' EXIT
 if [ ! -f "$installed_packages_dir/Package Control.sublime-package" ]; then
     package_file="$(mktemp "$installed_packages_dir/.package-control.XXXXXX")"
-    curl -fsSL "https://packagecontrol.io/Package%20Control.sublime-package" \
-        -o "$package_file"
+    curl -fsSL "https://download.sublimetext.com/Package%20Control.sublime-package" -o "$package_file"
     mv "$package_file" "$installed_packages_dir/Package Control.sublime-package"
     package_file=""
 fi
