@@ -7,8 +7,6 @@
 	[
 	],
 	// Theme
-	// "theme": "Gruvbox Material Dark.sublime-theme",
- 	// "color_scheme": "Packages/User/Material-Theme (Flake8Lint).tmTheme",
  	"theme": "Adaptive.sublime-theme",
 	"color_scheme": "Mariana.sublime-color-scheme",
 	"folders":

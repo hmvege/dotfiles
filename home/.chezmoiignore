@@ -23,7 +23,6 @@ Library/Application\ Support/Code/User/settings.json
 .config/sublime-text/Packages/User/DocblockrPython.sublime-settings
 .config/sublime-text/Packages/User/Doxy.sublime-settings
 .config/sublime-text/Packages/User/LSP-pyright.sublime-settings
-.config/sublime-text/Packages/User/Material-Theme (Flake8Lint).tmTheme
 .config/sublime-text/Packages/User/Package Control.sublime-settings
 .config/sublime-text/Packages/User/Preferences.sublime-settings
 .config/sublime-text/Packages/User/python-cli.sublime-snippet
