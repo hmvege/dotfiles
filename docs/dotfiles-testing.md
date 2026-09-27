@@ -159,7 +159,7 @@ Start with a fresh Ubuntu Desktop 22.04, 24.04, or 26.04 VM or snapshot and a no
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y curl sudo
+sudo apt-get install -y curl
 ```
 
 Run the Linux README bootstrap command:
@@ -180,8 +180,6 @@ Use a test email. For desktop GUI acceptance, answer no to lite and yes to GUI. 
 Verify the downloaded configuration, then force the installers to run again in the same home:
 
 ```bash
-set -euo pipefail
-git -C "$HOME/dotfiles" rev-parse HEAD
 bash "$HOME/dotfiles/tests/verify-unix.sh" full-gui
 
 "$HOME/.local/bin/chezmoi" -S "$HOME/dotfiles" state delete-bucket --bucket=scriptState
@@ -213,7 +211,6 @@ mode=lite lite=true gui=false
 # Or full CLI
 # mode=full-cli lite=false gui=false
 
-set -euo pipefail
 cp -R /dotfiles "$HOME/dotfiles"
 chezmoi init -S "$HOME/dotfiles" \
   --promptString "Enter GitHub mail for this machine=testmail@example.com" \
@@ -226,7 +223,6 @@ chezmoi -S "$HOME/dotfiles" state delete-bucket --bucket=scriptState
 chezmoi -S "$HOME/dotfiles" apply
 bash /tests/verify-unix.sh "$mode"
 chezmoi -S "$HOME/dotfiles" verify --exclude=scripts
-exit
 ```
 
 After exiting, save logs if needed and remove the named container:
