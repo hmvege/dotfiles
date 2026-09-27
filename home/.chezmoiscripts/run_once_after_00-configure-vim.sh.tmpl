@@ -3,6 +3,6 @@
 
 set -euo pipefail
 
-vim +'silent! PlugInstall' +qall
+vim -es -i NONE -c 'PlugInstall --sync' -c 'qa!'
 
 {{ end -}}
