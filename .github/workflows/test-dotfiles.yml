@@ -26,6 +26,12 @@ jobs:
       - name: Check changed-file whitespace
         run: git diff --check "${{ github.event.pull_request.base.sha }}...HEAD"
 
+      - name: Install zsh for template smoke tests
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes zsh
+
       - name: Install Chezmoi test binary
         run: |
           mkdir -p "$RUNNER_TEMP/bin"
