@@ -5,11 +5,27 @@
 # failures.
 set -euo pipefail
 
-if ! type -p xcodebuild >/dev/null 2>&1
-then
-    # Starts by installing basic developer tools for OSX
-    xcode-select --install
+{{ if .lite -}}
+{{ includeTemplate "homebrew-env.sh" . }}
+# Lite uses an existing Homebrew to avoid bootstrapping developer tools.
+if command -v brew >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
+    # Avoid updates and retain existing tools, including macOS Git, Vim and Zsh.
+    for pkg in git zsh vim fzf the_silver_searcher uv zoxide bat; do
+        tool="$pkg"
+        [ "$pkg" != the_silver_searcher ] || tool=ag
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            if ! HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_UPGRADE=1 brew install --formula "$pkg"; then
+                echo "Warning: could not install $pkg. Continuing lite setup." >&2
+            fi
+        fi
+    done
+else
+    echo "Skipping optional packages: lite requires an existing Homebrew and a non-root user."
 fi
+
+{{ includeTemplate "install-uv.sh" . }}
+echo "Lite setup attempted. Start zsh to load the configuration."
+{{ else -}}
 
 packages=(
     bat
@@ -20,9 +36,8 @@ packages=(
     jq
     lsd
     node  # Needed by LSP
-    pipx
-    pyenv
-    pyenv-virtualenv
+    uv
+    the_silver_searcher
     tmux
     unzip
     # vim # Should already be installed on Mac
@@ -31,29 +46,20 @@ packages=(
     zsh
 )
 
-## Brew
-if ! type -p brew >/dev/null 2>&1
-then
+## Brew (the installer also handles missing Command Line Tools)
+{{ includeTemplate "homebrew-env.sh" . }}
+if ! command -v brew >/dev/null 2>&1; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    echo "Installed Brew"
-else
-    echo "Brew is already installed"
+    {{ includeTemplate "homebrew-env.sh" . }}
 fi
-
-if [[ "$(uname -m)" == "arm64" ]]; then
-    # Apple Silicon typically uses /opt/homebrew
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-else
-    # Intel typically uses /usr/local
-    eval "$(/usr/local/bin/brew shellenv)"
-fi
+command -v brew >/dev/null 2>&1 || { echo "Homebrew is unavailable" >&2; exit 1; }
 
 brew update
-brew upgrade
-
-for pkg in ${packages[@]}
-do
-    brew install $pkg
+# Leave upgrades to the user. Dependencies of new packages may still be updated.
+for pkg in "${packages[@]}"; do
+    if ! brew list --formula "$pkg" >/dev/null 2>&1; then
+        brew install --formula "$pkg"
+    fi
 done
 echo "Packages installed"
 
@@ -76,76 +82,28 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
       "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 fi
 
-## pyenv
-PYTHON_GLOBAL="3.12.9"
+{{ includeTemplate "python-tools.sh" . }}
 
-if type -p pyenv >/dev/null 2>&1
-then
-    echo "pyenv exists: proceeding to check if global python is set to $PYTHON_GLOBAL"
-    if ! pyenv which python | grep -q $PYTHON_GLOBAL
-    then
-        echo "Setting up pyenv globals"
-        pyenv install $PYTHON_GLOBAL
-        pyenv global $PYTHON_GLOBAL
-    else
-        echo "Global Python is already set to $PYTHON_GLOBAL"
+# Install the official standalone Codex CLI without modifying managed profiles.
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v codex >/dev/null 2>&1; then
+    if [ -e "$HOME/.local/bin/codex" ] || [ -L "$HOME/.local/bin/codex" ]; then
+        echo "Cannot install Codex: conflicting $HOME/.local/bin/codex. Move it explicitly and retry." >&2
+        exit 1
     fi
+    installer="$(mktemp)"
+    trap 'rm -f "$installer"' EXIT
+    curl -fsSL https://chatgpt.com/codex/install.sh -o "$installer"
+    CODEX_NON_INTERACTIVE=1 CODEX_INSTALL_DIR="$HOME/.local/bin" \
+        sh "$installer" --release latest
 fi
-
-## pipx
-if ! type -p pipx >/dev/null 2>&1
-then
-    pipx ensurepath
-fi
-
-pipx_packages=(
-    black
-    flake8
-    mkdocs
-    mypy
-    pip-tools
-    poetry
-    pre-commit
-)
-for pkg in ${pipx_packages[@]}
-do
-    pipx install --python {{ .chezmoi.homeDir }}/.pyenv/shims/python3 $pkg
-done
-
-## Mypy package injections
-mypy_packages=(
-    types-requests
-)
-for pkg in ${mypy_packages[@]}
-do
-    pipx inject mypy $pkg
-done
-
-## Flake8 package injections
-flake8_packages=(
-    flake8-broken-line
-    flake8-bugbear
-    flake8-builtins
-    flake8-docstrings
-    flake8-docstrings-complete
-    flake8-import-order
-    flake8-markdown
-    flake8-pie
-    flake8-scream
-    flake8-simplify
-    flake8-use-fstring
-    flake8-useless-assert
-)
-for pkg in ${flake8_packages[@]}
-do
-    pipx inject flake8 $pkg
-done
+codex --version
 
 ## fzf installation completion
-$(brew --prefix)/opt/fzf/install
+"$(brew --prefix fzf)/install" --key-bindings --completion --no-update-rc --no-fish
 
 ## vim plugin manager
-if [ ! -d "${HOME}/.vim/autoload/plug.vim" ]
+if [ ! -f "${HOME}/.vim/autoload/plug.vim" ]
 then
     curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -154,11 +112,13 @@ else
     echo "vim plugin manager already installed"
 fi
 
-{{ if and .gui (not .lite) }}
+{{ if .gui }}
 ## VSCode installation
-if [ ! type -p code >/dev/null 2>&1 ]
+if ! command -v code >/dev/null 2>&1
 then
-    brew install --cask visual-studio-code
+    if ! brew list --cask visual-studio-code >/dev/null 2>&1; then
+        brew install --cask visual-studio-code
+    fi
     echo "VSCode installed."
 else
     echo "VSCode already installed"
@@ -166,8 +126,9 @@ fi
 
 vscode_extensions=(
     cschlosser.doxdocgen
-    eamodio.gitlens
     ms-azuretools.vscode-docker
+    charliermarsh.ruff
+    ms-python.mypy-type-checker
     ms-python.python
     ms-python.vscode-pylance
     ms-toolsai.jupyter
@@ -187,16 +148,25 @@ vscode_extensions=(
     yzhang.markdown-all-in-one
 )
 
-installed_extensions=$(code --list-extensions)
-for extension in ${vscode_extensions[@]}
-do
-    if ! echo $installed_extensions | grep -q $extension
-    then
-        code --install-extension $extension
-        echo "Installed $extension"
+installed_extensions="$(code --list-extensions)"
+for extension in "${vscode_extensions[@]}"; do
+    if ! grep -Fqix -- "$extension" <<< "$installed_extensions"; then
+        if code --install-extension "$extension"; then
+            echo "Installed $extension"
+        else
+            echo "VS Code reported an error while installing $extension; checking the final state." >&2
+        fi
     else
         echo "VSCode extension $extension found"
     fi
 done
+installed_extensions="$(code --list-extensions)"
+for extension in "${vscode_extensions[@]}"; do
+    if ! grep -Fqix -- "$extension" <<< "$installed_extensions"; then
+        echo "VS Code extension missing after installation: $extension" >&2
+        exit 1
+    fi
+done
+{{ end -}}
 {{ end -}}
 {{ end -}}

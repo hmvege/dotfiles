@@ -1,3 +1,4 @@
+{{ if not .lite -}}
 call plug#begin('~/.vim/plugged')
 
 " Plug 'kaicataldo/material.vim', { 'branch': 'main' }
@@ -5,6 +6,7 @@ Plug 'sainnhe/everforest'
 
 " Initialize plugin system
 call plug#end()
+{{ end -}}
 
 
 " Enable type file detection. Vim will be able to try to detect the type of file in use.
@@ -17,7 +19,7 @@ filetype plugin on
 filetype indent on
 
 " Turn syntax highlighting on.
-syntax on 
+syntax on
 
 " Add numbers to each line on the left-hand side.
 set number
@@ -74,6 +76,7 @@ endif
 "     silent! PlugInstall
 " endif
 
+{{ if not .lite -}}
 try
     " Background either 'dark' or 'light'.
     set background=dark
@@ -93,3 +96,5 @@ catch
     " Fallback to default colorscheme if everforest is not installed
     colorscheme default
 endtry
+
+{{ end -}}

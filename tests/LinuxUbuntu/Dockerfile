@@ -1,50 +1,31 @@
-# Use a build argument to choose the Ubuntu version (default: 20.04)
-ARG UBUNTU_VERSION=20.04
+# syntax=docker/dockerfile:1
+ARG UBUNTU_VERSION=24.04
 FROM ubuntu:${UBUNTU_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ="Europe/Oslo"
+ENV TZ=Europe/Oslo
 
-# Install basic dependencies
+# Prepare the base system only. Dotfiles are initialized and applied at runtime.
 RUN apt-get update && \
-    apt-get install -y curl git sudo tzdata xauth x11-apps && \
+    apt-get install -y --no-install-recommends ca-certificates curl git sudo tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user for testing, handling existing GID conflicts (GitHub action ubuntu docker images has 1000)
-RUN groupadd -g 1010 developer && \
-    useradd -m -s /bin/bash -u 1010 -g 1010 developer && \
-    echo "developer ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN groupadd --gid 1010 developer && \
+    useradd --create-home --shell /bin/bash --uid 1010 --gid 1010 developer && \
+    printf 'developer ALL=(ALL) NOPASSWD:ALL\n' > /etc/sudoers.d/developer && \
+    chmod 0440 /etc/sudoers.d/developer && \
+    groupadd --gid 1020 nosudo && \
+    useradd --create-home --shell /bin/bash --uid 1020 --gid 1020 nosudo
 
-# Ensure the home directory has correct ownership
-RUN chown -R developer:developer /home/developer
+# A system-wide binary lets the same image test developer, root, and no-sudo users.
+RUN sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b /usr/local/bin
 
-# Set the user first, then switch working directory explicitly
+COPY .chezmoiroot /dotfiles/.chezmoiroot
+COPY home/ /dotfiles/home/
+RUN chmod -R a+rX /dotfiles
+
 USER developer
 WORKDIR /home/developer
 ENV HOME=/home/developer
 
-# Determine Ubuntu version and install correct Chezmoi version into $HOME/.local/bin
-# Ubuntu 20.04 and previously require an older Chezmoi version in order to work
-# due to missing GLIBC library.
-RUN UBUNTU_VERSION=$(awk -F= '/^VERSION_ID/ { print $2 }' /etc/os-release | tr -d '"') && \
-    if [ "$(echo "$UBUNTU_VERSION" | cut -d. -f1)" -ge 22 ]; then \
-    CHEZMOI_VERSION="latest"; \
-    else \
-    CHEZMOI_VERSION="v2.49.1"; \
-    fi && \
-    cd $HOME && sh -c "$(curl -fsLS get.chezmoi.io)" -- -t "$CHEZMOI_VERSION" -b "$HOME/.local/bin/"
-
-# Update PATH so Chezmoi is found
-ENV PATH=$HOME/.local/bin:$PATH
-
-# Initialize and apply the dotfiles using Chezmoi
-ARG GIT_BRANCH=master
-ARG LITE="false"
-RUN cd $HOME && chezmoi init \
-    --promptString "Enter GitHub mail for this machine=testmail@example.com" \
-    --promptBool "Do you want a minimal (lite) setup (y/n)=${LITE}" \
-    --promptBool "Install GUI tools (y/n)=n" \
-    --branch "$GIT_BRANCH" hmvege
-
-# Set default command to an interactive shell (or override with test image)
 CMD ["/bin/bash"]

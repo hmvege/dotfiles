@@ -12,9 +12,9 @@ The goal for this dotfiles project repository, is following,
 * Have the setup **install packages automatically**.
 * Have a **cross-platform** dotfiles setup, working for
    * MacOS
-   * Ubuntu 20.04
    * Ubuntu 22.04
    * Ubuntu 24.04
+   * Ubuntu 26.04
    * Rocky8
    * WSL 2
    * Windows 11
@@ -24,11 +24,32 @@ The goal for this dotfiles project repository, is following,
 
 ### :question: Prompted Questions
 During the installation, you'll be asked:
-- Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts), with auto-detected recommendation.
-- Whether to perform a **minimal (lite) setup**. If `lite` mode is selected, GUI apps will automatically be skipped (e.g. VSCode, Sublime, tmux, Gogh etc.).
 - **Mail** used for GitHub.
+- Whether to perform a **minimal (lite) setup**. Lite mode provides basic shell and Vim configuration with a small optional tool set. It skips GUI apps and development suites.
+- Whether to **install GUI apps** (e.g., VSCode, Sublime, fonts). There is no automatic GUI recommendation. Lite mode skips this question and installs no GUI apps.
+
+### :feather: Lite setup for containers and limited environments
+
+Choose lite for a quick setup, providing only the bare minimum tooling.
+
+The basic set of tools are **Git**, **Vim**, **fzf**, **ag**, **uv**, **zoxide**, and **bat**. On unix, **zsh** is also attempted.
+
+Note: lite does not upgrade the system or change the login shell. Start `zsh` after applying, or keep using your current shell if Zsh could not be installed. The managed Zsh configuration requires Zsh.
+
+**Skipped tools** are not automatically retried by an unchanged run_once script. Retry individual packages directly:
+
+| Platform | Example retries                                                                                               |
+| -------- | ------------------------------------------------------------------------------------------------------------- |
+| Ubuntu   | `apt-get install -y zsh fzf silversearcher-ag zoxide bat` as root, or with sudo                                   |
+| Rocky 8  | `dnf install -y epel-release`, then `dnf install -y zsh fzf the_silver_searcher zoxide bat` as root, or with sudo |
+| macOS    | `brew install fzf the_silver_searcher uv zoxide bat`                                                              |
+| Windows  | `scoop install fzf ag uv zoxide bat`                                                                              |
+
+On Ubuntu, a manually retried bat installation may provide `batcat`. Use that command if the setup did not create the `bat` link.
 
 ### :penguin: Linux
+Ubuntu targets are 22.04, 24.04, and 26.04. Ubuntu 20.04 is unsupported. Runtime validation is pending.
+
 Install Chezmoi and initialize, ensure `curl` and `sudo` is installed,
 ```bash
 apt-get update && apt-get install -y curl sudo
@@ -37,20 +58,26 @@ then download and apply the dotfiles,
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 ```
-which will download the Chezmoi binary to `$HOME/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
+which will download the Chezmoi binary to `$HOME/.local/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
 ### :green_apple:	MacOS
+Setup discovers Homebrew on Intel and Apple Silicon. It installs missing packages without a blanket upgrade. fzf setup is noninteractive and leaves shell startup files under Chezmoi control.
+
 On MacOS, you should be able to install Chezmoi via
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 ```
 
 ### :window: Windows
-The dotfiles for Windows is targeting PowerShell. Install Chezmoi via,
+The Windows setup targets x64 Windows and PowerShell 7. Start in a **non-administrator** terminal (Windows PowerShell 5.1 can bootstrap it), then install Chezmoi:
 ```powershell
 iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '~/bin' -- init -S ~/dotfiles --apply hmvege"
 ```
-The dotfiles setup will download the latest PowerShell 7.4.1.
+The PowerShell installer accepts an existing stable version 7.5.0 or newer. When installation is needed, it selects the newest stable patch in the **7.6 MSI series** from the [official PowerShell releases](https://github.com/PowerShell/PowerShell/releases), verifies the published SHA-256 checksum, and retains an MSI log in the temporary directory.
+
+If a restart is needed before PowerShell becomes usable, restart Windows and rerun `chezmoi apply -v -S ~/dotfiles`.
+
+After setup, open **PowerShell** in Windows Terminal, or run `pwsh` from a new terminal. `powershell.exe` launches Windows PowerShell 5.1, and `pwsh.exe` launches PowerShell 7. The managed profile is `~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1`. In PowerShell 7, `$PROFILE` shows the actual profile location. Machines with redirected Documents folders should check that it matches the deployed path. Choose PowerShell as Windows Terminal's default profile if desired.
 
 ### Pulling latest changing from repository
 Pull latest changes from repository.
@@ -87,24 +114,99 @@ and then the dotfiles can be applied again.
 
 ## :inbox_tray: Packages to be installed
 
+ - [`ag`](https://github.com/ggreer/the_silver_searcher) (The Silver Searcher), for searching code. Included in full and lite package selections. Rocky 8 attempts installation through EPEL and warns if unavailable.
  - [`fzf`](https://github.com/junegunn/fzf#using-git) fuzzy searching.
  - [`fd`](https://github.com/sharkdp/fd) better `find`.
  - [`lsd`](https://github.com/Peltoche/lsd). Pretties `ls`.
  - [`tmux`](https://github.com/tmux/tmux). Terminal multiplexer.
  - [`tmux-plugins`](https://github.com/tmux-plugins/tpm). Plugins for `tmux`.
  - `vim` and [`vim plugins`](https://github.com/junegunn/vim-plug). On-the-go editor.
- - [`pyenv` and `pyenv-virtualenv`](https://github.com/pyenv). Python virtual environment handler.
+ - [`uv`](https://docs.astral.sh/uv/). Python version, project environment, and persistent CLI tool manager.
+ - Codex CLI in full setups, except Rocky.
+ - [`Ruff`](https://docs.astral.sh/ruff/). Python linting and formatting in full setups.
  - `zsh` and [`ohmyzsh`](https://github.com/ohmyzsh/ohmyzsh). Shell and zsh framework.
- - [`pipx`](https://pypa.github.io/pipx/). For installing pip packages in independent Python environments.
  - [`gogh`](https://gogh-co.github.io/Gogh/). Terminal colors.
  - [`zoxide`](https://github.com/ajeetdsouza/zoxide). Better change directory `cd`.
+
+### Python environments
+
+The dotfiles do not select a global Python. Projects choose through `requires-python`, a local `.python-version`, or `--python`. Instead, uv downloads a compatible interpreter when needed. Existing Python installations and environments are preserved.
+
+Run `uv venv` or `uv sync` in a project. Activate with `source .venv/bin/activate` (Zsh) or `.\.venv\Scripts\Activate.ps1` (PowerShell).
+
+### Persistent and occasional Python tools
+
+Full Ubuntu, macOS, and Windows setups install Ruff, Black, Flake8, MkDocs, mypy, pip-tools, and pre-commit with `uv tool install --managed-python`. Rocky installs only Ruff. Lite skips Python tools.
+
+Existing uv tool environments are preserved. Inspect their interpreters with `uv tool list --show-python`. Conflicting pipx or other commands are reported and skipped. Before migrating a pipx tool, record `pipx list --json` and `pipx runpip <tool> freeze`, then uninstall it and reapply or run `uv tool install --managed-python <tool>`.
+
+To install with additional plugins for mypy, run:
+```sh
+uv tool install --managed-python --with types-requests mypy
+```
+
+Flake8 has quite a few plugins. To install them, run:
+```sh
+uv tool install --managed-python \
+  --with flake8-broken-line --with flake8-bugbear \
+  --with flake8-builtins --with flake8-docstrings \
+  --with flake8-docstrings-complete --with flake8-import-order \
+  --with flake8-markdown --with flake8-pie --with flake8-scream \
+  --with flake8-simplify --with flake8-use-fstring \
+  --with flake8-useless-assert flake8
+```
+
+### Python linting and formatting
+
+Full setups install missing Ruff with a uv-managed Python selected by uv. Existing uv tool environments and conflicting commands are retained.
+
+The Linux and macOS VSCode and Sublime settings default to Ruff linting and formatting on save, with a 79-character fallback. Project `pyproject.toml`, `ruff.toml`, or `.ruff.toml` settings take precedence. The editor fallback selects `E`, `F`, `W`, and `C90`, retaining the old VSCode rule families and `E203` exclusion. Note, Ruff has no `W503` rule. This does not reproduce every Sublime Flake8 plugin check: those settings and tools remain available, with automatic Flake8 linting disabled. Mypy remains enabled separately, and Sublime Black remains available for manual use.
+
+The editor fallback also enables these Flake8-plugin equivalents (Ruff implements rules internally, so Flake8 package version bounds do not apply):
+
+| Flake8 plugin | Ruff coverage |
+| --- | --- |
+| `flake8-bugbear` | `B` |
+| `flake8-comprehensions` | `C4` |
+| `flake8-use-fstring` | `UP031` and `UP032` for percent-format conversion and f-strings |
+| `flake8-useless-assert` | Partial: `PLW0129` checks string literals. Existing `F631` checks tuples, and `B011` checks `assert False`. Other constant expressions and formatted-string assertions are not fully covered. |
+| `flake8-broken-line` | No direct lint rule. Ruff formatting handles line continuations, but is not an equivalent diagnostic. |
+| `flake8-markdown` | No equivalent lint rule for Python blocks in Markdown. Markdown formatting support is separate. |
+
+See the [Ruff rules](https://docs.astral.sh/ruff/rules/), [broken-line tracking issue](https://github.com/astral-sh/ruff/issues/3465), and [original useless-assert checks](https://pypi.org/project/flake8-useless-assert/). The existing Flake8 tooling remains available for missing checks. These additions remain editor fallbacks. A project Ruff configuration takes precedence.
+
+Use `ruff check .` and `ruff format .` from the CLI. To use the same 79-character preference outside the editors, set `line-length = 79` under `[tool.ruff]` in the project's `pyproject.toml`. Projects using Black can override VSCode's Python formatter or disable Sublime's `lsp_format_on_save`, and re-enable their chosen linter. GUI installers add the Ruff and mypy VSCode extensions. Sublime uses LSP-ruff. See [Ruff editor configuration](https://docs.astral.sh/ruff/editors/settings/) for project precedence.
+
+### Directory jumping
+
+Zoxide provides `z` on Zsh and PowerShell. `zi` opens an fzf picker. Full and lite setups attempt installation on all platforms. If it fails, use ordinary `cd`. Lite tolerates optional installation failures. Full setup can still stop on installation failures.
+
+If applying dotfiles on a system previously using the `z` plugin, one can import `zsh-z`'s history to `zoxide` via,
+```sh
+zoxide import --from=z "${ZSHZ_DATA:-$HOME/.z}"
+```
+
+The old database is preserved. For a skipped installation, retry with `sudo apt-get install zoxide`, `brew install zoxide`, or `scoop install zoxide`. On Rocky, try `sudo dnf install zoxide` or the [upstream installer](https://github.com/ajeetdsouza/zoxide#installation).
+
+### PowerShell Git shortcuts
+
+The profile optionally loads `git-aliases` and `posh-git`, installed for the current user during Windows post-install setup. These preferred shortcuts also work without either module, provided Git is available:
+
+| Shortcut          | Command                                |
+| ----------------- | -------------------------------------- |
+| `gco <branch>`    | `git checkout <branch>`                |
+| `gc`              | `git commit`                           |
+| `gcmsg "message"` | `git commit --message "message"`       |
+| `gcam "message"`  | `git commit --all --message "message"` |
+
+Additional arguments are forwarded to Git. `gc` replaces PowerShell's `Get-Content` alias. Instead, use `Get-Content` explicitly to read files. The shared Git aliases `git cm "message"` and `git cam "message"` remain available in all shells.
 
 ### Vim plugins
 Plugins used in Vim is,
  - [Material Theme](https://github.com/material-theme/vsc-community-material-theme)
 
 ### Oh-my-zsh
-ohmyzsh is used as framework for managing the zsh configuration.
+Full Unix setups use ohmyzsh for Zsh configuration. Lite uses plain Zsh.
 
 Following plugins are used:
  - colored-man-pages
@@ -116,12 +218,13 @@ Following plugins are used:
  - jsontools
  - sublime
  - tmux
- - z
  - zsh-autosuggestions
  - zsh-syntax-highlighting
 
 ### VSCode
 VSCode is now the preferred Editor.
+
+If Node emits DEP0169 during extension installation, check for VSCode updates.
 
 ### Sublime Text 4
 Sublime Text 4 still installed for a full Linux and MacOS setup, even tho VSCode is now the preferred editor. [Package Control](https://packagecontrol.io/) is used for managing plugins in ST4.
@@ -130,90 +233,14 @@ Sublime Text 4 still installed for a full Linux and MacOS setup, even tho VSCode
 A basic Vim setup is installed.
 
 ### Gogh
+Ubuntu enables Gogh in full GUI mode, including WSL with GNOME Terminal and a graphical D-Bus session. Lite skips it. This does not theme Windows Terminal.
+
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
 
 ## :alembic: Testing
-To manually test that the dotfiles work as intended, you can use the Dockerfiles found in `tests`.
+Pull requests run template, syntax, whitespace, and workflow smoke checks without installing packages. Pushes to `master` run Linux, macOS, and WSL2 installation coverage. Windows installation runs only by manual workflow dispatch. Ubuntu GUI desktop behavior is accepted manually on 22.04, 24.04, and 26.04.
 
-### :penguin: Linux: Ubuntu
-Build docker image as,
-```bash
-docker build \
- --build-arg UBUNTU_VERSION=22.04 \
- --build-arg GIT_BRANCH=master \
- -f tests/LinuxUbuntu/Dockerfile \
- -t dotfiles-ubuntu-img --progress=plain . 
-```
-You can then enter the image and run the dotfiles as,
-```bash
-docker run -it -d --name ubuntu-dotfiles-test-1 dotfiles-ubuntu-img:latest
-docker exec -it ubuntu-dotfiles-test-1 bash
-```
-Once inside, 
-```bash
-chezmoi update -n # To ensure the latest changes are picked up
-chezmoi apply # To start installing dotfiles
-```
-
-To clean up, run
-```bash
-docker stop ubuntu-dotfiles-test-1 && docker rm ubuntu-dotfiles-test-1
-```
-
-### :penguin: Linux: Rocky 8
-Build docker image as,
-```bash
-docker build \
- --build-arg GIT_BRANCH=master \
- -f tests/LinuxRocky/Dockerfile \
- -t dotfiles-rocky-test --progress=plain . 
-```
-You can then enter the image and run the dotfiles as,
-```bash
-docker run -it -d --name rocky-dotfiles-test-1 dotfiles-rocky-test:latest bash
-docker exec -it rocky-dotfiles-test-1 bash
-```
-Once inside, 
-```bash
-chezmoi --version || echo "Chezmoi is missing!"
-chezmoi update -n # To ensure the latest changes are picked up
-chezmoi apply # To start installing dotfiles
-```
-
-To clean up, run
-```bash
-docker stop rocky-dotfiles-test-1 && docker rm rocky-dotfiles-test-1
-docker rmi dotfiles-rocky-test
-```
-
-This also runs as a GitHub actions pipeline.
-
-### :window: Windows
-To test on windows, you can run and test in [Sandbox mode](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/. The config file can be something like,
-```
-<Configuration>
-  <MemoryInMB>8192</MemoryInMB>
-  <ProcessorCount>8</ProcessorCount>
-  <VGpu>Enable</VGpu>
-
-  <LogonCommand>
-    <Command>powershell.exe -ExecutionPolicy Bypass -NoLogo -NoExit</Command>
-  </LogonCommand>
-</Configuration>
-```
-Once started, run the following commands
-```
-# For faster downloading and installing
-Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -Name 'VerifiedAndReputablePolicyState' -Value 0
-& "$env:windir\System32\CiTool.exe" -r
-
-Set-ExecutionPolicy Bypass -Scope Process -Force
-iex "& { $(irm 'https://get.chezmoi.io/ps1') } -b '~/bin' -- init --branch <branch-to-test> --apply hmvege"
-```
-The pipeline will also run tests on the windows setup.
-
-### :green_apple: MacOS
-The pipeline will run tests on the MacOS setup.
+See [Dotfiles testing](docs/dotfiles-testing.md) for the matrix, local commands, repeat-apply policy, failure logs, and manual VMware/Windows/WSLg/macOS checklists.
 
 ## :question: Troubleshooting
 
@@ -258,6 +285,10 @@ dotfiles
 - https://github.com/twpayne
 - Script for installing fonts: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0
 
+
+## TODOs
+- Run verifications tests for containers.
+- Run full VM tests on Windows.
 
 ## :balance_scale: License
 MIT License.

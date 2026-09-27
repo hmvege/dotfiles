@@ -1,3 +1,13 @@
+# User-installed uv, Python executables, and persistent uv tools.
+export UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-$HOME/.local/bin}"
+export PATH="$UV_TOOL_BIN_DIR:$HOME/.local/bin:$PATH"
+{{ if eq .chezmoi.os "darwin" -}}
+{{ includeTemplate "homebrew-env.sh" . }}
+{{ end -}}
+
+{{ if .lite -}}
+{{ includeTemplate "zsh-lite.zsh" . }}
+{{ else -}}
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -85,7 +95,7 @@ plugins=(
     git
     history
     jsontools
-{{ if hasKey .chezmoi.osRelease "id" }}
+{{ if eq .chezmoi.os "linux" }}
 {{ if (ne .chezmoi.osRelease.id "rocky") -}}
     sublime
     tmux
@@ -126,7 +136,18 @@ export FZF_ALT_C_COMMAND="fd --type d . $HOME"
 # fasd shortcuts
 alias fp="fzf --height 50% --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias v='f -e vim' # quick opening files with vim
-{{ if hasKey .chezmoi.osRelease "id" }}
+{{ if not .lite}}
+# Full setups prefer lsd when it is available. Lite keeps its native ls aliases.
+if command -v lsd >/dev/null 2>&1; then
+    alias ls="lsd"
+    alias l="lsd -l"
+    alias lt="lsd --tree"
+    alias la="lsd -laht"
+    alias tree="lsd --tree"
+    alias ltsh='lt -l --blocks size --blocks name'
+fi
+{{ end }}
+{{ if eq .chezmoi.os "linux" }}
 {{ if ne .chezmoi.osRelease.id "rocky" -}}
 alias o='a -e xdg-open' # quick opening files with xdg-open
 
@@ -136,32 +157,9 @@ if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
 fi
 
 {{ if not .lite}}
-# LSD settings
-alias ls="lsd"
-alias l="lsd -l"
-alias lt="lsd --tree"
-alias la="lsd -laht"
-alias tree="ls --tree"
-alias ltsh='lt -l --blocks size --blocks name'
-
-# For making LSD work with
 export PATH="$PATH:/snap/bin/"
-
-# LSD aliases
-alias ltsh='lt -l --blocks size --blocks name'
 {{ end }}
 
-# Settings for pyenv and pyenv-virtualenv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
-# Created by `pipx` on 2022-02-16 12:29:05
-export PATH="$HOME/.local/bin:$PATH"
-
-# Zoxide setup
-eval "$(zoxide init zsh)"
 {{ end -}}
 {{ end -}}
 
@@ -169,10 +167,17 @@ eval "$(zoxide init zsh)"
 # For making alt+c change directory work in MacOS
 bindkey "ç" fzf-cd-widget
 
-alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
-echo 'export PATH="/usr/local/sbin:$PATH"' >> ~/.zshrc
-
 # Enabling terminal colors
 export TERM=xterm-256color
 
 {{ end -}}
+
+{{ end -}}
+
+# Use zoxide on every platform and in lite mode. Do not load OMZ's z plugin.
+# Clear a legacy alias when re-sourcing this profile after migration.
+unalias z zi 2>/dev/null || true
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+fi
+# Without zoxide, use the shell's ordinary cd command.

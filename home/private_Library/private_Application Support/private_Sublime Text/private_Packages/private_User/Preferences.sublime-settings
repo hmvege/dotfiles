@@ -1,0 +1,38 @@
+{
+	"DocblockrPython":
+	{
+		"formatter": "sphinx",
+	},
+	"added_words":
+	[
+	],
+	// Theme
+	"theme": "Adaptive.sublime-theme",
+	"color_scheme": "Mariana.sublime-color-scheme",
+	"folders":
+	[
+		{
+			"path": ".",
+		}
+	],
+	"font_size": 10,
+	"ignored_packages":
+	[
+		"Vintage",
+	],
+	"ignored_words":
+	[
+	],
+	"auto_complete_include_snippets": false,
+	"enable_autoreload": false,
+	"ensure_newline_at_eof_on_save": false,
+	"ignored_snippets": ["*html*", "*lorem*"],
+	"show_encoding": true,
+	"show_line_endings": true,
+	"spell_check": true,
+	"translate_tabs_to_spaces": true,
+	"trim_trailing_white_space_on_save": "all",
+	"update_check": true,
+	"word_wrap": true,
+	// "auto_complete_include_snippets_when_typing": false,
+}
