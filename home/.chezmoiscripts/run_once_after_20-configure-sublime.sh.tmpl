@@ -24,13 +24,17 @@ sudo apt-get install -y sublime-text sublime-merge
 
 echo "Installed Sublime Text 4 and Sublime Merge"
 
-if [ ! -f "${installed_packages_dir}/Package Control.sublime-package" ]; then
-    package_file="$(mktemp "${installed_packages_dir}/.package-control.XXXXXX")"
-    curl -fsSL "https://packagecontrol.io/Package%20Control.sublime-package" \
-        -o "$package_file"
-    mv "$package_file" "${installed_packages_dir}/Package Control.sublime-package"
+# Replace stale or corrupt copies instead of trusting file existence alone.
+package_file="$(mktemp "${installed_packages_dir}/.package-control.XXXXXX")"
+curl -fsSL "https://packagecontrol.io/Package%20Control.sublime-package" \
+    -o "$package_file"
+if ! python3 -c 'import sys, zipfile; archive = zipfile.ZipFile(sys.argv[1]); sys.exit(archive.testzip() is not None)' "$package_file"; then
+    echo "Downloaded Package Control archive is invalid; the existing installation was left unchanged." >&2
+    exit 1
 fi
-echo "Package Control is ready — run Sublime Text to finish plugin setup"
+mv "$package_file" "${installed_packages_dir}/Package Control.sublime-package"
+package_file=""
+echo "Installed or refreshed Package Control — restart Sublime Text to load it"
 
 echo "Note: Remember to enter licenses if you have one"
 
