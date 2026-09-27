@@ -3,7 +3,7 @@
     "server_path": "ruff",
     // LSP prepends these entries to PATH, including when opened from the desktop.
     "env": {
-        "PATH": ["{{ .chezmoi.homeDir }}/.local/bin", "/opt/homebrew/bin", "/usr/local/bin"]
+        "PATH": "{{ .chezmoi.homeDir }}/.local/bin:/usr/local/bin"
     },
     "initialization_options": {
         "settings.configurationPreference": "filesystemFirst",
