@@ -1,11 +1,15 @@
 {
-    "workbench.colorTheme": "Default Dark+",
+    "workbench.colorTheme": "Dark Modern",
     "security.workspace.trust.untrustedFiles": "open",
     "explorer.confirmDragAndDrop": false,
     "explorer.confirmDelete": false,
     // Editor
     "editor.formatOnSave": true,
     "editor.minimap.enabled": false,
+    "editor.rulers": [
+        80,
+        120
+    ],
     // Ubuntu: disables the Ctrl+Alt focus
     "window.titleBarStyle": "custom",
     "window.customMenuBarAltFocus": false,
@@ -15,11 +19,25 @@
     "ruff.configuration": {
         "line-length": 79,
         "lint": {
-            "select": ["E", "F", "W", "C90", "B", "C4", "UP031", "UP032", "PLW0129"],
-            "ignore": ["E203"]
+            "select": [
+                "E",
+                "F",
+                "W",
+                "C90",
+                "B",
+                "C4",
+                "UP031",
+                "UP032",
+                "PLW0129"
+            ],
+            "ignore": [
+                "E203"
+            ]
         }
     },
-    "mypy-type-checker.path": ["{{ .chezmoi.homeDir }}/.local/bin/mypy"],
+    "mypy-type-checker.path": [
+        "{{ .chezmoi.homeDir }}/.local/bin/mypy"
+    ],
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingImports": "none",
         "reportMissingModuleSource": "none"
@@ -77,4 +95,8 @@
     "markdown.extension.preview.autoShowPreviewToSide": true,
     "markdown.extension.toc.levels": "2..6",
     "markdown.extension.toc.orderedList": true,
+    // AI rules
+    "chat.agent.enabled": false,
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "C_Cpp.copilotHover": "disabled"
 }
