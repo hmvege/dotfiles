@@ -40,4 +40,4 @@ Use the history's bracketed prefixes, such as `[ADD]`, `[REFACTOR]`, and `[DOCS]
 - Use built-in editor for updating scripts.
 - Avoid using `;` and `--` when writing documentation.
 - Prefer terseness and conciseness as opposed to verbosity.
-- Follow the same style of documentation as currently exists in README.md. 
+- Follow the same style of documentation as currently exists in README.md.
