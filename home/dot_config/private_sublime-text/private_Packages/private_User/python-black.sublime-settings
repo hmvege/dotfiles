@@ -1,6 +1,0 @@
-{
-    // Whether to automatically format the entire document when saving
-    "format_on_save": false,
-    "line-length": 79,
-    "target-version": ["py314"]
-}
