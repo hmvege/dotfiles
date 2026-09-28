@@ -506,17 +506,30 @@ jobs:
             throw "Could not convert '$env:GITHUB_WORKSPACE' to a WSL path."
           }
           $wslWorkspace = ([string] $wslWorkspace).Trim()
-          & wsl -d $distro -u root -- bash -lc "
-            set -e
-            mkdir -p /dotfiles
-            cp -a '$wslWorkspace/.' /dotfiles/
-            apt-get update
-            apt-get install -y ca-certificates curl git sudo
-            useradd --create-home --shell /bin/bash developer
-            echo 'developer ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/developer
-            chmod 0440 /etc/sudoers.d/developer
-            chown -R developer:developer /home/developer /dotfiles
-          " 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\wsl-$env:MODE.log"
+
+          function ConvertTo-LfBase64 {
+            param([string] $Text)
+            $normalizedText = $Text -replace '\r\n?', "`n"
+            return [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($normalizedText))
+          }
+
+          $prepareScript = @'
+          set -euo pipefail
+          workspace="$(printf '%s' "$1" | base64 -d)"
+          mkdir -p /dotfiles
+          cp -a "$workspace/." /dotfiles/
+          apt-get update
+          apt-get install -y ca-certificates curl git sudo
+          useradd --create-home --shell /bin/bash developer
+          echo 'developer ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/developer
+          chmod 0440 /etc/sudoers.d/developer
+          chown -R developer:developer /home/developer /dotfiles
+          '@
+          $prepareEncoded = ConvertTo-LfBase64 $prepareScript
+          $workspaceEncoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($wslWorkspace))
+          $prepareCommand = "printf '%s' '$prepareEncoded' | base64 -d | bash -s -- '$workspaceEncoded'"
+          & wsl -d $distro -u root -- bash -lc "$prepareCommand" 2>&1 |
+            Tee-Object -FilePath "$env:RUNNER_TEMP\wsl-$env:MODE.log"
           if ($LASTEXITCODE -ne 0) { throw 'WSL preparation failed' }
 
           # Keep Bash literal. Pass the two mode values as positional arguments.
@@ -542,9 +555,9 @@ jobs:
           test "$(getent passwd root | cut -d: -f7)" = "$root_shell_before"
           chezmoi -S /dotfiles verify --exclude=scripts
           '@
-          $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($linuxScript))
+          $encoded = ConvertTo-LfBase64 $linuxScript
           & wsl -d $distro -u developer -- env HOME=/home/developer bash -lc `
-            "echo '$encoded' | base64 -d | bash -s -- $env:LITE $env:MODE" 2>&1 |
+            "printf '%s' '$encoded' | base64 -d | bash -s -- $env:LITE $env:MODE" 2>&1 |
             Tee-Object -FilePath "$env:RUNNER_TEMP\wsl-$env:MODE.log" -Append
           $result = $LASTEXITCODE
           if ($result -ne 0) { throw "WSL case failed with exit code $result" }
