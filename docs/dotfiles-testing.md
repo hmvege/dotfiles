@@ -23,7 +23,7 @@ Ubuntu GUI is intentionally not an automated Docker installation case. Snap need
 
 Every installation case applies once, runs the platform verifier, clears only Chezmoi's `scriptState` bucket, applies again in the same home, reruns the verifier, and finishes with `chezmoi verify --exclude=scripts`. Failed cases upload their logs.
 
-The full CLI Vim setup can currently block a repeat apply with `Press ENTER`. Treat that as an automated-installation failure. Do not bypass the prompt and call the case unattended success.
+Full Unix setups install Vim plugins without a terminal and load Everforest to check the result. Installation or theme loading failures stop setup and print Vim diagnostics.
 
 Run source-only developer checks from a local checkout:
 
