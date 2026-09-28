@@ -3,6 +3,28 @@
 
 set -euo pipefail
 
-vim +'silent! PlugInstall' +qall
+vim_log="$(mktemp)"
+trap 'rm -f "$vim_log"' EXIT
+export DOTFILES_VIM_LOG="$vim_log"
+
+# Silent Ex mode needs an explicit vimrc and Vim's non-compatible mode.
+# Loading the theme catches failed downloads even when PlugInstall exits normally.
+if vim -N -es -u "$HOME/.vimrc" -i NONE \
+    -c 'PlugInstall --sync' \
+    -c 'colorscheme everforest' \
+    -c 'call writefile(["Vim error: " . v:errmsg, "Current Vim buffer:"] + getline(1, "$") + ["Vim message history:"] + split(execute("messages"), "\n"), $DOTFILES_VIM_LOG)' \
+    -c 'qa!'; then
+    :
+else
+    vim_status=$?
+    printf 'Vim plugin installation failed with exit status %s.\n' "$vim_status" >&2
+    printf 'For Git clone or connection errors, check network access to GitHub, DNS, and proxy settings. Diagnostics follow.\n' >&2
+    if [ -s "$vim_log" ]; then
+        cat "$vim_log" >&2
+    else
+        printf 'Vim exited before saving diagnostic messages.\n' >&2
+    fi
+    exit "$vim_status"
+fi
 
 {{ end -}}

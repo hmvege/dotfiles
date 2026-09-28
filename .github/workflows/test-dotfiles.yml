@@ -501,7 +501,11 @@ jobs:
           wsl --import $distro $installDir $rootfs --version 2
           if ($LASTEXITCODE -ne 0) { throw 'WSL import failed' }
 
-          $wslWorkspace = (& wsl -d $distro -u root -- wslpath -a $env:GITHUB_WORKSPACE).Trim()
+          $wslWorkspace = & wsl -d $distro -u root --exec wslpath -a "$env:GITHUB_WORKSPACE"
+          if ($LASTEXITCODE -ne 0 -or -not $wslWorkspace) {
+            throw "Could not convert '$env:GITHUB_WORKSPACE' to a WSL path."
+          }
+          $wslWorkspace = ([string] $wslWorkspace).Trim()
           & wsl -d $distro -u root -- bash -lc "
             set -e
             mkdir -p /dotfiles
