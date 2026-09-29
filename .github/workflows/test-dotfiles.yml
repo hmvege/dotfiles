@@ -350,24 +350,14 @@ jobs:
           if-no-files-found: warn
 
   windows:
-    # Installation uses a temporary standard-user logon. Keep it opt-in because
-    # Windows hosted-runner minutes cost more than Linux runner minutes.
-    if: github.event_name == 'workflow_dispatch'
+    # Full modes remain opt-in because they install a substantial tool set.
+    if: github.event_name != 'pull_request'
     runs-on: windows-latest
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - mode: lite
-            lite: "true"
-            gui: "false"
-          - mode: full-cli
-            lite: "false"
-            gui: "false"
-          - mode: full-gui
-            lite: "false"
-            gui: "true"
+        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '["lite","full-cli","full-gui"]' || '["lite"]') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -375,8 +365,8 @@ jobs:
         shell: pwsh
         env:
           MODE: ${{ matrix.mode }}
-          LITE: ${{ matrix.lite }}
-          GUI: ${{ matrix.gui }}
+          LITE: ${{ matrix.mode == 'lite' }}
+          GUI: ${{ matrix.mode == 'full-gui' }}
         run: |
           $ErrorActionPreference = 'Stop'
           $user = 'dotfiles-ci'

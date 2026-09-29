@@ -14,7 +14,8 @@ Manual installation acceptance starts in a fresh VM or snapshot with no cloned r
 | Resilience                          | Push to `master` or manual dispatch       | Ubuntu 24.04 lite                               | Root without sudo, unprivileged without passwordless sudo, optional package failure, and uv ownership conflict. |
 | Installation                        | Push to `master` or manual dispatch       | macOS lite, full CLI, and full GUI              | Apply, same-home repeat apply, and verification.                                                                 |
 | Installation                        | Push to `master` or manual dispatch       | WSL2 Ubuntu 24.04 lite and full CLI             | Apply, same-home repeat apply, and verification.                                                                 |
-| Installation                        | Manual workflow dispatch                  | Windows lite, full CLI, and full GUI            | Temporary standard-user installation and verification from a copied checkout.                                   |
+| Installation                        | Push to `master` or manual dispatch       | Windows lite                                    | Temporary standard-user installation and verification from a copied checkout.                                   |
+| Installation                        | Manual workflow dispatch                  | Windows full CLI and full GUI                   | Temporary standard-user installation and verification from a copied checkout.                                   |
 | Desktop acceptance                  | Manual checklist                          | Ubuntu Desktop 22.04, 24.04, and 26.04 full GUI | Visual terminal, editor, Gogh, fonts, and repeat-apply behavior.                                                |
 | Installation and desktop acceptance | Not currently run, no Windows test bench | Windows VM lite, full CLI, and full GUI         | Planned fresh bootstrap, repeat apply, normal profile startup, and GUI inspection.                              |
 
@@ -33,11 +34,11 @@ bash tests/smoke-unix.sh
 git diff --check
 ```
 
-Ubuntu, Rocky, macOS, and WSL2 installation tests run on pushes to `master` and manual dispatch. Windows installation is opt-in because it uses a Windows hosted runner and may install a substantial tool set.
+Ubuntu, Rocky, macOS, WSL2, and Windows lite installation tests run on pushes to `master` and manual dispatch. Windows full CLI and full GUI installation require manual dispatch because they may install a substantial tool set.
 
 ## Run Windows installation through GitHub Actions
 
-The workflow creates a temporary standard user and one limited scheduled task to obtain that user's real profile. It runs all three Windows modes, has a 45-minute limit per mode, and removes the task and user afterward. It applies a copy of the Actions checkout twice and runs the verifier. The verifier loads the PowerShell profile explicitly in a noninteractive shell. This job does not test the README download bootstrap, normal interactive profile startup, or visual desktop behavior.
+The workflow creates a temporary standard user and one limited scheduled task to obtain that user's real profile. Pushes to `master` run lite. Manual dispatch runs all three Windows modes. Each mode has a 45-minute limit, and the workflow removes the task and user afterward. It applies a copy of the Actions checkout twice and runs the verifier. The verifier loads the PowerShell profile explicitly in a noninteractive shell. This job does not test the README download bootstrap, normal interactive profile startup, or visual desktop behavior.
 
 In GitHub, open **Actions** → **Test Dotfiles Installation** → **Run workflow**, then select the branch. With the GitHub CLI from the checkout:
 
@@ -54,7 +55,7 @@ This checklist is for a future Windows test bench. It has not been run as VM acc
 1. Start a clean Windows 11 VM or snapshot and sign in as a standard user. Leave the home directory free of a prior dotfiles installation.
 2. From a non-administrator PowerShell window, run the [Windows README bootstrap](../README.md#window-windows) against a published branch. Add `--branch '<published-branch>'` before `--apply` in the command. Use a test email and test lite, full CLI, and full GUI in clean snapshots.
 3. Record the Windows version, mode, downloaded commit SHA, terminal output, and any installer logs. Stop and save logs on failure.
-4. In PowerShell 7, enter `~/dotfiles` and run `./tests/verify-windows.ps1 -Mode lite`, substituting the tested mode. Run `chezmoi -S ~/dotfiles state delete-bucket --bucket=scriptState` and `chezmoi -S ~/dotfiles apply`, then repeat the verifier and run `chezmoi -S ~/dotfiles verify --exclude=scripts`.
+4. In PowerShell 7, enter `~/dotfiles` and run `./tests/verify-windows.ps1 -Mode lite`, substituting the tested mode. Run `~/bin/chezmoi.exe -S ~/dotfiles state delete-bucket --bucket=scriptState` and `~/bin/chezmoi.exe -S ~/dotfiles apply`, then repeat the verifier and run `~/bin/chezmoi.exe -S ~/dotfiles verify --exclude=scripts`.
 5. Open PowerShell 7 normally in Windows Terminal. Check profile startup, fzf history, and zoxide. In full GUI mode, launch VSCode and Sublime Merge and inspect font rendering.
 
 ## Manual Ubuntu desktop GUI acceptance
