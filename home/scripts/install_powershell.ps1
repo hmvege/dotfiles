@@ -143,11 +143,18 @@ try {
     $response = Invoke-WebRequest -UseBasicParsing -TimeoutSec 60 `
         -Uri $checksumAssets[0].browser_download_url
 
-    $checksumText = $response.Content
-    if ($checksumText -is [byte[]]) {
-        $checksumText = [Text.Encoding]::UTF8.GetString($checksumText)
+    $response.RawContentStream.Position = 0
+    $reader = [IO.StreamReader]::new(
+        $response.RawContentStream,
+        [Text.Encoding]::UTF8,
+        $true  # Detect encoding from the byte-order mark.
+    )
+    try {
+        $checksumText = $reader.ReadToEnd()
     }
-    $checksumText = ([string] $checksumText).TrimStart([char] 0xFEFF)
+    finally {
+        $reader.Dispose()
+    }
 
     $pattern = '(?im)^([a-f0-9]{64})[ \t]+\*?' + [regex]::Escape($installerName) + '[ \t]*\r?$'
     $checksumMatches = [regex]::Matches($checksumText, $pattern)

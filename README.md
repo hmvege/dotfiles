@@ -238,9 +238,9 @@ Ubuntu enables Gogh in full GUI mode, including WSL with GNOME Terminal and a gr
 Terminal color provided by [Gogh](https://gogh-co.github.io/Gogh/), using the theme Afterglow.
 
 ## :alembic: Testing
-Pull requests run template, syntax, whitespace, and workflow smoke checks without installing packages. Pushes to `master` run Linux, macOS, and WSL2 installation coverage. Windows installation runs only by manual workflow dispatch. Ubuntu GUI desktop behavior is accepted manually on 22.04, 24.04, and 26.04.
+Pull requests run template, syntax, whitespace, and workflow smoke checks without installing dotfiles packages. Pushes to `master` run Ubuntu, Rocky, macOS, and WSL2 installation checks. Manual workflow dispatch also runs those checks and adds Windows installation under a temporary standard user. The guide includes a manual Ubuntu desktop checklist. Windows VM acceptance is not currently run.
 
-See [Dotfiles testing](docs/dotfiles-testing.md) for the matrix, local commands, repeat-apply policy, failure logs, and manual VMware/Windows/WSLg/macOS checklists.
+See [Dotfiles testing](docs/dotfiles-testing.md) for the matrix, local commands, repeat-apply policy, failure logs, the Ubuntu desktop checklist, and the future Windows VM checklist.
 
 ## :question: Troubleshooting
 
