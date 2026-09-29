@@ -1,21 +1,22 @@
 # Dotfiles testing
 
-Use smoke checks for source safety, automated installation for non-GUI paths, Windows Sandbox for quick local Windows testing, and manual desktop checks for GUI behavior.
+Use smoke checks for source safety, automated installation for supported modes, and manual desktop checks for GUI behavior. Windows VM acceptance is not currently run because there is no Windows test bench.
 
-Manual installation acceptance starts in a fresh VM, snapshot, or Sandbox with no cloned repository or previous dotfiles installation. Use the platform's README bootstrap command and let Chezmoi download the repository. Branch tests require a published branch. Source-only checks and Docker investigation are separate developer checks.
+Manual installation acceptance starts in a fresh VM or snapshot with no cloned repository or previous dotfiles installation. Use the platform's README bootstrap command and let Chezmoi download the repository. Branch tests require a published branch. Source-only checks and Docker investigation are separate developer checks.
 
 ## Test matrix
 
-| Layer                               | Trigger                  | Platform and mode                               | Purpose                                                                                                         |
-| ----------------------------------- | ------------------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Smoke                               | Pull request             | Ubuntu, macOS, Windows, all modes               | Whitespace, workflow YAML, template rendering, and shell syntax. No packages are installed.                     |
-| Installation                        | Push to `master`         | Ubuntu 22.04, 24.04, 26.04 lite and full CLI    | Docker apply, same-home repeat apply, and verification.                                                         |
-| Installation                        | Push to `master`         | Rocky 8 lite and full CLI                       | Docker apply, same-home repeat apply, and verification.                                                         |
-| Resilience                          | Push to `master`         | Ubuntu 24.04 lite                               | Root without sudo, unprivileged without passwordless sudo, optional package failure, and uv ownership conflict. |
-| Installation                        | Push to `master`         | macOS and WSL2                                  | Existing lite and full CLI or GUI matrix.                                                                       |
-| Installation                        | Manual workflow dispatch | Windows lite, full CLI, and full GUI            | Temporary standard-user installation and verification.                                                          |
-| Installation and desktop acceptance | Manual Windows Sandbox   | Windows lite, full CLI, and full GUI            | Local installation, repeat apply, profile checks, and GUI inspection.                                           |
-| Desktop acceptance                  | Manual                   | Ubuntu Desktop 22.04, 24.04, and 26.04 full GUI | Visual terminal, editor, Gogh, fonts, and repeat-apply behavior.                                                |
+| Layer                               | Trigger                                   | Platform and mode                               | Purpose                                                                                                         |
+| ----------------------------------- | ----------------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Smoke                               | Pull request                              | Ubuntu, macOS, Windows, all modes               | Whitespace, workflow YAML, template rendering, and shell syntax. No dotfiles packages are installed.            |
+| Installation                        | Push to `master` or manual dispatch       | Ubuntu 22.04, 24.04, 26.04 lite and full CLI    | Docker apply, same-home repeat apply, and verification.                                                         |
+| Installation                        | Push to `master` or manual dispatch       | Rocky 8 lite and full CLI                       | Docker apply, same-home repeat apply, and verification.                                                         |
+| Resilience                          | Push to `master` or manual dispatch       | Ubuntu 24.04 lite                               | Root without sudo, unprivileged without passwordless sudo, optional package failure, and uv ownership conflict. |
+| Installation                        | Push to `master` or manual dispatch       | macOS lite, full CLI, and full GUI              | Apply, same-home repeat apply, and verification.                                                                 |
+| Installation                        | Push to `master` or manual dispatch       | WSL2 Ubuntu 24.04 lite and full CLI             | Apply, same-home repeat apply, and verification.                                                                 |
+| Installation                        | Manual workflow dispatch                  | Windows lite, full CLI, and full GUI            | Temporary standard-user installation and verification from a copied checkout.                                   |
+| Desktop acceptance                  | Manual checklist                          | Ubuntu Desktop 22.04, 24.04, and 26.04 full GUI | Visual terminal, editor, Gogh, fonts, and repeat-apply behavior.                                                |
+| Installation and desktop acceptance | Not currently run, no Windows test bench | Windows VM lite, full CLI, and full GUI         | Planned fresh bootstrap, repeat apply, normal profile startup, and GUI inspection.                              |
 
 Ubuntu GUI is intentionally not an automated Docker installation case. Snap needs `snapd`, which a plain Docker image does not provide, so it cannot install VSCode or provide `code`. GUI template rendering still runs in smoke checks.
 
@@ -32,16 +33,11 @@ bash tests/smoke-unix.sh
 git diff --check
 ```
 
-macOS and WSL2 installation tests run on `master`. Windows installation is opt-in because it uses a Windows hosted runner and may install a substantial tool set.
-
-## Test Windows locally with Windows Sandbox
-
-See document on [Windows Sandbox testing](windows-sandbox-testing.md)
-
+Ubuntu, Rocky, macOS, and WSL2 installation tests run on pushes to `master` and manual dispatch. Windows installation is opt-in because it uses a Windows hosted runner and may install a substantial tool set.
 
 ## Run Windows installation through GitHub Actions
 
-The workflow creates a temporary standard user and one limited scheduled task to obtain that user's real profile. It runs all three Windows modes, has a 45-minute limit per mode, and removes the task and user afterward.
+The workflow creates a temporary standard user and one limited scheduled task to obtain that user's real profile. It runs all three Windows modes, has a 45-minute limit per mode, and removes the task and user afterward. It applies a copy of the Actions checkout twice and runs the verifier. The verifier loads the PowerShell profile explicitly in a noninteractive shell. This job does not test the README download bootstrap, normal interactive profile startup, or visual desktop behavior.
 
 In GitHub, open **Actions** → **Test Dotfiles Installation** → **Run workflow**, then select the branch. With the GitHub CLI from the checkout:
 
@@ -50,6 +46,16 @@ branch="$(git branch --show-current)"
 gh workflow run test-dotfiles.yml --ref "$branch"
 gh run watch
 ```
+
+## Future Windows VM acceptance
+
+This checklist is for a future Windows test bench. It has not been run as VM acceptance.
+
+1. Start a clean Windows 11 VM or snapshot and sign in as a standard user. Leave the home directory free of a prior dotfiles installation.
+2. From a non-administrator PowerShell window, run the [Windows README bootstrap](../README.md#window-windows) against a published branch. Add `--branch '<published-branch>'` before `--apply` in the command. Use a test email and test lite, full CLI, and full GUI in clean snapshots.
+3. Record the Windows version, mode, downloaded commit SHA, terminal output, and any installer logs. Stop and save logs on failure.
+4. In PowerShell 7, enter `~/dotfiles` and run `./tests/verify-windows.ps1 -Mode lite`, substituting the tested mode. Run `chezmoi -S ~/dotfiles state delete-bucket --bucket=scriptState` and `chezmoi -S ~/dotfiles apply`, then repeat the verifier and run `chezmoi -S ~/dotfiles verify --exclude=scripts`.
+5. Open PowerShell 7 normally in Windows Terminal. Check profile startup, fzf history, and zoxide. In full GUI mode, launch VSCode and Sublime Merge and inspect font rendering.
 
 ## Manual Ubuntu desktop GUI acceptance
 
