@@ -61,19 +61,12 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfile
 which will download the Chezmoi binary to `$HOME/.local/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
 ### :green_apple:	MacOS
-Setup discovers Homebrew on Intel and Apple Silicon. It installs missing packages without a blanket upgrade. fzf setup is noninteractive and leaves shell startup files under Chezmoi control.
-
-**Developer tools:** Full Xcode is not required. `xcode-select` is included with macOS. Its installation command launches the installer for the separate Command Line Tools package. Homebrew requires developer tools on Intel Macs and for source builds on all Macs. Apple Silicon can install prebuilt bottles and casks without them. See [Homebrew requirements](https://docs.brew.sh/Installation).
-
-For a reliable full setup, install Command Line Tools before initializing the dotfiles:
+Xcode Command Line Tools are a prerequisite. Install them first:
 ```bash
 xcode-select --install
 ```
-Wait for installation to finish, then check `git --version`. A working Git is needed to fetch the repository before its setup scripts run. If Git already works and your developer tools are installed, skip this step.
 
-Full setup runs Homebrew's installer when Homebrew is missing, which can install Command Line Tools. An existing Homebrew installation skips that bootstrap. Lite does not install Homebrew or developer tools, and optional package failures are tolerated. Lite still needs working Git to initialize from GitHub.
-
-On MacOS, install Chezmoi via
+Once installation finishes, install Chezmoi and apply the dotfiles:
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 ```
