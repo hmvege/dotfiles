@@ -91,4 +91,19 @@ printf '%s\n' 'In Sublime, open the Command Palette and select "Package Control:
 {{ if and .gui (not .lite) (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") -}}
 printf '%s\n' 'In GNOME Terminal, select the Afterglow profile to apply the Gogh theme.'
 {{ end -}}
+{{ if and (not .lite) (eq .chezmoi.os "darwin") -}}
+printf '\nTerminal font setup:\n'
+if command -v brew >/dev/null 2>&1 && brew list --cask font-meslo-lg-nerd-font >/dev/null 2>&1; then
+    printf '%s\n' 'Meslo Nerd Font is installed. Select it in each terminal profile you use.'
+else
+    printf '%s\n' 'Warning: Meslo Nerd Font is missing. Terminal icons may appear as question marks.' >&2
+    printf '%s\n' 'Install or retry with: brew install --cask font-meslo-lg-nerd-font'
+fi
+printf '%s\n' 'Apple Terminal: Settings > Profiles > your profile > Text > Font > Change.'
+printf '%s\n' 'Select MesloLGM Nerd Font Mono, then make that profile the default for new windows.'
+printf '%s\n' 'iTerm2: Settings > Profiles > your profile > Text > Font > MesloLGM Nerd Font Mono.'
+printf '%s\n' 'If iTerm2 uses a separate non-ASCII font, select the Nerd Font there too.'
+printf '%s\n' 'VS Code terminal: set terminal.integrated.fontFamily to MesloLGM Nerd Font Mono.'
+printf '%s\n' 'Open a new terminal window using the updated profile. Installing a font does not select it.'
+{{ end -}}
 {{ end -}}

@@ -1,5 +1,23 @@
-{{ if and .gui (not .lite) -}}
-{{ if (eq .chezmoi.os "linux") -}}
+{{ if not .lite -}}
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+
+set -euo pipefail
+
+{{ includeTemplate "homebrew-env.sh" . }}
+font_cask="font-meslo-lg-nerd-font"
+if ! command -v brew >/dev/null 2>&1; then
+    echo "Warning: Homebrew is unavailable. Nerd Font installation skipped." >&2
+elif brew list --cask "$font_cask" >/dev/null 2>&1; then
+    echo "Meslo Nerd Font is already installed."
+elif brew install --cask "$font_cask"; then
+    echo "Meslo Nerd Font installed."
+else
+    echo "Warning: Meslo Nerd Font installation failed. Terminal icons may appear as question marks." >&2
+    echo "Retry with: brew install --cask $font_cask" >&2
+fi
+
+{{ else if and .gui (eq .chezmoi.os "linux") -}}
 {{ if (eq .chezmoi.osRelease.id "ubuntu") -}}
 #!/bin/bash
 
