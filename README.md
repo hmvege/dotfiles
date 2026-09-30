@@ -63,8 +63,6 @@ which will download the Chezmoi binary to `$HOME/.local/bin`, and use `~/dotfile
 ### :green_apple:	MacOS
 Setup discovers Homebrew on Intel and Apple Silicon. It installs missing packages without a blanket upgrade. fzf setup is noninteractive and leaves shell startup files under Chezmoi control.
 
-Full setup installs missing Homebrew using its [unattended mode](https://docs.brew.sh/Installation#unattended-installation), without confirmation or password prompts. A fresh installation still needs sufficient permissions. Run `sudo -v` before setup to authenticate if needed. If permissions or Command Line Tools installation prevent unattended setup, install those prerequisites and reapply. Lite requires existing Homebrew and does not bootstrap it.
-
 On MacOS, you should be able to install Chezmoi via
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
