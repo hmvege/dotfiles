@@ -49,7 +49,9 @@ packages=(
 ## Brew (the installer also handles missing Command Line Tools)
 {{ includeTemplate "homebrew-env.sh" . }}
 if ! command -v brew >/dev/null 2>&1; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Skip confirmation and password prompts. Non-TTY stdin also disables the
+    # installer's interactive Command Line Tools fallback.
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </dev/null
     {{ includeTemplate "homebrew-env.sh" . }}
 fi
 command -v brew >/dev/null 2>&1 || { echo "Homebrew is unavailable" >&2; exit 1; }
