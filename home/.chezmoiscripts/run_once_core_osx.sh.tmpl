@@ -49,8 +49,7 @@ packages=(
 ## Brew (the installer also handles missing Command Line Tools)
 {{ includeTemplate "homebrew-env.sh" . }}
 if ! command -v brew >/dev/null 2>&1; then
-    # Skip confirmation and password prompts. Non-TTY stdin also disables the
-    # installer's interactive Command Line Tools fallback.
+    # Install unattended without an interactive fallback. Let failures stop setup.
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </dev/null
     {{ includeTemplate "homebrew-env.sh" . }}
 fi
