@@ -10,11 +10,9 @@
             "ignore": ["E203"]
         }
     },
-    "mypy-type-checker.path": ["{{ .chezmoi.homeDir }}/.local/bin/mypy"],
-    "python.analysis.diagnosticSeverityOverrides": {
-        "reportMissingImports": "none",
-        "reportMissingModuleSource": "none"
-    },
+    "python.analysis.typeCheckingMode": "standard",
+    "python.analysis.autoImportCompletions": true,
+    "mypy-type-checker.importStrategy": "fromEnvironment",
     "editor.formatOnSave": true,
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
