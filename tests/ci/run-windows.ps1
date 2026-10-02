@@ -1,55 +1,69 @@
 <#
 .SYNOPSIS
-Launch the existing Windows installation check as a temporary standard user.
-The workflow removes the scheduled task and account in its always-run cleanup step.
+Apply and verify Windows dotfiles directly on the ephemeral GitHub Actions runner.
+The runner is disposable, so no temporary user or Task Scheduler launcher is needed.
 #>
 param(
     [string]$Mode,
     [string]$Lite,
     [string]$Gui,
     [string]$Source,
-    [string]$LogDirectory,
-    [string]$TaskName
+    [string]$Log
 )
 
 $ErrorActionPreference = 'Stop'
-$user = 'dotfiles-ci'
-$passwordText = 'Df!' + [guid]::NewGuid().ToString('N')
-$password = ConvertTo-SecureString $passwordText -AsPlainText -Force
-New-LocalUser -Name $user -Password $password -PasswordNeverExpires | Out-Null
-
-$logDir = $LogDirectory
-New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-icacls $Source /grant "${env:COMPUTERNAME}\${user}:(OI)(CI)RX" /T | Out-Null
-icacls $logDir /grant "${env:COMPUTERNAME}\${user}:(OI)(CI)M" /T | Out-Null
-
-$caseScript = Join-Path $logDir 'run-case.ps1'
-# Copy the checked-in child script to the same accessible location as before.
-Copy-Item (Join-Path $PSScriptRoot 'run-install-windows.ps1') $caseScript
-
-$log = Join-Path $logDir "windows-$Mode.log"
-$arguments = @(
-    '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
-    '-File', "`"$caseScript`"", '-Mode', $Mode, '-Lite', $Lite,
-    '-Gui', $Gui, '-Source', "`"$Source`"", '-Log', "`"$log`""
-) -join ' '
-# Task Scheduler supplies a real standard-user logon and user profile.
-# RunLevel Limited preserves the production non-admin safeguard.
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $arguments
-Register-ScheduledTask -TaskName $taskName -Action $action `
-    -User "$env:COMPUTERNAME\$user" -Password $passwordText -RunLevel Limited -Force | Out-Null
-Start-ScheduledTask -TaskName $taskName
-$deadline = (Get-Date).AddMinutes(45)
-do {
-    Start-Sleep -Seconds 5
-    $task = Get-ScheduledTask -TaskName $taskName
-    if ((Get-Date) -gt $deadline) {
-        Stop-ScheduledTask -TaskName $taskName
-        throw 'Standard-user installation exceeded 45 minutes'
+Start-Transcript -Path $Log -Force
+try {
+    if ($env:GITHUB_ACTIONS -ne 'true') {
+        throw 'run-windows.ps1 is intended for GitHub Actions only.'
     }
-} while ($task.State -eq 'Running')
-$result = (Get-ScheduledTaskInfo -TaskName $taskName).LastTaskResult
-if ($result -ne 0) {
-    if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log }
-    throw "Standard-user task failed with exit code $result"
+
+    # GitHub's Windows runner is elevated. Normal installs still reject elevated
+    # shells; the bootstrap accepts this override only inside GitHub Actions.
+    $env:DOTFILES_CI_ALLOW_ADMIN = '1'
+
+    # Use a fresh Scoop root so preinstalled runner software cannot satisfy the
+    # package checks accidentally. Scoop's CI bootstrap needs RunAsAdmin because
+    # the hosted runner itself is elevated.
+    $env:SCOOP = Join-Path $env:RUNNER_TEMP 'dotfiles-scoop'
+    $scoopShim = Join-Path $env:SCOOP 'shims\scoop.ps1'
+    if (-not (Test-Path -LiteralPath $scoopShim -PathType Leaf)) {
+        $scoopInstaller = Join-Path $env:RUNNER_TEMP 'install-scoop.ps1'
+        Invoke-WebRequest 'https://get.scoop.sh' -OutFile $scoopInstaller
+        & $scoopInstaller -RunAsAdmin
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $scoopShim -PathType Leaf)) {
+            throw 'Scoop CI bootstrap failed.'
+        }
+    }
+    $env:PATH = (Join-Path $env:SCOOP 'shims') + ';' + $env:PATH
+
+    $bin = Join-Path $env:RUNNER_TEMP 'chezmoi-bin'
+    New-Item -ItemType Directory -Force -Path $bin | Out-Null
+    iex "& { $(irm https://get.chezmoi.io/ps1) } -b '$bin'"
+    $chezmoi = Join-Path $bin 'chezmoi.exe'
+
+    & $chezmoi init -S $Source `
+        --promptString 'Enter GitHub mail for this machine=testmail@example.com' `
+        --promptBool "Do you want a minimal (lite) setup (y/n)=$Lite" `
+        --promptBool "Install GUI tools (y/n)=$Gui" --apply
+    if ($LASTEXITCODE -ne 0) { throw 'First Chezmoi apply failed' }
+
+    & pwsh -NoLogo -NoProfile -File (Join-Path $Source 'tests\verify-windows.ps1') -Mode $Mode
+    if ($LASTEXITCODE -ne 0) { throw 'First verification failed' }
+
+    # Rerun run_once scripts without resetting configuration or installed files.
+    & $chezmoi -S $Source state delete-bucket --bucket=scriptState
+    if ($LASTEXITCODE -ne 0) { throw 'Run-once state reset failed' }
+    & $chezmoi -S $Source apply
+    if ($LASTEXITCODE -ne 0) { throw 'Second Chezmoi apply failed' }
+
+    & pwsh -NoLogo -NoProfile -File (Join-Path $Source 'tests\verify-windows.ps1') -Mode $Mode
+    if ($LASTEXITCODE -ne 0) { throw 'Second verification failed' }
+
+    # run_after scripts remain pending, so verify only deployed files.
+    & $chezmoi -S $Source verify --exclude=scripts
+    if ($LASTEXITCODE -ne 0) { throw 'Chezmoi verify failed' }
+}
+finally {
+    Stop-Transcript -ErrorAction SilentlyContinue
 }
