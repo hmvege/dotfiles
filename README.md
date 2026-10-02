@@ -61,9 +61,12 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfile
 which will download the Chezmoi binary to `$HOME/.local/bin`, and use `~/dotfiles` as source for Chezmoi by downloading this repository to this location.
 
 ### :green_apple:	MacOS
-Setup discovers Homebrew on Intel and Apple Silicon. It installs missing packages without a blanket upgrade. fzf setup is noninteractive and leaves shell startup files under Chezmoi control.
+Xcode Command Line Tools are a prerequisite. Install them first:
+```bash
+xcode-select --install
+```
 
-On MacOS, you should be able to install Chezmoi via
+Once installation finishes, install Chezmoi and apply the dotfiles:
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin/" init -S ~/dotfiles --apply hmvege
 ```
