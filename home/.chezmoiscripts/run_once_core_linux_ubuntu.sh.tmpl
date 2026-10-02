@@ -117,6 +117,7 @@ if ! command -v codex >/dev/null 2>&1; then
         sh "$installer" --release latest
 fi
 codex --version
+{{ includeTemplate "install-claude-code.sh" . }}
 
 ## Install fzf, reusing an existing checkout after an interrupted installation.
 if ! command -v fzf >/dev/null 2>&1; then

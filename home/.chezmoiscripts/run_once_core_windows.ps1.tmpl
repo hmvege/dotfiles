@@ -111,6 +111,11 @@ if (-not (Get-Command codex -CommandType Application,ExternalScript -ErrorAction
 }
 Invoke-SetupCommand codex @('--version')
 
+if (-not (Get-Command claude -CommandType Application,ExternalScript -ErrorAction SilentlyContinue)) {
+    Ensure-ScoopPackage 'claude-code'
+}
+Invoke-SetupCommand claude @('--version')
+
 # Migrate the previous Scoop-owned module to the PSGallery post-install step.
 if (Test-Path -LiteralPath (Join-Path $scoopRoot 'apps\psfzf\current\install.json')) {
     Invoke-SetupCommand scoop @('uninstall', 'psfzf')

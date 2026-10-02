@@ -98,6 +98,7 @@ if ! command -v codex >/dev/null 2>&1; then
         sh "$installer" --release latest
 fi
 codex --version
+{{ includeTemplate "install-claude-code.sh" . }}
 
 ## fzf installation completion
 "$(brew --prefix fzf)/install" --key-bindings --completion --no-update-rc --no-fish
