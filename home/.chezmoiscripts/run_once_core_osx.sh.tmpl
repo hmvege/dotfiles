@@ -98,7 +98,14 @@ if ! command -v codex >/dev/null 2>&1; then
         sh "$installer" --release latest
 fi
 codex --version
-{{ includeTemplate "install-claude-code.sh" . }}
+
+# Homebrew manages Claude Code updates alongside the other macOS applications.
+if ! command -v claude >/dev/null 2>&1; then
+    if ! brew list --cask claude-code >/dev/null 2>&1; then
+        brew install --cask claude-code
+    fi
+fi
+claude --version
 
 ## fzf installation completion
 "$(brew --prefix fzf)/install" --key-bindings --completion --no-update-rc --no-fish
