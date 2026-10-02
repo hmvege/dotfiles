@@ -118,6 +118,12 @@ if ! command -v codex >/dev/null 2>&1; then
 fi
 codex --version
 
+# Install the native Claude Code CLI, preserving an existing installation.
+if ! command -v claude >/dev/null 2>&1; then
+    curl -fsSL https://claude.ai/install.sh | bash
+fi
+claude --version
+
 ## Install fzf, reusing an existing checkout after an interrupted installation.
 if ! command -v fzf >/dev/null 2>&1; then
     if [ ! -e "$HOME/.fzf" ] && [ ! -L "$HOME/.fzf" ]; then
