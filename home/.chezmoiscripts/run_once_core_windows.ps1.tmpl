@@ -52,17 +52,27 @@ catch {
 }
 {{ end -}}
 
+function Test-ScoopPackageInstalled {
+    param([string]$Name)
+
+    # Scoop now writes scoop-install.json; older installs use install.json.
+    # Scope detection to this user's Scoop root, including custom SCOOP paths.
+    $packageDir = Join-Path $scoopRoot "apps\$Name\current"
+    return (
+        (Test-Path -LiteralPath (Join-Path $packageDir 'scoop-install.json') -PathType Leaf) -or
+        (Test-Path -LiteralPath (Join-Path $packageDir 'install.json') -PathType Leaf)
+    )
+}
+
 function Ensure-ScoopPackage {
     param([string]$Name)
 
-    # Scope detection to this user's Scoop root, including custom SCOOP paths.
-    $metadata = Join-Path $scoopRoot "apps\$Name\current\install.json"
-    if (Test-Path -LiteralPath $metadata -PathType Leaf) {
+    if (Test-ScoopPackageInstalled $Name) {
         Write-Output "$Name is already installed."
     }
     else {
         Invoke-SetupCommand scoop @('install', $Name)
-        if (-not (Test-Path -LiteralPath $metadata -PathType Leaf)) {
+        if (-not (Test-ScoopPackageInstalled $Name)) {
             throw "Scoop did not finish installing $Name."
         }
     }
@@ -112,7 +122,7 @@ if (-not (Get-Command codex -CommandType Application,ExternalScript -ErrorAction
 Invoke-SetupCommand codex @('--version')
 
 # Migrate the previous Scoop-owned module to the PSGallery post-install step.
-if (Test-Path -LiteralPath (Join-Path $scoopRoot 'apps\psfzf\current\install.json')) {
+if (Test-ScoopPackageInstalled 'psfzf') {
     Invoke-SetupCommand scoop @('uninstall', 'psfzf')
 }
 

@@ -28,6 +28,16 @@ function Assert-Module {
     }
 }
 
+function Test-ScoopPackageInstalled {
+    param([string]$Name)
+
+    $packageDir = Join-Path $scoopRoot "apps\$Name\current"
+    return (
+        (Test-Path -LiteralPath (Join-Path $packageDir 'scoop-install.json') -PathType Leaf) -or
+        (Test-Path -LiteralPath (Join-Path $packageDir 'install.json') -PathType Leaf)
+    )
+}
+
 if (-not $IsWindows) { throw 'verify-windows.ps1 must run on Windows' }
 # Installers run in child processes. Refresh their persisted user PATH before
 # checking commands, just as a newly opened terminal would.
@@ -46,7 +56,7 @@ if ($Mode -ne 'full-gui') {
     $excluded += @('vscode', 'sublime-merge', 'windirstat', 'Meslo-NF', 'JetBrainsMono-NF')
 }
 foreach ($package in $excluded) {
-    if (Test-Path (Join-Path $scoopRoot "apps\$package\current\install.json")) {
+    if (Test-ScoopPackageInstalled $package) {
         throw "Excluded package was installed: $package"
     }
 }
@@ -129,11 +139,11 @@ if ($Mode -eq 'full-gui') {
 
     $scoopRoot = if ($env:SCOOP) { $env:SCOOP } else { Join-Path $HOME 'scoop' }
     foreach ($font in @('Meslo-NF', 'JetBrainsMono-NF')) {
-        $metadata = Join-Path $scoopRoot "apps\$font\current\install.json"
-        if (-not (Test-Path -LiteralPath $metadata -PathType Leaf)) {
+        $packageDir = Join-Path $scoopRoot "apps\$font\current"
+        if (-not (Test-ScoopPackageInstalled $font)) {
             throw "Missing Scoop font installation: $font"
         }
-        $fontFiles = Get-ChildItem (Split-Path $metadata) -Recurse -File -Include '*.ttf', '*.otf'
+        $fontFiles = Get-ChildItem $packageDir -Recurse -File -Include '*.ttf', '*.otf'
         if (-not $fontFiles) { throw "Font package contains no font files: $font" }
     }
 }
