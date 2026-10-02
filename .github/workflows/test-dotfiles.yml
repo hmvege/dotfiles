@@ -293,31 +293,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Apply as a temporary standard user
+      - name: Apply twice and verify Windows ${{ matrix.mode }}
         shell: pwsh
         env:
           MODE: ${{ matrix.mode }}
           LITE: ${{ matrix.mode == 'lite' }}
           GUI: ${{ matrix.mode == 'full-gui' }}
+          DOTFILES_INSTALL_LOG: ${{ runner.temp }}/windows-${{ matrix.mode }}.log
         run: |
           ./tests/ci/run-windows.ps1 -Mode $env:MODE -Lite $env:LITE -Gui $env:GUI `
-            -Source $env:GITHUB_WORKSPACE -LogDirectory 'C:\dotfiles-ci-logs' `
-            -TaskName "dotfiles-ci-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
-
-      - name: Clean up temporary Windows user
-        if: always()
-        shell: pwsh
-        run: |
-          Get-ScheduledTask -TaskName "dotfiles-ci-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT" `
-            -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
-          Remove-LocalUser -Name 'dotfiles-ci' -ErrorAction SilentlyContinue
+            -Source $env:GITHUB_WORKSPACE -Log $env:DOTFILES_INSTALL_LOG
 
       - name: Upload failed installation log
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: install-log-windows-${{ matrix.mode }}
-          path: C:/dotfiles-ci-logs/windows-${{ matrix.mode }}.log
+          path: ${{ runner.temp }}/windows-${{ matrix.mode }}.log
           if-no-files-found: warn
 
   wsl:
