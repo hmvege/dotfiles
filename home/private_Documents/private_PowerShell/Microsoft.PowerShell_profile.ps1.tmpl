@@ -78,9 +78,13 @@ if (Get-Module -ListAvailable PSReadLine) {
 
     Set-PSReadLineOption `
         -EditMode Vi `
-        -PredictionSource History `
         -MaximumHistoryCount 20000 `
         -HistorySearchCursorMovesToEnd
+
+    # Prediction requires VT support and a console whose output is not redirected.
+    if ($Host.UI.SupportsVirtualTerminal -and -not [Console]::IsOutputRedirected) {
+        Set-PSReadLineOption -PredictionSource History
+    }
 
     Write-Timing "PSReadLine options"
 
