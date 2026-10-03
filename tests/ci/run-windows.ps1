@@ -12,6 +12,26 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Update-InstallEnvironment {
+    # Child installers cannot update this process. Reload Scoop's persisted uv
+    # locations so verification and the next apply use the installed tools.
+    foreach ($name in @('UV_CACHE_DIR', 'UV_PYTHON_BIN_DIR', 'UV_PYTHON_INSTALL_DIR', 'UV_TOOL_BIN_DIR', 'UV_TOOL_DIR')) {
+        $value = [Environment]::GetEnvironmentVariable($name, 'User')
+        if ($null -ne $value) {
+            [Environment]::SetEnvironmentVariable($name, $value, 'Process')
+        }
+    }
+
+    # Retain process-only paths such as the Chezmoi bootstrap directory.
+    $paths = @(
+        [Environment]::GetEnvironmentVariable('Path', 'User')
+        [Environment]::GetEnvironmentVariable('Path', 'Machine')
+        $env:PATH
+    )
+    $env:PATH = (($paths -join ';') -split ';' | Where-Object { $_ } | Select-Object -Unique) -join ';'
+}
+
 Start-Transcript -Path $Log -Force
 try {
     if ($env:GITHUB_ACTIONS -ne 'true') {
@@ -48,6 +68,7 @@ try {
         --promptBool "Install GUI tools (y/n)=$Gui" --apply
     if ($LASTEXITCODE -ne 0) { throw 'First Chezmoi apply failed' }
 
+    Update-InstallEnvironment
     & pwsh -NoLogo -NoProfile -File (Join-Path $Source 'tests\verify-windows.ps1') -Mode $Mode
     if ($LASTEXITCODE -ne 0) { throw 'First verification failed' }
 
@@ -57,6 +78,7 @@ try {
     & $chezmoi -S $Source apply
     if ($LASTEXITCODE -ne 0) { throw 'Second Chezmoi apply failed' }
 
+    Update-InstallEnvironment
     & pwsh -NoLogo -NoProfile -File (Join-Path $Source 'tests\verify-windows.ps1') -Mode $Mode
     if ($LASTEXITCODE -ne 0) { throw 'Second verification failed' }
 

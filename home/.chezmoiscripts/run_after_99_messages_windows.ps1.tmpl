@@ -1,4 +1,13 @@
 {{ if (eq .chezmoi.os "windows") -}}
+# Earlier installer processes persisted new tool paths. Refresh them for this
+# summary while retaining paths that exist only in the current process.
+$paths = @(
+    [Environment]::GetEnvironmentVariable('Path', 'User')
+    [Environment]::GetEnvironmentVariable('Path', 'Machine')
+    $env:PATH
+)
+$env:PATH = (($paths -join ';') -split ';' | Where-Object { $_ } | Select-Object -Unique) -join ';'
+
 $scoopRoot = $env:SCOOP
 if (-not $scoopRoot) { $scoopRoot = Join-Path $env:USERPROFILE 'scoop' }
 $scoopShims = Join-Path $scoopRoot 'shims'
