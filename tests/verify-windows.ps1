@@ -49,7 +49,7 @@ Assert-Path (Join-Path $HOME '.gitconfig')
 Assert-Path $profilePath
 if ($Mode -eq 'lite') { Assert-Path (Join-Path $HOME '.vimrc') }
 $scoopRoot = if ($env:SCOOP) { $env:SCOOP } else { Join-Path $HOME 'scoop' }
-# These checks assume a fresh disposable test user, not a personal workstation.
+# These checks assume a fresh disposable Scoop root on the GitHub runner.
 $excluded = @()
 if ($Mode -eq 'lite') { $excluded += @('codex', 'lsd', 'oh-my-posh', 'cppcheck', 'coreutils') }
 if ($Mode -ne 'full-gui') {

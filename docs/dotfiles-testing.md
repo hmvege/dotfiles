@@ -14,8 +14,8 @@ Manual installation acceptance starts in a fresh VM or snapshot with no cloned r
 | Resilience                          | Push to `master` or manual dispatch       | Ubuntu 24.04 lite                               | Root without sudo, unprivileged without passwordless sudo, optional package failure, and uv ownership conflict. |
 | Installation                        | Push to `master` or manual dispatch       | macOS lite, full CLI, and full GUI              | Apply, same-home repeat apply, and verification.                                                                 |
 | Installation                        | Push to `master` or manual dispatch       | WSL2 Ubuntu 24.04 lite and full CLI             | Apply, same-home repeat apply, and verification.                                                                 |
-| Installation                        | Push to `master` or manual dispatch       | Windows lite                                    | Temporary standard-user installation and verification from a copied checkout.                                   |
-| Installation                        | Manual workflow dispatch                  | Windows full CLI and full GUI                   | Temporary standard-user installation and verification from a copied checkout.                                   |
+| Installation                        | Push to `master` or manual dispatch       | Windows lite                                    | Direct apply on the elevated hosted runner with an isolated Scoop root, repeat apply, and verification.          |
+| Installation                        | Manual workflow dispatch                  | Windows full CLI and full GUI                   | Direct apply on the elevated hosted runner with an isolated Scoop root, repeat apply, and verification.          |
 | Desktop acceptance                  | Manual checklist                          | Ubuntu Desktop 22.04, 24.04, and 26.04 full GUI | Visual terminal, editor, Gogh, fonts, and repeat-apply behavior.                                                |
 | Installation and desktop acceptance | Not currently run, no Windows test bench | Windows VM lite, full CLI, and full GUI         | Planned fresh bootstrap, repeat apply, normal profile startup, and GUI inspection.                              |
 
@@ -38,7 +38,7 @@ Ubuntu, Rocky, macOS, WSL2, and Windows lite installation tests run on pushes to
 
 ## Run Windows installation through GitHub Actions
 
-The workflow creates a temporary standard user and one limited scheduled task to obtain that user's real profile. Pushes to `master` run lite. Manual dispatch runs all three Windows modes. Each mode has a 45-minute limit, and the workflow removes the task and user afterward. It applies a copy of the Actions checkout twice and runs the verifier. The verifier loads the PowerShell profile explicitly in a noninteractive shell. This job does not test the README download bootstrap, normal interactive profile startup, or visual desktop behavior.
+The workflow runs directly on the disposable GitHub-hosted Windows runner. Pushes to `master` run lite. Manual dispatch runs all three Windows modes. Each mode has a 45-minute limit. CI uses a fresh Scoop root under the runner temporary directory so preinstalled Scoop packages cannot satisfy package checks. The hosted runner is elevated, so CI uses an explicit GitHub-Actions-only override for the normal non-administrator guard. The verifier loads the PowerShell profile explicitly in a noninteractive shell. This job does not test the normal non-administrator installation path, the README download bootstrap, normal interactive profile startup, or visual desktop behavior.
 
 In GitHub, open **Actions** → **Test Dotfiles Installation** → **Run workflow**, then select the branch. With the GitHub CLI from the checkout:
 

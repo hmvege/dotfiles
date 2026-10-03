@@ -5,7 +5,10 @@ $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 try {
     $principal = [Security.Principal.WindowsPrincipal]::new($identity)
     if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        throw 'Run chezmoi from a non-administrator terminal. Only the PowerShell MSI helper will request elevation.'
+        $ciAdminAllowed = $env:GITHUB_ACTIONS -eq 'true' -and $env:DOTFILES_CI_ALLOW_ADMIN -eq '1'
+        if (-not $ciAdminAllowed) {
+            throw 'Run chezmoi from a non-administrator terminal. Only the PowerShell MSI helper will request elevation.'
+        }
     }
 }
 finally {
