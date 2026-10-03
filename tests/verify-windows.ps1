@@ -131,7 +131,11 @@ if ($LASTEXITCODE -ne 0) { throw 'PowerShell profile behavior check failed' }
 if ($Mode -eq 'full-gui') {
     Assert-Command 'code' | Out-Null
     Assert-Command 'smerge' | Out-Null
-    Assert-Command 'windirstat' | Out-Null
+    # Scoop exposes WinDirStat through a Start-menu shortcut, not a PATH command.
+    if (-not (Test-ScoopPackageInstalled 'windirstat')) {
+        throw 'Missing Scoop installation: windirstat'
+    }
+    Assert-Path (Join-Path $scoopRoot 'apps\windirstat\current\WinDirStat.exe')
     $extensions = @(code --list-extensions)
     foreach ($extension in @('charliermarsh.ruff', 'ms-python.mypy-type-checker')) {
         if ($extension -notin $extensions) { throw "Missing VSCode extension: $extension" }
