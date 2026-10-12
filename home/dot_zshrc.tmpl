@@ -95,10 +95,12 @@ plugins=(
     git
     history
     jsontools
+{{ if or (eq .chezmoi.os "darwin") (and (eq .chezmoi.os "linux") (ne .chezmoi.osRelease.id "rocky")) }}
+    tmux
+{{ end }}
 {{ if eq .chezmoi.os "linux" }}
 {{ if (ne .chezmoi.osRelease.id "rocky") -}}
     sublime
-    tmux
     vscode
 {{ end -}}
 {{ end -}}

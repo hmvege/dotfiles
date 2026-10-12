@@ -64,6 +64,15 @@ for pkg in "${packages[@]}"; do
 done
 echo "Packages installed"
 
+## tmux plugin manager
+if [ ! -d "${HOME}/.tmux/plugins/tpm" ]; then
+    git clone https://github.com/tmux-plugins/tpm.git \
+        "${HOME}/.tmux/plugins/tpm"
+    echo "tmux plugin manager installed."
+else
+    echo "tmux plugin manager already installed."
+fi
+
 ## OMZ 
 if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
