@@ -289,9 +289,5 @@ dotfiles
 - Script for installing fonts: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0
 
 
-## TODOs
-- Run verifications tests for containers.
-- Run full VM tests on Windows.
-
 ## :balance_scale: License
 MIT License.
