@@ -34,7 +34,7 @@ Tests should be added cautiously. That is, if the feature is not implicitly test
 
 ## Commit & Pull Request Guidelines
 
-Use the history's bracketed prefixes, such as `[ADD]`, `[REFACTOR]`, and `[DOCS]`, followed by a concise description. Keep changes focused. PR descriptions should identify affected platforms and modes, summarize behavior changes, report validation and remaining gaps, and link relevant issues. Include screenshots when changing visible desktop behavior.
+Use the Conventional Commit format in `docs/commit-style.md` for new commits. Keep changes focused. PR descriptions should identify affected platforms and modes, summarize behavior changes, report validation and remaining gaps, and link relevant issues. Include screenshots when changing visible desktop behavior.
 
 ## General rules
 - Use built-in editor for updating scripts.
