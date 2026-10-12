@@ -72,6 +72,8 @@ if [ ! -d "${HOME}/.tmux/plugins/tpm" ]; then
 else
     echo "tmux plugin manager already installed."
 fi
+# Install the plugins declared in ~/.tmux.conf without an interactive tmux session.
+"${HOME}/.tmux/plugins/tpm/bin/install_plugins"
 
 ## OMZ 
 if [ ! -d "${HOME}/.oh-my-zsh" ]; then
